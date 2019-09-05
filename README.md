@@ -1,4 +1,7 @@
-# wallet
+# GODcoin Wallet
+
+The GODcoin desktop wallet built with Electron and Vue. This project is under
+heavy active development.
 
 ## Project setup
 ```
@@ -7,17 +10,12 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+yarn run electron:serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
+yarn run electron:build
 ```
 
 ### Lints and fixes files
@@ -25,10 +23,7 @@ yarn run test
 yarn run lint
 ```
 
-### Run your unit tests
+### Run unit tests
 ```
 yarn run test:unit
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
