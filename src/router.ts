@@ -1,23 +1,36 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import Welcome from './views/Welcome.vue';
 
 Vue.use(Router);
 
-export default new Router({
+const DEFAULT_TITLE = 'GODcoin Wallet';
+
+const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      name: 'welcome',
+      component: Welcome,
     },
     {
-      path: '/about',
-      name: 'about',
+      path: '/create-wallet',
+      name: 'create-wallet',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      component: () => import(/* webpackChunkName: "create-wallet" */ './views/CreateWallet.vue'),
+    },
+    {
+      path: '/restore-wallet',
+      name: 'restore-wallet',
+      component: () => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet.vue'),
     },
   ],
 });
+
+router.afterEach((to, _from) => {
+  document.title = to.meta.title || DEFAULT_TITLE;
+});
+
+export default router;

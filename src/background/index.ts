@@ -19,6 +19,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
+    resizable: false,
   });
 
   if (isDevelopment || process.env.IS_TEST) {
