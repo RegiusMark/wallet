@@ -4,8 +4,8 @@
       <div class="home--login-screen-logo">
         <img src="../assets/logo.png" width="100" />
       </div>
+      <div class="home--welcome-header">{{ isNew ? 'Welcome to GODcoin' : 'Welcome back' }}</div>
       <template v-if="isNew">
-        <div class="home--welcome-header">Welcome to GODcoin</div>
         <div class="home--form">
           <PasswordInput placeholder="Choose your password" />
           <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
@@ -22,7 +22,6 @@
         </div>
       </template>
       <template v-else>
-        <div class="home--welcome-header">Welcome back</div>
       </template>
     </div>
   </div>
