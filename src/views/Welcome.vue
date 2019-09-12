@@ -1,39 +1,39 @@
 <template>
-  <div class="home">
-    <div class="home--content">
-      <div class="home--login-screen-logo">
-        <img src="../assets/logo.png" width="100" />
-      </div>
-      <div class="home--welcome-header">{{ isNew ? 'Welcome to GODcoin' : 'Welcome back' }}</div>
-      <template v-if="isNew">
-        <div class="home--form">
-          <PasswordInput placeholder="Choose your password" />
-          <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
-        </div>
-        <div class="home--bottom-buttons">
-          <router-link to="/restore-wallet" class="home--bottom-btn">
-            <i class="fas fa-history fa-lg"></i>
-            <div class="home--bottom-btn-txt">Restore</div>
-          </router-link>
-          <router-link to="/create-wallet" class="home--bottom-btn-right">
-            <i class="fas fa-arrow-circle-right fa-lg"></i>
-            <div class="home--bottom-btn-txt">Next</div>
-          </router-link>
-        </div>
-      </template>
-      <template v-else>
-      </template>
+  <StartArea>
+    <div class="home--login-screen-logo">
+      <img src="../assets/logo.png" width="100" />
     </div>
-  </div>
+    <div class="home--welcome-header">{{ isNew ? 'Welcome to GODcoin' : 'Welcome back' }}</div>
+    <template v-if="isNew">
+      <div class="home--form">
+        <PasswordInput placeholder="Choose your password" />
+        <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
+      </div>
+      <div class="home--bottom-buttons">
+        <router-link to="/restore-wallet" class="home--bottom-btn">
+          <i class="fas fa-history fa-lg"></i>
+          <div class="home--bottom-btn-txt">Restore</div>
+        </router-link>
+        <router-link to="/create-wallet" class="home--bottom-btn-right">
+          <i class="fas fa-arrow-circle-right fa-lg"></i>
+          <div class="home--bottom-btn-txt">Next</div>
+        </router-link>
+      </div>
+    </template>
+    <template v-else>
+    </template>
+  </StartArea>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import PasswordInput from '@/components/PasswordInput.vue';
+import StartArea from '@/components/StartArea.vue';
 
 @Component({
   components: {
     PasswordInput,
+    StartArea,
   },
 })
 export default class Welcome extends Vue {
@@ -43,27 +43,6 @@ export default class Welcome extends Vue {
 
 <style lang="scss">
 $btns-color: hsla(0, 0, 100%, 0.5);
-
-.home::before {
-  background-image: url('../assets/login-bg.jpg');
-  background-size: cover;
-  content: '';
-  width: 100%;
-  height: 100%;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.home {
-  margin-left: 15%;
-  margin-right: 15%;
-}
-
-.home--content {
-  position: relative;
-}
 
 .home--login-screen-logo {
   text-align: center;
