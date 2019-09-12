@@ -7,8 +7,7 @@
         <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
       </div>
     </template>
-    <template v-else>
-    </template>
+    <template v-else> </template>
   </StartArea>
 </template>
 
