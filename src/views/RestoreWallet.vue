@@ -1,5 +1,6 @@
 <template>
   <StartArea>
+    <div></div>
   </StartArea>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <StartArea>
+  <StartArea :bottom-buttons="bottomBtns">
     <div class="home--login-screen-logo">
       <img src="../assets/logo.png" width="100" />
     </div>
@@ -8,16 +8,6 @@
       <div class="home--form">
         <PasswordInput placeholder="Choose your password" />
         <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
-      </div>
-      <div class="home--bottom-buttons">
-        <router-link to="/restore-wallet" class="home--bottom-btn">
-          <i class="fas fa-history fa-lg"></i>
-          <div class="home--bottom-btn-txt">Restore</div>
-        </router-link>
-        <router-link to="/create-wallet" class="home--bottom-btn-right">
-          <i class="fas fa-arrow-circle-right fa-lg"></i>
-          <div class="home--bottom-btn-txt">Next</div>
-        </router-link>
       </div>
     </template>
     <template v-else>
@@ -37,7 +27,20 @@ import StartArea from '@/components/StartArea.vue';
   },
 })
 export default class Welcome extends Vue {
-  isNew = true;
+  private bottomBtns = [
+    {
+      icon: 'fa-history',
+      link: '/restore-wallet',
+      text: 'Restore',
+    },
+    {
+      icon: 'fa-arrow-circle-right',
+      link: '/create-wallet',
+      text: 'Next',
+    },
+  ];
+
+  private isNew = true;
 }
 </script>
 

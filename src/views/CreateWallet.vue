@@ -1,5 +1,6 @@
 <template>
-  <StartArea>
+  <StartArea :bottom-buttons="bottomBtns">
+    <div></div>
   </StartArea>
 </template>
 
@@ -12,5 +13,18 @@ import StartArea from '@/components/StartArea.vue';
     StartArea,
   },
 })
-export default class CreateWallet extends Vue {}
+export default class CreateWallet extends Vue {
+  private bottomBtns = [
+    {
+      icon: 'fa-history',
+      link: '/restore-wallet',
+      text: 'Restore',
+    },
+    {
+      icon: 'fa-sign-in-alt',
+      link: '/create-wallet',
+      text: 'Create',
+    },
+  ];
+}
 </script>
