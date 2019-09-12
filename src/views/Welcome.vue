@@ -1,8 +1,5 @@
 <template>
   <StartArea :bottom-buttons="bottomBtns">
-    <div class="home--login-screen-logo">
-      <img src="../assets/logo.png" width="100" />
-    </div>
     <div class="home--welcome-header">{{ isNew ? 'Welcome to GODcoin' : 'Welcome back' }}</div>
     <template v-if="isNew">
       <div class="home--form">
@@ -46,11 +43,6 @@ export default class Welcome extends Vue {
 
 <style lang="scss">
 $btns-color: hsla(0, 0, 100%, 0.5);
-
-.home--login-screen-logo {
-  text-align: center;
-  padding-top: 1em;
-}
 
 .home--welcome-header {
   color: hsla(0, 0, 100%, 0.9);

@@ -1,5 +1,8 @@
 <template>
   <div class="start">
+    <div class="logo">
+      <img src="../assets/logo.png" width="100" />
+    </div>
     <slot />
     <div class="footer">
       <div class="bottom-btns">
@@ -42,6 +45,11 @@ export default class StartArea extends Vue {
 
 <style lang="scss" scoped>
 $margin: 13%;
+
+.logo {
+  text-align: center;
+  padding-top: 1em;
+}
 
 .start {
   margin-left: $margin;
