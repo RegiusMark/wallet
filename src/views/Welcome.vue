@@ -5,7 +5,7 @@
       <div class="form">
         <PasswordInput placeholder="Choose your password" v-model="passwords.initial" />
         <PasswordInput placeholder="Confirm password" v-model="passwords.confirm" />
-        <div style="text-align: center;">
+        <div style="text-align: center; user-select: none">
           <span>{{ helpMsg }}</span>
         </div>
       </div>
