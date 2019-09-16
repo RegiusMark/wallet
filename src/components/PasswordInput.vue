@@ -1,15 +1,21 @@
 <template>
   <div class="text-input">
     <Tooltip :msg="action">
-      <i class="far fa-sm" style="font-size: 1em" :class="eyeIcon" v-on:click="onEyeClick"></i>
+      <i class="far fa-sm" style="font-size: 1em" :class="eyeIcon" @click="onEyeClick"></i>
     </Tooltip>
-    <input :type="inputType" autofocus :placeholder="placeholder" />
+    <input
+      :type="inputType"
+      autofocus
+      :placeholder="placeholder"
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    />
     <hr />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Model, Vue } from 'vue-property-decorator';
 import Tooltip from './Tooltip.vue';
 
 @Component({
@@ -19,6 +25,7 @@ import Tooltip from './Tooltip.vue';
 })
 export default class PasswordInput extends Vue {
   @Prop() private placeholder!: string;
+  @Prop() private value!: string;
   private masked = true;
 
   private get action(): string {

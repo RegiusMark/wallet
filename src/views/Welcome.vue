@@ -3,8 +3,11 @@
     <div class="welcome-header">{{ isNew ? 'Welcome to GODcoin' : 'Welcome back' }}</div>
     <template v-if="isNew">
       <div class="form">
-        <PasswordInput placeholder="Choose your password" />
-        <PasswordInput style="padding-top: 40px;" placeholder="Confirm password" />
+        <PasswordInput placeholder="Choose your password" v-model="passwords.initial" />
+        <PasswordInput placeholder="Confirm password" v-model="passwords.confirm" />
+        <div style="text-align: center;">
+          <span>{{ helpMsg }}</span>
+        </div>
       </div>
     </template>
     <template v-else> </template>
@@ -12,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Watch, Vue } from 'vue-property-decorator';
 import PasswordInput from '@/components/PasswordInput.vue';
 import StartArea from '@/components/StartArea.vue';
 
@@ -36,13 +39,47 @@ export default class Welcome extends Vue {
     },
   ];
 
+  private helpMsgs = {
+    emptyForm: "Let's start creating your wallet by typing your password.",
+    passMismatch: "Those passwords don't match. Please try again.",
+    ready: 'Click the arrow or press "ENTER" to continue.',
+  };
+
+  private helpMsg = this.helpMsgs.emptyForm;
+
   private isNew = true;
+  private passMismatchTimeout: NodeJS.Timeout | null = null;
+  private passwords = {
+    initial: '',
+    confirm: '',
+  };
+
+  @Watch('passwords', { deep: true })
+  onPropertyChanged(value: { initial: string; confirm: string }) {
+    if (this.passMismatchTimeout) {
+      clearTimeout(this.passMismatchTimeout);
+      this.passMismatchTimeout = null;
+    }
+
+    const { initial, confirm } = value;
+
+    if (initial && confirm) {
+      // Both passwords supplied
+      if (initial === confirm) {
+        this.helpMsg = this.helpMsgs.ready;
+      } else {
+        this.passMismatchTimeout = setTimeout(() => {
+          this.helpMsg = this.helpMsgs.passMismatch;
+        }, 250);
+      }
+    } else {
+      this.helpMsg = this.helpMsgs.emptyForm;
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-$btns-color: hsla(0, 0, 100%, 0.5);
-
 .welcome-header {
   color: hsla(0, 0, 100%, 0.9);
   text-align: center;
@@ -53,6 +90,11 @@ $btns-color: hsla(0, 0, 100%, 0.5);
 }
 
 .form {
-  padding-top: 75px;
+  margin-top: 60px;
+  color: hsla(0, 0, 100%, 0.55);
+
+  & > * {
+    margin-bottom: 35px;
+  }
 }
 </style>
