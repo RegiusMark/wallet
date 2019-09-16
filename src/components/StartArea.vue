@@ -3,6 +3,7 @@
     <div class="logo">
       <img src="../assets/logo.png" width="100" />
     </div>
+    <div class="header">{{ headerMsg }}</div>
     <slot />
     <div class="footer">
       <div class="bottom-btns">
@@ -40,6 +41,8 @@ export default class StartArea extends Vue {
     },
   })
   private bottomButtons!: Button[];
+
+  @Prop({ required: true }) headerMsg!: string;
 }
 </script>
 
@@ -67,6 +70,15 @@ $margin: 13%;
     left: 0;
     z-index: -1;
   }
+}
+
+.header {
+  color: hsla(0, 0, 100%, 0.9);
+  text-align: center;
+  padding-top: 1.12em;
+  font-size: 1.25em;
+  font-weight: 900;
+  user-select: none;
 }
 
 .footer {

@@ -13,7 +13,7 @@ import StartArea from '@/components/StartArea.vue';
     StartArea,
   },
 })
-export default class CreateWallet extends Vue {
+export default class CreateWallet2 extends Vue {
   private bottomBtns = [
     {
       icon: 'fa-history',

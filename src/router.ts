@@ -14,12 +14,14 @@ const router = new Router({
       component: Welcome,
     },
     {
-      path: '/create-wallet',
-      name: 'create-wallet',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "create-wallet" */ './views/CreateWallet.vue'),
+      path: '/create-wallet-1',
+      name: 'create-wallet-1',
+      component: () => import(/* webpackChunkName: "create-wallet-1" */ './views/CreateWallet-1.vue'),
+    },
+    {
+      path: '/create-wallet-2',
+      name: 'create-wallet-2',
+      component: () => import(/* webpackChunkName: "create-wallet-2" */ './views/CreateWallet-2.vue'),
     },
     {
       path: '/restore-wallet',
