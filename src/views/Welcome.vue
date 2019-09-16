@@ -19,6 +19,7 @@ export default class Welcome extends Vue {
       icon: 'fa-history',
       link: '/restore-wallet',
       text: 'Restore',
+      disabled: false,
     },
   ];
 

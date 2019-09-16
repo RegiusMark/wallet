@@ -8,7 +8,13 @@
     <div class="footer">
       <div class="bottom-btns">
         <template v-for="btn in bottomButtons">
-          <router-link :key="btn.text" :to="btn.link" class="bottom-btn">
+          <router-link
+            :key="btn.text"
+            :to="btn.link"
+            :event="btn.disabled ? '' : 'disabled'"
+            :class="{ disabled: btn.disabled }"
+            class="bottom-btn"
+          >
             <i class="fas fa-lg" :class="btn.icon"></i>
             <div class="bottom-btn-txt">{{ btn.text }}</div>
           </router-link>
@@ -25,6 +31,7 @@ interface Button {
   icon: string;
   link: string;
   text: string;
+  disabled: boolean;
 }
 
 @Component
@@ -33,7 +40,7 @@ export default class StartArea extends Vue {
     default: () => [],
     validator: (btns: Button[]) => {
       for (const btn of btns) {
-        if (!(btn.icon && btn.link && btn.text)) {
+        if (!(btn.icon && btn.link && btn.text && typeof btn.disabled === 'boolean')) {
           return false;
         }
       }
@@ -42,7 +49,8 @@ export default class StartArea extends Vue {
   })
   private bottomButtons!: Button[];
 
-  @Prop({ required: true }) headerMsg!: string;
+  @Prop({ required: true })
+  private headerMsg!: string;
 }
 </script>
 
@@ -101,8 +109,8 @@ $margin: 13%;
 .bottom-btn {
   $btns-color: hsla(0, 0, 100%, 0.5);
 
-  color: $btns-color;
   background-color: adjust-color($btns-color, $alpha: -0.44);
+  color: $btns-color;
   border-radius: 4px;
   padding: 15px;
   width: 56px;
@@ -111,7 +119,6 @@ $margin: 13%;
   .bottom-btn-txt {
     font-size: 0.9em;
     padding-top: 8px;
-    color: $btns-color;
   }
 
   &:last-child {
@@ -121,6 +128,21 @@ $margin: 13%;
     .bottom-btn-txt {
       font-weight: bold;
     }
+  }
+
+  &:not(.disabled):hover {
+    background-color: adjust-color($btns-color, $alpha: -0.4);
+    color: adjust-color($btns-color, $alpha: 0.24);
+
+    .bottom-btn-txt {
+      color: adjust-color($btns-color, $alpha: 0.24);
+    }
+  }
+
+  &.disabled {
+    background-color: adjust-color($btns-color, $lightness: -70%, $alpha: -0.4);
+    color: adjust-color($btns-color, $alpha: -0.25);
+    cursor: default;
   }
 }
 </style>

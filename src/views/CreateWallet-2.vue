@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup information">
     <div></div>
   </StartArea>
 </template>
@@ -19,11 +19,13 @@ export default class CreateWallet2 extends Vue {
       icon: 'fa-history',
       link: '/restore-wallet',
       text: 'Restore',
+      disabled: false,
     },
     {
       icon: 'fa-sign-in-alt',
       link: '/create-wallet',
       text: 'Create',
+      disabled: false,
     },
   ];
 }
