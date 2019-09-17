@@ -87,7 +87,7 @@ export default class CreateWallet1 extends Vue {
   @Watch('ready')
   private onReadyChange(newReadyVal: boolean) {
     const nextBtn = this.bottomBtns[1];
-    if (nextBtn.link !== '/create-wallet-2') {
+    if (nextBtn.link !== this.nextStepPage) {
       throw new Error('expected to disable the "next" button');
     }
     nextBtn.disabled = !newReadyVal;
