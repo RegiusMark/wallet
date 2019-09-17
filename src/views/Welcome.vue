@@ -25,7 +25,7 @@ export default class Welcome extends Vue {
 
   private isNew = true;
 
-  // Vue lifecycle hook
+  /* Vue lifecycle hook */
   beforeMount() {
     if (this.isNew) {
       this.$router.push('/create-wallet-1');

@@ -1,6 +1,21 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup information">
-    <div>{{ privateKey }}</div>
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup wallet">
+    <div class="form">
+      <div>
+        <div style="margin-bottom: 0.5em">Private key</div>
+        <div class="key" style="user-select: text;">{{ privateKey }}</div>
+        <hr />
+      </div>
+      <div style="display: flex; font-size: 1.1em">
+        <div>
+          <i class="fas fa-exclamation-triangle" style="padding-right: 0.7em"></i>
+        </div>
+        <div>
+          <span>Write down your private key in a safe place.&nbsp;</span>
+          <span>Losing your key will result in the loss of funds.</span>
+        </div>
+      </div>
+    </div>
   </StartArea>
 </template>
 
@@ -15,7 +30,8 @@ import { generateKeyPair } from 'godcoin';
   },
 })
 export default class CreateWallet2 extends Vue {
-  private privateKey = generateKeyPair().privateKey.toWif();
+  private readonly createWalletPage = '/create-wallet';
+  private readonly privateKey = generateKeyPair().privateKey.toWif();
 
   private bottomBtns = [
     {
@@ -26,10 +42,36 @@ export default class CreateWallet2 extends Vue {
     },
     {
       icon: 'fa-sign-in-alt',
-      link: '/create-wallet',
+      link: this.createWalletPage,
       text: 'Create',
-      disabled: false,
+      disabled: true,
     },
   ];
+
+  /* Vue lifecycle hook */
+  mounted() {
+    setTimeout(() => {
+      const btn = this.bottomBtns[1];
+      if (btn.link !== this.createWalletPage) {
+        throw new Error('Expected page link to be the create wallet page');
+      }
+      btn.disabled = false;
+    }, 5000);
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+.form {
+  color: hsla(0, 0, 100%, 0.6);
+  user-select: none;
+
+  & > * {
+    margin-bottom: 35px;
+  }
+}
+
+.key {
+  color: hsla(0, 0, 100%, 0.8);
+}
+</style>
