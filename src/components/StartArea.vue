@@ -83,7 +83,8 @@ $margin: 13%;
 .header {
   color: hsla(0, 0, 100%, 0.9);
   text-align: center;
-  padding-top: 1.12em;
+  margin-top: 1.12em;
+  margin-bottom: 2.4em;
   font-size: 1.25em;
   font-weight: 900;
   user-select: none;

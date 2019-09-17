@@ -106,7 +106,6 @@ export default class CreateWallet1 extends Vue {
 }
 
 .form {
-  margin-top: 60px;
   color: hsla(0, 0, 100%, 0.55);
 
   & > * {
