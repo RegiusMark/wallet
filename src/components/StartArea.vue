@@ -11,7 +11,7 @@
           <router-link
             :key="btn.text"
             :to="btn.link"
-            :event="btn.disabled ? '' : 'disabled'"
+            :event="btn.disabled ? '' : 'click'"
             :class="{ disabled: btn.disabled }"
             class="bottom-btn"
           >
