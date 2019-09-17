@@ -1,12 +1,13 @@
 <template>
   <StartArea :bottom-buttons="bottomBtns" header-msg="Backup information">
-    <div></div>
+    <div>{{ privateKey }}</div>
   </StartArea>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import StartArea from '@/components/StartArea.vue';
+import { generateKeyPair } from 'godcoin';
 
 @Component({
   components: {
@@ -14,6 +15,8 @@ import StartArea from '@/components/StartArea.vue';
   },
 })
 export default class CreateWallet2 extends Vue {
+  private privateKey = generateKeyPair().privateKey.toWif();
+
   private bottomBtns = [
     {
       icon: 'fa-history',
