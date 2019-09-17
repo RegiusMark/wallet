@@ -2,7 +2,7 @@
   <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
     <div class="form">
       <PasswordInput placeholder="Choose your password" v-model="passwords.initial" />
-      <PasswordInput placeholder="Confirm password" v-model="passwords.confirm" />
+      <PasswordInput placeholder="Confirm password" v-model="passwords.confirm" @keyup.native.enter="onConfirmEnter" />
       <div style="text-align: center; user-select: none">
         <span>{{ helpMsg }}</span>
       </div>
@@ -22,6 +22,8 @@ import StartArea from '@/components/StartArea.vue';
   },
 })
 export default class CreateWallet1 extends Vue {
+  private readonly nextStepPage = '/create-wallet-2';
+
   private bottomBtns = [
     {
       icon: 'fa-history',
@@ -31,7 +33,7 @@ export default class CreateWallet1 extends Vue {
     },
     {
       icon: 'fa-arrow-circle-right',
-      link: '/create-wallet-2',
+      link: this.nextStepPage,
       text: 'Next',
       disabled: true,
     },
@@ -50,6 +52,12 @@ export default class CreateWallet1 extends Vue {
     initial: '',
     confirm: '',
   };
+
+  private onConfirmEnter(evt: any) {
+    if (this.ready) {
+      this.$router.push(this.nextStepPage);
+    }
+  }
 
   @Watch('passwords', { deep: true })
   private onPropertyChanged(value: { initial: string; confirm: string }) {
