@@ -4,11 +4,12 @@
       <i class="far fa-sm" style="font-size: 1em" :class="eyeIcon" @click="onEyeClick"></i>
     </Tooltip>
     <input
-      :type="inputType"
+      type="text"
       autofocus
       :placeholder="placeholder"
       :value="value"
       @input="$emit('input', $event.target.value)"
+      :style="{ '-webkit-text-security': this.masked ? 'disc' : 'none' }"
     />
     <hr />
   </div>
@@ -30,10 +31,6 @@ export default class PasswordInput extends Vue {
 
   private get action(): string {
     return this.masked ? 'Show password' : 'Hide password';
-  }
-
-  private get inputType(): string {
-    return this.masked ? 'password' : 'text';
   }
 
   private get eyeIcon(): string {
