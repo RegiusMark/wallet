@@ -52,9 +52,11 @@ export default class RestoreWallet extends Vue {
 
   private invalidWifTimeout: NodeJS.Timeout | null = null;
   private privateKey: string = '';
+  private ready: boolean = false;
 
   @Watch('privateKey')
   private onPropertyChanged(value: string) {
+    this.ready = false;
     if (this.invalidWifTimeout) {
       clearTimeout(this.invalidWifTimeout);
       this.invalidWifTimeout = null;
@@ -63,6 +65,7 @@ export default class RestoreWallet extends Vue {
     if (value) {
       try {
         const key = KeyPair.fromWif(value);
+        this.ready = true;
       } catch (e) {
         this.invalidWifTimeout = setTimeout(() => {
           this.helpMsg = this.helpMsgs.invalidWif;
@@ -78,6 +81,15 @@ export default class RestoreWallet extends Vue {
     } else {
       this.helpMsg = this.helpMsgs.emptyForm;
     }
+  }
+
+  @Watch('ready')
+  private onReadyChange(newReadyVal: boolean) {
+    const btn = this.bottomBtns[1];
+    if (btn.link !== this.dashboardPage) {
+      throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
+    }
+    btn.disabled = !newReadyVal;
   }
 }
 </script>
