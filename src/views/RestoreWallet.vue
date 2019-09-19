@@ -1,5 +1,5 @@
 <template>
-  <StartArea header-msg="Restore wallet">
+  <StartArea header-msg="Restore wallet" :bottom-buttons="bottomBtns">
     <div class="form">
       <PasswordInput placeholder="Enter private key" :mask-mode="MaskMode.None" v-model.trim="privateKey" />
       <div style="text-align: center;">
@@ -27,6 +27,22 @@ const log = new Logger('restore-wallet');
 export default class RestoreWallet extends Vue {
   // Allow referencing in the template
   private MaskMode = MaskMode;
+
+  private readonly dashboardPage = '/dashboard';
+  private bottomBtns = [
+    {
+      icon: 'fa-arrow-circle-left',
+      link: '/create-wallet-1',
+      text: 'Go back',
+      disabled: false,
+    },
+    {
+      icon: 'fa-flag-checkered',
+      link: this.dashboardPage,
+      text: 'Finish',
+      disabled: true,
+    },
+  ];
 
   private helpMsgs = {
     emptyForm: 'In order to restore your wallet, we need you to enter your private key.',
