@@ -28,6 +28,11 @@ const router = new Router({
       name: 'restore-wallet',
       component: () => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet.vue'),
     },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue'),
+    },
   ],
 });
 

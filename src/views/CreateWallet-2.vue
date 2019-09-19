@@ -30,7 +30,7 @@ import { generateKeyPair } from 'godcoin';
   },
 })
 export default class CreateWallet2 extends Vue {
-  private readonly createWalletPage = '/create-wallet';
+  private readonly dashboardPage = '/dashboard';
   private readonly privateKey = generateKeyPair().privateKey.toWif();
 
   private bottomBtns = [
@@ -42,7 +42,7 @@ export default class CreateWallet2 extends Vue {
     },
     {
       icon: 'fa-sign-in-alt',
-      link: this.createWalletPage,
+      link: this.dashboardPage,
       text: 'Create',
       disabled: true,
     },
@@ -52,8 +52,8 @@ export default class CreateWallet2 extends Vue {
   private mounted() {
     setTimeout(() => {
       const btn = this.bottomBtns[1];
-      if (btn.link !== this.createWalletPage) {
-        throw new Error('Expected page link to be the create wallet page');
+      if (btn.link !== this.dashboardPage) {
+        throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
       }
       btn.disabled = false;
     }, 5000);
