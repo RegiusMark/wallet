@@ -56,7 +56,7 @@ export default class RestoreWallet extends Vue {
         if (e instanceof InvalidWif) {
           log.info('invalid wif:', e.message);
         } else {
-          log.error('unhandled error:', e);
+          log.info('other error:', e);
         }
       }
     } else {
