@@ -100,15 +100,6 @@ export default class CreateWallet1 extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.welcome-header {
-  color: hsla(0, 0, 100%, 0.9);
-  text-align: center;
-  padding-top: 1.12em;
-  font-size: 1.25em;
-  font-weight: 900;
-  user-select: none;
-}
-
 .form {
   color: hsla(0, 0, 100%, 0.55);
 

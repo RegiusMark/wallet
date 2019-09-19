@@ -49,7 +49,7 @@ export default class CreateWallet2 extends Vue {
   ];
 
   /* Vue lifecycle hook */
-  mounted() {
+  private mounted() {
     setTimeout(() => {
       const btn = this.bottomBtns[1];
       if (btn.link !== this.createWalletPage) {
