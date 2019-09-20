@@ -23,14 +23,15 @@ import StartArea from '@/components/StartArea.vue';
   },
 })
 export default class CreateWallet1 extends Vue {
+  private readonly restorePage = '/restore-wallet';
   private readonly nextStepPage = '/create-wallet-2';
 
   private bottomBtns = [
     {
       icon: 'fa-history',
-      link: '/restore-wallet',
+      link: this.restorePage,
       text: 'Restore',
-      disabled: false,
+      disabled: true,
     },
     {
       icon: 'fa-arrow-circle-right',
@@ -42,10 +43,12 @@ export default class CreateWallet1 extends Vue {
 
   private helpMsgs = {
     emptyForm:
-      "Let's start creating your wallet by typing your password.<br />" +
+      "Let's start creating or restoring your wallet by typing your password.<br />" +
       'Do not share your password, anyone with your password can access your funds.',
     passMismatch: "Those passwords don't match. Please try again.",
-    ready: 'Click the arrow or press "ENTER" to continue.',
+    ready:
+      'Click the arrow or press "ENTER" to continue.<br />' +
+      'Press the restore button to recover a previously existing wallet.',
   };
   /* SECURITY: Use only hardcoded trusted inputs (XSS prone) */
   private helpMsg = this.helpMsgs.emptyForm;
@@ -90,10 +93,17 @@ export default class CreateWallet1 extends Vue {
 
   @Watch('ready')
   private onReadyChange(newReadyVal: boolean) {
+    const restoreBtn = this.bottomBtns[0];
+    if (restoreBtn.link !== this.restorePage) {
+      throw new Error('expected page link ' + this.nextStepPage + ' got ' + restoreBtn.link);
+    }
+
     const nextBtn = this.bottomBtns[1];
     if (nextBtn.link !== this.nextStepPage) {
       throw new Error('expected page link ' + this.nextStepPage + ' got ' + nextBtn.link);
     }
+
+    restoreBtn.disabled = !newReadyVal;
     nextBtn.disabled = !newReadyVal;
   }
 }
