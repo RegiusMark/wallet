@@ -15,6 +15,7 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import PasswordInput from '@/components/PasswordInput.vue';
 import StartArea from '@/components/StartArea.vue';
+import { RootStore } from '@/store';
 
 @Component({
   components: {
@@ -63,6 +64,24 @@ export default class CreateWallet1 extends Vue {
   private onConfirmEnter(evt: any) {
     if (this.ready) {
       this.$router.push(this.nextStepPage);
+    }
+  }
+
+  /* Vue lifecycle hook */
+  private beforeMount() {
+    const key = RootStore.password;
+    if (key !== null) {
+      this.passwords = {
+        initial: key,
+        confirm: key,
+      };
+    }
+  }
+
+  /* Vue lifecycle hook */
+  private beforeDestroy() {
+    if (this.ready) {
+      RootStore.setPassword(this.passwords.confirm);
     }
   }
 

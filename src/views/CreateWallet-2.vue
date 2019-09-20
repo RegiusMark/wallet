@@ -23,6 +23,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import StartArea from '@/components/StartArea.vue';
 import { generateKeyPair } from 'godcoin';
+import { RootStore } from '@/store';
 
 @Component({
   components: {
@@ -31,7 +32,6 @@ import { generateKeyPair } from 'godcoin';
 })
 export default class CreateWallet2 extends Vue {
   private readonly dashboardPage = '/dashboard';
-  private readonly privateKey = generateKeyPair().privateKey.toWif();
 
   private bottomBtns = [
     {
@@ -47,6 +47,18 @@ export default class CreateWallet2 extends Vue {
       disabled: true,
     },
   ];
+
+  private get privateKey() {
+    const key = RootStore.keyPair;
+    return key ? key.privateKey.toWif() : null;
+  }
+
+  /* Vue lifecycle hook */
+  private beforeMount() {
+    if (RootStore.keyPair === null) {
+      RootStore.setKeypair(generateKeyPair());
+    }
+  }
 
   /* Vue lifecycle hook */
   private mounted() {
