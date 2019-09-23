@@ -35,9 +35,9 @@ export default class CreateWallet2 extends Vue {
 
   private bottomBtns = [
     {
-      icon: 'fa-history',
-      link: '/restore-wallet',
-      text: 'Restore',
+      icon: 'fa-arrow-circle-left',
+      link: '/create-wallet-1',
+      text: 'Go back',
       disabled: false,
     },
     {
