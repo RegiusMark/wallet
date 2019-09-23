@@ -96,6 +96,29 @@ if (!app.requestSingleInstanceLock()) {
   });
 }
 
+function uncaughtHandler(err: any, promise?: Promise<any>) {
+  let message: string = 'Fatal error:\n';
+  if (err instanceof Error) {
+    message += err.message + '\n' + err.stack;
+  } else {
+    message += err;
+  }
+
+  const messageBoxOptions = {
+    type: "error",
+    title: "Fatal error",
+    message
+  };
+  dialog.showMessageBox(messageBoxOptions);
+  app.quit();
+}
+
+if (!isDevelopment) {
+  // Only enable during production so the errors get printed to console
+  process.on("uncaughtException", uncaughtHandler);
+  process.on("unhandledRejection", uncaughtHandler);
+}
+
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
