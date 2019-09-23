@@ -20,6 +20,7 @@ function createWindow() {
       nodeIntegration: true,
     },
     resizable: false,
+    show: false,
   });
 
   if (isDevelopment || process.env.IS_TEST) {
@@ -31,6 +32,12 @@ function createWindow() {
     // Load the index.html when not in development
     window.loadURL('app://./index.html');
   }
+
+  window.once('ready-to-show', () => {
+    if (window) {
+      window.show();
+    }
+  });
 
   window.on('closed', () => {
     window = null;
