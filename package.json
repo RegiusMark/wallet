@@ -21,6 +21,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "godcoin": "https://github.com/GODcoin/godcoin-js.git#ec6d367",
+    "libsodium-wrappers": "^0.7.5",
     "sqlite3": "^4.1.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@types/big.js": "^4.0.5",
     "@types/jest": "^23.1.4",
+    "@types/libsodium-wrappers": "^0.7.5",
     "@types/long": "^4.0.0",
     "@types/sqlite3": "^3.1.5",
     "@types/webdriverio": "4.13.3",

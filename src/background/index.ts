@@ -1,5 +1,6 @@
 import { app, protocol, BrowserWindow, dialog } from 'electron';
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
+import sodium from 'libsodium-wrappers';
 import { WalletDb } from './db';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -69,6 +70,8 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('ready', async () => {
+    await sodium.ready;
+
     if (isDevelopment && !process.env.IS_TEST) {
       // Install Vue Devtools
       // Devtools extensions are broken in Electron 6.0.0 and greater
