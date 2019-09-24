@@ -49,8 +49,8 @@ export default class PasswordInput extends Vue {
       case MaskMode.Forced:
         return 'disc';
       default: {
-        const unhandledMode: never = this.maskMode;
-        throw new Error('Unknown mask mode: ' + unhandledMode);
+        const _exhaustiveCheck: never = this.maskMode;
+        throw new Error('Unknown mask mode: ' + _exhaustiveCheck);
       }
     }
   }
