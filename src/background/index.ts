@@ -105,9 +105,9 @@ function uncaughtHandler(err: any, promise?: Promise<any>) {
   }
 
   const messageBoxOptions = {
-    type: "error",
-    title: "Fatal error",
-    message
+    type: 'error',
+    title: 'Fatal error',
+    message,
   };
   dialog.showMessageBox(messageBoxOptions);
   app.quit();
@@ -115,8 +115,8 @@ function uncaughtHandler(err: any, promise?: Promise<any>) {
 
 if (!isDevelopment) {
   // Only enable during production so the errors get printed to console
-  process.on("uncaughtException", uncaughtHandler);
-  process.on("unhandledRejection", uncaughtHandler);
+  process.on('uncaughtException', uncaughtHandler);
+  process.on('unhandledRejection', uncaughtHandler);
 }
 
 // Exit cleanly on request from parent process in development mode.

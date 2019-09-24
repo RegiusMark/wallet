@@ -1,10 +1,26 @@
 import { testWithSpectron } from 'vue-cli-plugin-electron-builder';
+import { Application } from 'spectron';
 
 jest.setTimeout(50000);
 
+let app: Application;
+let stopServe: () => Promise<Application>;
+
+beforeAll(async () => {
+  const spectron = await testWithSpectron();
+  app = spectron.app;
+  stopServe = spectron.stopServe;
+});
+
+afterAll(async () => {
+  await stopServe();
+});
+
+beforeEach(async () => {
+  await app.restart();
+});
+
 test('Window Loads Properly', async () => {
-  // Wait for dev server to start
-  const { app, stopServe } = await testWithSpectron();
   const win = app.browserWindow;
   const client = app.client;
 
@@ -18,8 +34,7 @@ test('Window Loads Properly', async () => {
   const { width, height } = await win.getBounds();
   expect(width).toBeGreaterThan(0);
   expect(height).toBeGreaterThan(0);
-  // App is loaded properly
-  expect(/Welcome to Your Vue\.js (\+ TypeScript )?App/.test(await client.getHTML('#app'))).toBe(true);
 
-  await stopServe();
+  // Redirects to the create wallet setup page for new users
+  expect(new URL(await app.webContents.getURL()).hash).toBe('#/create-wallet-1');
 });
