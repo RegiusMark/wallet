@@ -21,5 +21,5 @@ export interface FirstSetupReq {
 }
 
 export interface FirstSetupRes {
-  type: 'settings:first_setup'
+  type: 'settings:first_setup';
 }

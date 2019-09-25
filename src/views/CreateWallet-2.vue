@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup wallet">
+  <StartArea :bottom-buttons="bottomBtns" @bottom-button-click="buttonClick" header-msg="Backup wallet">
     <div class="form">
       <div>
         <div style="margin-bottom: 0.5em">Private key</div>
@@ -20,10 +20,14 @@
 </template>
 
 <script lang="ts">
+import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import { Component, Vue } from 'vue-property-decorator';
-import StartArea from '@/components/StartArea.vue';
 import { generateKeyPair } from 'godcoin';
 import { RootStore } from '@/store';
+import { Logger } from '@/log';
+import ipc from '@/renderer/ipc';
+
+const log = new Logger('create-wallet-2');
 
 @Component({
   components: {
@@ -33,7 +37,7 @@ import { RootStore } from '@/store';
 export default class CreateWallet2 extends Vue {
   private readonly dashboardPage = '/dashboard';
 
-  private bottomBtns = [
+  private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',
       link: '/create-wallet-1',
@@ -69,6 +73,25 @@ export default class CreateWallet2 extends Vue {
       }
       btn.disabled = false;
     }, 5000);
+  }
+
+  private async buttonClick(evt: ButtonClickEvent) {
+    if (evt.target.link !== this.dashboardPage) return;
+    const password = RootStore.password!;
+    const keyPair = RootStore.keyPair!;
+
+    RootStore.setPassword(null);
+    RootStore.setKeypair(null);
+
+    try {
+      await ipc.send({
+        type: 'settings:first_setup',
+        password,
+        privateKey: keyPair.privateKey.toWif(),
+      });
+    } catch (e) {
+      log.error('Failed to create wallet', e);
+    }
   }
 }
 </script>
