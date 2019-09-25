@@ -8,16 +8,10 @@
     <div class="footer">
       <div class="bottom-btns">
         <template v-for="btn in bottomButtons">
-          <router-link
-            :key="btn.text"
-            :to="btn.link"
-            :event="btn.disabled ? '' : 'click'"
-            :class="{ disabled: btn.disabled }"
-            class="bottom-btn"
-          >
+          <div :key="btn.text" :class="{ disabled: btn.disabled }" @click="onBottomBtnClick(btn)" class="bottom-btn">
             <i class="fas fa-lg" :class="btn.icon"></i>
             <div class="bottom-btn-txt">{{ btn.text }}</div>
-          </router-link>
+          </div>
         </template>
       </div>
     </div>
@@ -27,11 +21,15 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
-interface Button {
+export interface Button {
   icon: string;
   link: string;
   text: string;
   disabled: boolean;
+}
+
+export interface ButtonClickEvent {
+  target: Button;
 }
 
 @Component
@@ -51,6 +49,13 @@ export default class StartArea extends Vue {
 
   @Prop({ required: true })
   private headerMsg!: string;
+
+  private onBottomBtnClick(btn: Button) {
+    if (btn.disabled) return;
+    const evt: ButtonClickEvent = { target: btn };
+    this.$emit('bottom-button-click', evt);
+    this.$router.push(btn.link);
+  }
 }
 </script>
 
@@ -134,6 +139,7 @@ $margin: 13%;
   &:not(.disabled):hover {
     background-color: adjust-color($btns-color, $alpha: -0.4);
     color: adjust-color($btns-color, $alpha: 0.24);
+    cursor: pointer;
 
     .bottom-btn-txt {
       color: adjust-color($btns-color, $alpha: 0.24);
