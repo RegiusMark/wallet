@@ -1,7 +1,8 @@
-import { app, protocol, BrowserWindow, dialog } from 'electron';
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
+import { app, protocol, BrowserWindow, dialog } from 'electron';
 import sodium from 'libsodium-wrappers';
 import { WalletDb } from './db';
+import setupIpc from './ipc';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -90,6 +91,7 @@ if (!app.requestSingleInstanceLock()) {
 
     try {
       await WalletDb.init();
+      setupIpc();
 
       // Create the window
       createWindow();
