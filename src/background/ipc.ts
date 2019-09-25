@@ -15,7 +15,7 @@ export default function() {
 
     switch (req.type) {
       case 'settings:first_setup': {
-        const secretKey = new SecretKey(randomBytes(sodium.crypto_secretbox_NONCEBYTES));
+          const secretKey = new SecretKey(randomBytes(sodium.crypto_secretbox_KEYBYTES));
         const keyPair = KeyPair.fromWif(req.privateKey);
 
         settings = new Settings({
