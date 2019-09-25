@@ -37,7 +37,6 @@ export class Settings implements SettingsData {
     // Move the current settings to a backup
     if (existsSync(loc)) {
       renameSync(loc, bakLoc);
-      unlinkSync(loc);
     }
 
     // Write the new settings

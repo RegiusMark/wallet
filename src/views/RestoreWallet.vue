@@ -1,5 +1,5 @@
 <template>
-  <StartArea header-msg="Restore wallet" :bottom-buttons="bottomBtns">
+  <StartArea header-msg="Restore wallet" @bottom-button-click="buttonClick" :bottom-buttons="bottomBtns">
     <div class="form">
       <PasswordInput placeholder="Enter private key" :mask-mode="MaskMode.None" v-model.trim="privateKey" />
       <div style="text-align: center;">
@@ -13,7 +13,9 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { PrivateKey, KeyPair, InvalidWif } from 'godcoin';
 import PasswordInput, { MaskMode } from '@/components/PasswordInput.vue';
-import StartArea from '@/components/StartArea.vue';
+import StartArea, { ButtonClickEvent } from '@/components/StartArea.vue';
+import { RootStore } from '@/store';
+import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
 
 const log = new Logger('restore-wallet');
@@ -90,6 +92,26 @@ export default class RestoreWallet extends Vue {
       throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
     }
     btn.disabled = !newReadyVal;
+  }
+
+  private async buttonClick(evt: ButtonClickEvent) {
+    if (evt.target.link !== this.dashboardPage || !this.ready) return;
+    const password = RootStore.password!;
+    const privateKey = this.privateKey;
+
+    // Set both to null as they are no longer necessary
+    RootStore.setPassword(null);
+    RootStore.setKeypair(null); // May or may not be set, clear it just in case
+
+    try {
+      await ipc.send({
+        type: 'settings:first_setup',
+        password,
+        privateKey,
+      });
+    } catch (e) {
+      log.error('Failed to restore wallet', e);
+    }
   }
 }
 </script>
