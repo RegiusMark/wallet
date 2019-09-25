@@ -4,8 +4,8 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
+import StartArea, { Button } from '@/components/StartArea.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
-import StartArea from '@/components/StartArea.vue';
 
 @Component({
   components: {
@@ -14,7 +14,7 @@ import StartArea from '@/components/StartArea.vue';
   },
 })
 export default class Welcome extends Vue {
-  private bottomBtns = [
+  private bottomBtns: Button[] = [
     {
       icon: 'fa-history',
       link: '/restore-wallet',

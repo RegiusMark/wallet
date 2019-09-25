@@ -13,7 +13,7 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { PrivateKey, KeyPair, InvalidWif } from 'godcoin';
 import PasswordInput, { MaskMode } from '@/components/PasswordInput.vue';
-import StartArea, { ButtonClickEvent } from '@/components/StartArea.vue';
+import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
@@ -31,7 +31,7 @@ export default class RestoreWallet extends Vue {
   private MaskMode = MaskMode;
 
   private readonly dashboardPage = '/dashboard';
-  private bottomBtns = [
+  private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',
       link: '/create-wallet-1',
