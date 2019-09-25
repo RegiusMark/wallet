@@ -44,7 +44,9 @@ export class Settings implements SettingsData {
     writeFileSync(loc, data);
 
     // Clear the backup
-    unlinkSync(bakLoc);
+    if (existsSync(bakLoc)) {
+      unlinkSync(bakLoc);
+    }
   }
 
   private serializeEnc(password: string): Buffer {
@@ -63,8 +65,7 @@ export class Settings implements SettingsData {
     const encData = localKey.encrypt(unencryptedData);
     localKey.zero();
 
-    const buf = Buffer.concat([version, encData]);
-    return buf;
+    return Buffer.concat([version, encData]);
   }
 
   public static load(password: string): Settings | undefined {
