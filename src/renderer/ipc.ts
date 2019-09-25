@@ -6,7 +6,7 @@ const log = new Logger('renderer:ipc');
 
 class IpcManager {
   private id: number = 0;
-  private promises: {[key: number]: (res: models.ResModel) => void} = {};
+  private promises: { [key: number]: (res: models.ResModel) => void } = {};
 
   public constructor() {
     ipcRenderer.on(models.APP_ACTION_RES, (_evt, payload: models.AppActionRes) => {
@@ -32,7 +32,7 @@ class IpcManager {
 
       setTimeout(() => {
         if (this.promises[id]) {
-          reject(new Error('IPC request timeout (req: ' + req + ')'));
+          reject(new Error('IPC request timeout (req: ' + JSON.stringify(rpcReq) + ')'));
         }
       }, 5000);
 
