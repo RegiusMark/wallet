@@ -40,5 +40,5 @@ export interface LoadSettingsReq {
 
 export interface LoadSettingsRes {
   type: 'settings:load_settings';
-  status: 'success' | 'incorrect_password' | 'no_settings_available' | 'unknown';
+  status: 'success' | 'incorrect_password' | 'invalid_checksum' | 'no_settings_available' | 'unknown';
 }

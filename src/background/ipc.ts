@@ -51,22 +51,20 @@ export default function() {
             };
           } catch (e) {
             // The error is logged from Settings.load()
+            let status: 'success' | 'incorrect_password' | 'invalid_checksum' | 'no_settings_available' | 'unknown';
             if (e instanceof NoAvailableSettings) {
-              response = {
-                type: 'settings:load_settings',
-                status: 'no_settings_available',
-              };
+              status = 'no_settings_available';
             } else if (e instanceof DecryptError && e.type == DecryptErrorType.INCORRECT_PASSWORD) {
-              response = {
-                type: 'settings:load_settings',
-                status: 'incorrect_password',
-              };
+              status = 'incorrect_password';
+            } else if (e instanceof DecryptError && e.type === DecryptErrorType.INVALID_CHECKSUM) {
+              status = 'invalid_checksum';
             } else {
-              response = {
-                type: 'settings:load_settings',
-                status: 'unknown',
-              };
+              status = 'unknown';
             }
+            response = {
+              type: 'settings:load_settings',
+              status,
+            };
           }
           break;
         }

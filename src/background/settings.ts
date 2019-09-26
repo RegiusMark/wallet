@@ -154,7 +154,7 @@ export class Settings implements SettingsData {
 }
 
 export class NoAvailableSettings extends Error {
-  constructor() {
+  public constructor() {
     super('No available settings to read from');
     Object.setPrototypeOf(this, NoAvailableSettings.prototype);
   }

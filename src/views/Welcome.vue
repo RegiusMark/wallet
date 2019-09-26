@@ -130,14 +130,30 @@ export default class Welcome extends Vue {
           throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
         }
         const status = ipcRes.status;
-        if (status === 'success') {
-          this.$router.push(this.dashboardPage);
-        } else if (status === 'incorrect_password') {
-          this.helpMsg = this.helpMsgs.incorrectPassword;
-          this.isReady = false;
-        } else {
-          log.error('Failed to load settings:', status);
-          this.helpMsg = 'An unknown error occurred: ' + status;
+        switch (status) {
+          case 'success':
+            this.$router.push(this.dashboardPage);
+            break;
+          case 'incorrect_password':
+            this.helpMsg = this.helpMsgs.incorrectPassword;
+            this.isReady = false;
+            break;
+          case 'invalid_checksum':
+            this.helpMsg = 'Data corruption detected. Try restoring your wallet.';
+            this.isReady = false;
+            break;
+          case 'no_settings_available':
+            this.helpMsg = 'Unable to locate settings file. Try restoring your wallet.';
+            this.isReady = false;
+            break;
+          case 'unknown':
+            this.helpMsg = 'Unknown error occurred.';
+            this.isReady = false;
+            break;
+          default: {
+            const _exhaustiveCheck: never = status;
+            throw new Error('invalid state:' + _exhaustiveCheck);
+          }
         }
       } catch (e) {
         log.error('Failed to load settings:', e);
