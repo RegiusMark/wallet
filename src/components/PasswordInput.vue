@@ -38,7 +38,7 @@ export default class PasswordInput extends Vue {
   @Prop() private value!: string;
 
   @Prop({ default: () => MaskMode.Mixed }) private maskMode!: MaskMode;
-  @Prop({ default: () => true }) private masked!: boolean;
+  private masked: boolean = true;
 
   private get textSecurity() {
     switch (this.maskMode) {
