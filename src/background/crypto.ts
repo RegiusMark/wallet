@@ -25,7 +25,13 @@ export class SecretKey {
     assert(data.byteLength > sodium.crypto_secretbox_NONCEBYTES, 'data must be at least NONCEBYTES + 1 bytes');
     const nonce = data.slice(0, sodium.crypto_secretbox_NONCEBYTES);
     const enc = data.slice(sodium.crypto_secretbox_NONCEBYTES);
-    return Buffer.from(sodium.crypto_secretbox_open_easy(enc, nonce, this.key!));
+
+    try {
+      const dec = sodium.crypto_secretbox_open_easy(enc, nonce, this.key!);
+      return Buffer.from(dec);
+    } catch (e) {
+      throw new DecryptError(e.message);
+    }
   }
 
   public bytes(): Uint8Array {
@@ -45,5 +51,26 @@ export class SecretKey {
     hasher.update(password);
     const hash = hasher.digest();
     return new SecretKey(hash);
+  }
+}
+
+export enum DecryptErrorType {
+  INCORRECT_PASSWORD = 'incorrect_password',
+  UNKNOWN = 'unknown_error',
+}
+
+export class DecryptError extends Error {
+  public readonly type: DecryptErrorType;
+
+  constructor(msg: string) {
+    super(msg);
+    switch (msg) {
+      case 'wrong secret key for the given ciphertext':
+        this.type = DecryptErrorType.INCORRECT_PASSWORD;
+        break;
+      default:
+        this.type = DecryptErrorType.UNKNOWN;
+    }
+    Object.setPrototypeOf(this, DecryptError.prototype);
   }
 }

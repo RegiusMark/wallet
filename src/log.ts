@@ -18,6 +18,8 @@ export class Logger {
     for (const arg of args) {
       if (arg instanceof Error) {
         str += ' ' + arg.stack + '\n';
+      } else if (typeof arg === 'object') {
+        str += ' ' + JSON.stringify(arg, undefined, '  ');
       } else {
         str += ' ' + arg;
       }

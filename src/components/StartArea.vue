@@ -29,6 +29,7 @@ export interface Button {
 }
 
 export interface ButtonClickEvent {
+  canceled: boolean;
   target: Button;
 }
 
@@ -52,9 +53,11 @@ export default class StartArea extends Vue {
 
   private onBottomBtnClick(btn: Button) {
     if (btn.disabled) return;
-    const evt: ButtonClickEvent = { target: btn };
+    const evt: ButtonClickEvent = { canceled: false, target: btn };
     this.$emit('bottom-button-click', evt);
-    this.$router.push(btn.link);
+    if (!evt.canceled) {
+      this.$router.push(btn.link);
+    }
   }
 }
 </script>

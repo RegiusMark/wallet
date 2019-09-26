@@ -1,7 +1,7 @@
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
-import { Settings } from './settings';
-import { SecretKey } from './crypto';
+import { Settings, NoAvailableSettings } from './settings';
+import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { randomBytes } from 'crypto';
 import { ipcMain } from 'electron';
 import { KeyPair } from 'godcoin';
@@ -33,9 +33,46 @@ export default function() {
           };
           break;
         }
+        case 'settings:does_exist': {
+          const exists = Settings.exists();
+          response = {
+            type: 'settings:does_exist',
+            exists,
+          };
+          break;
+        }
+        case 'settings:load_settings': {
+          const password = req.password;
+          try {
+            settings = Settings.load(password);
+            response = {
+              type: 'settings:load_settings',
+              status: 'success',
+            };
+          } catch (e) {
+            // The error is logged from Settings.load()
+            if (e instanceof NoAvailableSettings) {
+              response = {
+                type: 'settings:load_settings',
+                status: 'no_settings_available',
+              };
+            } else if (e instanceof DecryptError && e.type == DecryptErrorType.INCORRECT_PASSWORD) {
+              response = {
+                type: 'settings:load_settings',
+                status: 'incorrect_password',
+              };
+            } else {
+              response = {
+                type: 'settings:load_settings',
+                status: 'unknown',
+              };
+            }
+          }
+          break;
+        }
         default: {
-          const _exhaustiveCheck: never = req.type;
-          throw new Error('unreachable state: ' + _exhaustiveCheck);
+          const _exhaustiveCheck: never = req;
+          throw new Error('unreachable state: ' + JSON.stringify(_exhaustiveCheck));
         }
       }
 

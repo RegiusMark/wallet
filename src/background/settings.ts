@@ -67,31 +67,47 @@ export class Settings implements SettingsData {
     return Buffer.concat([version, encData]);
   }
 
-  public static load(password: string): Settings | undefined {
+  public static load(password: string): Settings {
     const locs = Settings.settingsLoc();
 
-    if (existsSync(locs.primary)) {
+    const primaryExists = existsSync(locs.primary);
+    const backupExists = existsSync(locs.backup);
+
+    if (primaryExists) {
       try {
         return Settings.deserializeEnc(locs.primary, password);
       } catch (e) {
+        // Log here to prevent error swallowing
         log.error('Failed to read from primary data store:', e);
+        if (!backupExists) {
+          // Propagate the error as there are no more locations to read from
+          throw e;
+        }
       }
     }
 
-    if (existsSync(locs.backup)) {
+    if (backupExists) {
       try {
         const settings = Settings.deserializeEnc(locs.backup, password);
         log.info('Successfully recovered from backup');
 
-        if (existsSync(locs.primary)) {
+        if (primaryExists) {
           const newLoc = locs.primary + '.' + new Date().getTime();
           renameSync(locs.primary, newLoc);
           log.info('Moved the potentially corrupt data store to ' + newLoc);
         }
+        renameSync(locs.backup, locs.primary);
+        return settings;
       } catch (e) {
+        // Log here to prevent error swallowing
         log.error('Failed to read from backup data store:', e);
+        throw e;
       }
     }
+
+    // Log here to prevent error swallowing
+    log.error('No more setting data stores available');
+    throw new NoAvailableSettings();
   }
 
   private static deserializeEnc(loc: string, password: string): Settings {
@@ -122,6 +138,11 @@ export class Settings implements SettingsData {
     return new Settings(data);
   }
 
+  public static exists(): boolean {
+    const locs = Settings.settingsLoc();
+    return existsSync(locs.primary) || existsSync(locs.backup);
+  }
+
   private static settingsLoc(): { primary: string; backup: string } {
     const primary = path.join(app.getPath('userData'), 'settings.dat');
     const backup = primary + '.bak';
@@ -129,5 +150,12 @@ export class Settings implements SettingsData {
       primary,
       backup,
     };
+  }
+}
+
+export class NoAvailableSettings extends Error {
+  constructor() {
+    super('No available settings to read from');
+    Object.setPrototypeOf(this, NoAvailableSettings.prototype);
   }
 }
