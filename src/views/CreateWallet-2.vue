@@ -79,9 +79,7 @@ export default class CreateWallet2 extends Vue {
     if (evt.target.link !== this.dashboardPage) return;
     const password = RootStore.password!;
     const keyPair = RootStore.keyPair!;
-
-    RootStore.setPassword(null);
-    RootStore.setKeypair(null);
+    RootStore.reset();
 
     try {
       await ipc.send({

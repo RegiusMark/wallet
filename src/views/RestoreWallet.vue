@@ -98,10 +98,7 @@ export default class RestoreWallet extends Vue {
     if (evt.target.link !== this.dashboardPage || !this.ready) return;
     const password = RootStore.password!;
     const privateKey = this.privateKey;
-
-    // Set both to null as they are no longer necessary
-    RootStore.setPassword(null);
-    RootStore.setKeypair(null); // May or may not be set, clear it just in case
+    RootStore.reset();
 
     try {
       await ipc.send({

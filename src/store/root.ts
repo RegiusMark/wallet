@@ -11,12 +11,18 @@ export default class RootStore extends VuexModule {
   public dbKey = null;
 
   @Mutation
-  public setPassword(val: string | null): void {
+  public setPassword(val: string): void {
     this.password = val;
   }
 
   @Mutation
-  public setKeypair(val: KeyPair | null): void {
+  public setKeypair(val: KeyPair): void {
     this.keyPair = val;
+  }
+
+  @Mutation
+  public reset(): void {
+    this.password = null;
+    this.keyPair = null;
   }
 }

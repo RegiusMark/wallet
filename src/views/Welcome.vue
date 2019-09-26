@@ -16,9 +16,9 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
+import { LoadSettingsRes } from '../ipc-models';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
-import { LoadSettingsRes } from '../ipc-models';
 
 const log = new Logger('welcome');
 
@@ -58,6 +58,7 @@ export default class Welcome extends Vue {
     ready: 'Click the arrow or press "ENTER" to continue.',
     incorrectPassword: 'Incorrect password, please try again.',
   };
+  /* SECURITY: Use only hardcoded trusted inputs (XSS prone) */
   private helpMsg: string = this.helpMsgs.emptyForm;
   private helpUpdateTimer: NodeJS.Timer | null = null;
 
