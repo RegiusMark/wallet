@@ -2,9 +2,11 @@ import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-buil
 import { app, protocol, BrowserWindow, dialog } from 'electron';
 import sodium from 'libsodium-wrappers';
 import { WalletDb } from './db';
+import { Logger } from '../log';
 import setupIpc from './ipc';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const log = new Logger('main');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -85,7 +87,7 @@ if (!app.requestSingleInstanceLock()) {
           await installVueDevtools();
         }
       } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString());
+        log.error('Vue Devtools failed to install:', e.toString());
       }
     }
 

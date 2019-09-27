@@ -1,5 +1,8 @@
 import { WalletDb } from './index';
+import { Logger } from '../../log';
 import util from 'util';
+
+const log = new Logger('db:migrations');
 
 interface MigrationData {
   id: number;
@@ -22,14 +25,14 @@ export async function runMigrations(db: WalletDb): Promise<void> {
     }
   })();
 
-  console.log('Current database version:', data.version);
+  log.info('Current database version:', data.version);
 
   switch (data.version) {
     case 0:
       // Upgrade to version 1
       await db.run(`CREATE TABLE ${migTblName}(id INTEGER PRIMARY KEY UNIQUE CHECK(id == 0), version INTEGER)`);
       await db.run(`INSERT INTO ${migTblName}(id, version) VALUES(?, ?)`, [0, 1]);
-      console.log('Upgraded database version to 1');
+      log.info('Upgraded database version to 1');
     /* fall through */
     case 1:
       // Only the last valid case should break for continuous upgrading of the database

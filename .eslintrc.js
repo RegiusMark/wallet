@@ -6,7 +6,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: ['plugin:vue/strongly-recommended', '@vue/prettier'],
   rules: {
-    'no-console': 'off',
+    'no-console': 'error',
     'no-debugger': 'error',
     'no-undef': 'off',
     'no-unused-vars': 'off',
