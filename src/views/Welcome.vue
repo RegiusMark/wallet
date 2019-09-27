@@ -3,9 +3,7 @@
     <div class="form">
       <PasswordInput v-model="password" placeholder="Type your password" @keyup.native.enter="attemptLogin" />
       <div style="text-align: center; user-select: none">
-        <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-html="helpMsg"></span>
+        <span>{{ helpMsg }}</span>
       </div>
     </div>
   </StartArea>
@@ -53,7 +51,6 @@ export default class Welcome extends Vue {
     ready: 'Click the arrow or press "ENTER" to continue.',
     incorrectPassword: 'Incorrect password, please try again.',
   };
-  /* SECURITY: Use only hardcoded trusted inputs (XSS prone) */
   private helpMsg: string = this.helpMsgs.emptyForm;
   private helpUpdateTimer: NodeJS.Timer | null = null;
 

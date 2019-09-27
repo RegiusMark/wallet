@@ -4,9 +4,7 @@
       <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
       <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />
       <div style="text-align: center; user-select: none">
-        <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-html="helpMsg"></span>
+        <div v-for="(msg, index) in helpMsg.split('\n')" :key="index">{{ msg }}</div>
       </div>
     </div>
   </StartArea>
@@ -45,14 +43,13 @@ export default class CreateWallet1 extends Vue {
 
   private helpMsgs = {
     emptyForm:
-      "Let's start creating or restoring your wallet by typing your password.<br />" +
+      "Let's start creating or restoring your wallet by typing your password.\n" +
       'Do not share your password, anyone with your password can access your funds.',
     passMismatch: "Those passwords don't match. Please try again.",
     ready:
-      'Click the arrow or press "ENTER" to continue.<br />' +
+      'Click the arrow or press "ENTER" to continue.\n' +
       'Press the restore button to recover a previously existing wallet.',
   };
-  /* SECURITY: Use only hardcoded trusted inputs (XSS prone) */
   private helpMsg = this.helpMsgs.emptyForm;
 
   private ready = false;
