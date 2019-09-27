@@ -40,7 +40,7 @@ export default class PasswordInput extends Vue {
   @Prop({ default: () => MaskMode.Mixed }) private maskMode!: MaskMode;
   private masked: boolean = true;
 
-  private get textSecurity() {
+  private get textSecurity(): string {
     switch (this.maskMode) {
       case MaskMode.None:
         return 'none';
@@ -63,7 +63,7 @@ export default class PasswordInput extends Vue {
     return this.masked ? 'fa-eye' : 'fa-eye-slash';
   }
 
-  private onEyeClick() {
+  private onEyeClick(): void {
     this.masked = !this.masked;
   }
 }

@@ -51,7 +51,7 @@ export default class StartArea extends Vue {
   @Prop({ required: true })
   private headerMsg!: string;
 
-  private onBottomBtnClick(btn: Button) {
+  private onBottomBtnClick(btn: Button): void {
     if (btn.disabled) return;
     const evt: ButtonClickEvent = { canceled: false, target: btn };
     this.$emit('bottom-button-click', evt);

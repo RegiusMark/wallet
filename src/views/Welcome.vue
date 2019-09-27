@@ -64,7 +64,7 @@ export default class Welcome extends Vue {
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
-    (async () => {
+    (async (): Promise<void> => {
       try {
         const ipcRes = await ipc.send({
           type: 'settings:does_exist',
@@ -98,7 +98,7 @@ export default class Welcome extends Vue {
   }
 
   @Watch('isReady')
-  private onReadyChange(newReadyVal: boolean) {
+  private onReadyChange(newReadyVal: boolean): void {
     const btn = this.bottomBtns[1];
     if (btn.link !== this.dashboardPage) {
       throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
@@ -115,7 +115,7 @@ export default class Welcome extends Vue {
   private attemptLogin(): void {
     if (this.isLoggingIn) return;
     this.isLoggingIn = true;
-    (async () => {
+    (async (): Promise<void> => {
       if (this.helpUpdateTimer) {
         clearTimeout(this.helpUpdateTimer);
         this.helpUpdateTimer = null;

@@ -13,7 +13,7 @@ let window: BrowserWindow | null;
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
-function createWindow() {
+function createWindow(): void {
   // Create the browser window.
   window = new BrowserWindow({
     width: 800,
@@ -101,7 +101,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 }
 
-function uncaughtHandler(err: any, promise?: Promise<any>) {
+function uncaughtHandler(err: any, _prom?: Promise<any>): void {
   let message = 'Fatal error:\n';
   if (err instanceof Error) {
     message += err.message + '\n' + err.stack;

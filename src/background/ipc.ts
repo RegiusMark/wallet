@@ -11,7 +11,7 @@ const log = new Logger('main:ipc');
 
 let settings: Settings | undefined;
 
-export default function() {
+export default function(): void {
   ipcMain.on(models.APP_ACTION_REQ, async (evt, payload: models.AppActionReq) => {
     try {
       const req = payload.req;

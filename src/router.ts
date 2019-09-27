@@ -16,22 +16,22 @@ const router = new Router({
     {
       path: '/create-wallet-1',
       name: 'create-wallet-1',
-      component: () => import(/* webpackChunkName: "create-wallet-1" */ './views/CreateWallet-1.vue'),
+      component: (): any => import(/* webpackChunkName: "create-wallet-1" */ './views/CreateWallet-1.vue'),
     },
     {
       path: '/create-wallet-2',
       name: 'create-wallet-2',
-      component: () => import(/* webpackChunkName: "create-wallet-2" */ './views/CreateWallet-2.vue'),
+      component: (): any => import(/* webpackChunkName: "create-wallet-2" */ './views/CreateWallet-2.vue'),
     },
     {
       path: '/restore-wallet',
       name: 'restore-wallet',
-      component: () => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet.vue'),
+      component: (): any => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet.vue'),
     },
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue'),
+      component: (): any => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue'),
     },
   ],
 });

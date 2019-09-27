@@ -57,7 +57,7 @@ export default class RestoreWallet extends Vue {
   private ready: boolean = false;
 
   @Watch('privateKey')
-  private onPropertyChanged(value: string) {
+  private onPropertyChanged(value: string): void {
     this.ready = false;
     if (this.invalidWifTimeout) {
       clearTimeout(this.invalidWifTimeout);
@@ -86,7 +86,7 @@ export default class RestoreWallet extends Vue {
   }
 
   @Watch('ready')
-  private onReadyChange(newReadyVal: boolean) {
+  private onReadyChange(newReadyVal: boolean): void {
     const btn = this.bottomBtns[1];
     if (btn.link !== this.dashboardPage) {
       throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
@@ -94,7 +94,7 @@ export default class RestoreWallet extends Vue {
     btn.disabled = !newReadyVal;
   }
 
-  private async buttonClick(evt: ButtonClickEvent) {
+  private async buttonClick(evt: ButtonClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage || !this.ready) return;
     const password = RootStore.password!;
     const privateKey = this.privateKey;

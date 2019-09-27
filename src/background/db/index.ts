@@ -57,7 +57,7 @@ class DbWrapper {
   }
 
   public run(sql: string, params: any = []): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject): void => {
       this.inner.run(sql, params, err => {
         if (err) return reject(err);
         resolve();
@@ -66,7 +66,7 @@ class DbWrapper {
   }
 
   public get(sql: string, params: any = []): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       this.inner.get(sql, params, function(this: sql.Statement, err, row) {
         if (err) return reject(err);
         resolve(row);
@@ -75,8 +75,8 @@ class DbWrapper {
   }
 
   public static open(filepath: string): Promise<DbWrapper> {
-    return new Promise<DbWrapper>((resolve, reject) => {
-      const db = new sql.Database(filepath, err => {
+    return new Promise<DbWrapper>((resolve, reject): void => {
+      const db = new sql.Database(filepath, (err): void => {
         if (err) return reject(err);
         resolve(new DbWrapper(db));
       });

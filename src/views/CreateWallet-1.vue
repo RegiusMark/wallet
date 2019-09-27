@@ -61,14 +61,14 @@ export default class CreateWallet1 extends Vue {
     confirm: '',
   };
 
-  private onConfirmEnter(evt: any) {
+  private onConfirmEnter(evt: any): void {
     if (this.ready) {
       this.$router.push(this.nextStepPage);
     }
   }
 
   /* Vue lifecycle hook */
-  private beforeMount() {
+  private beforeMount(): void {
     const pass = RootStore.password;
     if (pass !== null) {
       this.passwords = {
@@ -79,14 +79,14 @@ export default class CreateWallet1 extends Vue {
   }
 
   /* Vue lifecycle hook */
-  private beforeDestroy() {
+  private beforeDestroy(): void {
     if (this.ready) {
       RootStore.setPassword(this.passwords.confirm);
     }
   }
 
   @Watch('passwords', { deep: true })
-  private onPropertyChanged(value: { initial: string; confirm: string }) {
+  private onPropertyChanged(value: { initial: string; confirm: string }): void {
     this.ready = false;
     if (this.passMismatchTimeout) {
       clearTimeout(this.passMismatchTimeout);
@@ -111,7 +111,7 @@ export default class CreateWallet1 extends Vue {
   }
 
   @Watch('ready')
-  private onReadyChange(newReadyVal: boolean) {
+  private onReadyChange(newReadyVal: boolean): void {
     const restoreBtn = this.bottomBtns[0];
     if (restoreBtn.link !== this.restorePage) {
       throw new Error('expected page link ' + this.nextStepPage + ' got ' + restoreBtn.link);

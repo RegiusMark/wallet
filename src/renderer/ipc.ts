@@ -22,7 +22,7 @@ class IpcManager {
   }
 
   public send(req: models.ReqModel): Promise<models.ResModel> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const id = this.id++;
       const rpcReq: models.AppActionReq = {
         id,

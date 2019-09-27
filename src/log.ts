@@ -5,11 +5,11 @@ export class Logger {
     this.prefix = `[${namespace}]`;
   }
 
-  public info(...args: any) {
+  public info(...args: any): void {
     console.log(this.formatArgs(args));
   }
 
-  public error(...args: any) {
+  public error(...args: any): void {
     console.error(this.formatArgs(args));
   }
 

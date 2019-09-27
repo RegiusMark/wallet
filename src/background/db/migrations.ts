@@ -9,7 +9,7 @@ interface MigrationData {
 export async function runMigrations(db: WalletDb): Promise<void> {
   const migTblName = 'migrations';
 
-  const data: MigrationData = await (async () => {
+  const data = await (async (): Promise<MigrationData> => {
     const tbl = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [migTblName]);
     const exists = tbl !== undefined && tbl.name === migTblName;
     if (exists) {

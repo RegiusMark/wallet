@@ -52,21 +52,21 @@ export default class CreateWallet2 extends Vue {
     },
   ];
 
-  private get privateKey() {
+  private get privateKey(): string | null {
     const key = RootStore.keyPair;
     return key ? key.privateKey.toWif() : null;
   }
 
   /* Vue lifecycle hook */
-  private beforeMount() {
+  private beforeMount(): void {
     if (RootStore.keyPair === null) {
       RootStore.setKeypair(generateKeyPair());
     }
   }
 
   /* Vue lifecycle hook */
-  private mounted() {
-    setTimeout(() => {
+  private mounted(): void {
+    setTimeout((): void => {
       const btn = this.bottomBtns[1];
       if (btn.link !== this.dashboardPage) {
         throw new Error('expected page link ' + this.dashboardPage + ' got ' + btn.link);
@@ -75,7 +75,7 @@ export default class CreateWallet2 extends Vue {
     }, 5000);
   }
 
-  private async buttonClick(evt: ButtonClickEvent) {
+  private async buttonClick(evt: ButtonClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage) return;
     const password = RootStore.password!;
     const keyPair = RootStore.keyPair!;
