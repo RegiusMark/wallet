@@ -69,11 +69,11 @@ export default class CreateWallet1 extends Vue {
 
   /* Vue lifecycle hook */
   private beforeMount() {
-    const key = RootStore.password;
-    if (key !== null) {
+    const pass = RootStore.password;
+    if (pass !== null) {
       this.passwords = {
-        initial: key,
-        confirm: key,
+        initial: pass,
+        confirm: pass,
       };
     }
   }

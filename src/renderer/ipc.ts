@@ -5,7 +5,7 @@ import { Logger } from '@/log';
 const log = new Logger('renderer:ipc');
 
 class IpcManager {
-  private id: number = 0;
+  private id = 0;
   private promises: { [key: number]: (res: models.ResModel) => void } = {};
 
   public constructor() {

@@ -102,7 +102,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 function uncaughtHandler(err: any, promise?: Promise<any>) {
-  let message: string = 'Fatal error:\n';
+  let message = 'Fatal error:\n';
   if (err instanceof Error) {
     message += err.message + '\n' + err.stack;
   } else {
