@@ -8,7 +8,7 @@
     <div class="footer">
       <div class="bottom-btns">
         <template v-for="btn in bottomButtons">
-          <div :key="btn.text" :class="{ disabled: btn.disabled }" @click="onBottomBtnClick(btn)" class="bottom-btn">
+          <div :key="btn.text" :class="{ disabled: btn.disabled }" class="bottom-btn" @click="onBottomBtnClick(btn)">
             <i class="fas fa-lg" :class="btn.icon"></i>
             <div class="bottom-btn-txt">{{ btn.text }}</div>
           </div>

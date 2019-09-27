@@ -1,7 +1,7 @@
 <template>
-  <StartArea header-msg="Restore wallet" @bottom-button-click="buttonClick" :bottom-buttons="bottomBtns">
+  <StartArea header-msg="Restore wallet" :bottom-buttons="bottomBtns" @bottom-button-click="buttonClick">
     <div class="form">
-      <PasswordInput placeholder="Enter private key" :mask-mode="MaskMode.None" v-model.trim="privateKey" />
+      <PasswordInput v-model.trim="privateKey" placeholder="Enter private key" :mask-mode="MaskMode.None" />
       <div style="text-align: center;">
         <span>{{ helpMsg }}</span>
       </div>

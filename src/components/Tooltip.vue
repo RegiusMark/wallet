@@ -1,6 +1,6 @@
 <template>
   <div class="tooltip">
-    <div v-on:mouseover="show" v-on:mouseleave="hide">
+    <div @mouseover="show" @mouseleave="hide">
       <slot></slot>
     </div>
     <div class="tooltip-content" :style="displayStyle">

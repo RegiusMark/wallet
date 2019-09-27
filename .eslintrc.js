@@ -4,7 +4,7 @@ module.exports = {
     node: true,
   },
   plugins: ['@typescript-eslint'],
-  extends: ['plugin:vue/essential', '@vue/prettier'],
+  extends: ['plugin:vue/strongly-recommended', '@vue/prettier'],
   rules: {
     'no-console': 'off',
     'no-debugger': 'error',

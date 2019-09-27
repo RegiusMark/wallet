@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" @bottom-button-click="buttonClick" header-msg="Backup wallet">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup wallet" @bottom-button-click="buttonClick">
     <div class="form">
       <div>
         <div style="margin-bottom: 0.5em">Private key</div>

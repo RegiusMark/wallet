@@ -1,9 +1,10 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" @bottom-button-click="onButtonClick" header-msg="Welcome back">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome back" @bottom-button-click="onButtonClick">
     <div class="form">
-      <PasswordInput placeholder="Type your password" v-model="password" @keyup.native.enter="attemptLogin" />
+      <PasswordInput v-model="password" placeholder="Type your password" @keyup.native.enter="attemptLogin" />
       <div style="text-align: center; user-select: none">
         <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="helpMsg"></span>
       </div>
     </div>

@@ -8,8 +8,8 @@
       autofocus
       :placeholder="placeholder"
       :value="value"
+      :style="{ '-webkit-text-security': textSecurity }"
       @input="$emit('input', $event.target.value)"
-      :style="{ '-webkit-text-security': this.textSecurity }"
     />
     <hr />
   </div>

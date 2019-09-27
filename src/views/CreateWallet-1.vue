@@ -1,10 +1,11 @@
 <template>
   <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
     <div class="form">
-      <PasswordInput placeholder="Choose your password" v-model="passwords.initial" />
-      <PasswordInput placeholder="Confirm password" v-model="passwords.confirm" @keyup.native.enter="onConfirmEnter" />
+      <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
+      <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />
       <div style="text-align: center; user-select: none">
         <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="helpMsg"></span>
       </div>
     </div>
