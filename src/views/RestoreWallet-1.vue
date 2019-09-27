@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="GODcoin Wallet Recovery">
     <div class="form">
       <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
       <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />
@@ -22,16 +22,15 @@ import { RootStore } from '@/store';
     StartArea,
   },
 })
-export default class CreateWallet1 extends Vue {
-  private readonly restorePage = '/restore-wallet-2';
-  private readonly nextStepPage = '/create-wallet-2';
+export default class RestoreWallet1 extends Vue {
+  private readonly nextStepPage = '/restore-wallet-2';
 
   private bottomBtns: Button[] = [
     {
-      icon: 'fa-history',
-      link: this.restorePage,
-      text: 'Restore',
-      disabled: true,
+      icon: 'fa-arrow-circle-left',
+      link: '/',
+      text: 'Go back',
+      disabled: false,
     },
     {
       icon: 'fa-arrow-circle-right',
@@ -43,7 +42,7 @@ export default class CreateWallet1 extends Vue {
 
   private helpMsgs = {
     emptyForm:
-      "Let's start creating or restoring your wallet by typing your password.\n" +
+      "Let's start restoring your wallet by typing your password.\n" +
       'Do not share your password, anyone with your password can access your funds.',
     passMismatch: "Those passwords don't match. Please try again.",
     ready:
@@ -110,17 +109,11 @@ export default class CreateWallet1 extends Vue {
 
   @Watch('ready')
   private onReadyChange(newReadyVal: boolean): void {
-    const restoreBtn = this.bottomBtns[0];
-    if (restoreBtn.link !== this.restorePage) {
-      throw new Error('expected page link ' + this.nextStepPage + ' got ' + restoreBtn.link);
-    }
-
     const nextBtn = this.bottomBtns[1];
     if (nextBtn.link !== this.nextStepPage) {
       throw new Error('expected page link ' + this.nextStepPage + ' got ' + nextBtn.link);
     }
 
-    restoreBtn.disabled = !newReadyVal;
     nextBtn.disabled = !newReadyVal;
   }
 }

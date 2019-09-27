@@ -23,7 +23,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 
 export interface Button {
   icon: string;
-  link: string;
+  link?: string;
+  go?: number;
   text: string;
   disabled: boolean;
 }
@@ -39,7 +40,10 @@ export default class StartArea extends Vue {
     default: () => [],
     validator: (btns: Button[]) => {
       for (const btn of btns) {
-        if (!(btn.icon && btn.link && btn.text && typeof btn.disabled === 'boolean')) {
+        if (!(btn.icon && btn.text && typeof btn.disabled === 'boolean')) {
+          return false;
+        }
+        if ((btn.link === undefined && btn.go === undefined) || (btn.link !== undefined && btn.go !== undefined)) {
           return false;
         }
       }
@@ -56,7 +60,11 @@ export default class StartArea extends Vue {
     const evt: ButtonClickEvent = { canceled: false, target: btn };
     this.$emit('bottom-button-click', evt);
     if (!evt.canceled) {
-      this.$router.push(btn.link);
+      if (btn.link !== undefined) {
+        this.$router.push(btn.link);
+      } else if (btn.go !== undefined) {
+        this.$router.go(btn.go);
+      }
     }
   }
 }

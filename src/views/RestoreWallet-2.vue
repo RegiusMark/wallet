@@ -26,7 +26,7 @@ const log = new Logger('restore-wallet');
     PasswordInput,
   },
 })
-export default class RestoreWallet extends Vue {
+export default class RestoreWallet2 extends Vue {
   // Allow referencing in the template
   private MaskMode = MaskMode;
 
@@ -34,7 +34,7 @@ export default class RestoreWallet extends Vue {
   private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',
-      link: '/create-wallet-1',
+      go: -1,
       text: 'Go back',
       disabled: false,
     },

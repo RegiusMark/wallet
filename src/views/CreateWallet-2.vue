@@ -40,7 +40,7 @@ export default class CreateWallet2 extends Vue {
   private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',
-      link: '/create-wallet-1',
+      go: -1,
       text: 'Go back',
       disabled: false,
     },

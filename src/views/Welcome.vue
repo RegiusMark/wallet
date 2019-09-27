@@ -13,7 +13,8 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
-import { LoadSettingsRes } from '../ipc-models';
+import { LoadSettingsRes } from '@/ipc-models';
+import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
 
@@ -30,7 +31,7 @@ export default class Welcome extends Vue {
   private bottomBtns: Button[] = [
     {
       icon: 'fa-history',
-      link: '/restore-wallet',
+      link: '/restore-wallet-1',
       text: 'Restore',
       disabled: false,
     },
@@ -124,6 +125,7 @@ export default class Welcome extends Vue {
         const status = ipcRes.status;
         switch (status) {
           case 'success':
+            RootStore.reset();
             this.$router.push(this.dashboardPage);
             break;
           case 'incorrect_password':
