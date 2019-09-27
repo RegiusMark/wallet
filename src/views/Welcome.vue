@@ -1,15 +1,13 @@
 <template>
-  <div v-if="!isNew">
-    <StartArea :bottom-buttons="bottomBtns" @bottom-button-click="onButtonClick" header-msg="Welcome back">
-      <div class="form">
-        <PasswordInput placeholder="Type your password" v-model="password" @keyup.native.enter="attemptLogin" />
-        <div style="text-align: center; user-select: none">
-          <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
-          <span v-html="helpMsg"></span>
-        </div>
+  <StartArea :bottom-buttons="bottomBtns" @bottom-button-click="onButtonClick" header-msg="Welcome back">
+    <div class="form">
+      <PasswordInput placeholder="Type your password" v-model="password" @keyup.native.enter="attemptLogin" />
+      <div style="text-align: center; user-select: none">
+        <!-- SECURITY: Use only hardcoded trusted inputs (XSS prone) -->
+        <span v-html="helpMsg"></span>
       </div>
-    </StartArea>
-  </div>
+    </div>
+  </StartArea>
 </template>
 
 <script lang="ts">
@@ -45,10 +43,6 @@ export default class Welcome extends Vue {
     },
   ];
 
-  // Flag used to determine whether to render any html to the page that is triggered from an async function inside
-  // of the beforeMount hook
-  private isNew = true;
-
   private password: string = '';
   private isLoggingIn: boolean = false;
   private isReady: boolean = false;
@@ -73,8 +67,7 @@ export default class Welcome extends Vue {
           throw new Error('invalid response type: ' + JSON.stringify(ipcRes));
         }
 
-        this.isNew = !ipcRes.exists;
-        if (this.isNew) {
+        if (!ipcRes.exists) {
           this.$router.push('/create-wallet-1');
         }
       } catch (e) {
