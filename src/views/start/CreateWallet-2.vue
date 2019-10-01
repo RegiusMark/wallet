@@ -35,7 +35,7 @@ const log = new Logger('create-wallet-2');
   },
 })
 export default class CreateWallet2 extends Vue {
-  private readonly dashboardPage = '/dashboard';
+  private readonly dashboardPage = '/wallet/dashboard';
 
   private bottomBtns: Button[] = [
     {

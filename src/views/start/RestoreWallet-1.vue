@@ -23,12 +23,12 @@ import { RootStore } from '@/store';
   },
 })
 export default class RestoreWallet1 extends Vue {
-  private readonly nextStepPage = '/restore-wallet-2';
+  private readonly nextStepPage = '/start/restore-wallet-2';
 
   private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',
-      link: '/',
+      go: -1,
       text: 'Go back',
       disabled: false,
     },

@@ -36,13 +36,13 @@ export default class DashArea extends Vue {
   private readonly buttons: MenuButton[] = [
     {
       icon: 'fa-wallet',
-      link: '/dashboard',
+      link: '/wallet/dashboard',
       text: 'Wallet',
       active: false,
     },
     {
       icon: 'fa-file-export',
-      link: '/backup',
+      link: '/wallet/backup',
       text: 'Backup',
       active: false,
     },

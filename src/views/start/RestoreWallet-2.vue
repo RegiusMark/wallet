@@ -30,7 +30,7 @@ export default class RestoreWallet2 extends Vue {
   // Allow referencing in the template
   private MaskMode = MaskMode;
 
-  private readonly dashboardPage = '/dashboard';
+  private readonly dashboardPage = '/wallet/dashboard';
   private bottomBtns: Button[] = [
     {
       icon: 'fa-arrow-circle-left',

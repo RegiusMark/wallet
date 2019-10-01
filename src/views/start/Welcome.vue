@@ -27,11 +27,11 @@ const log = new Logger('welcome');
   },
 })
 export default class Welcome extends Vue {
-  private readonly dashboardPage = '/dashboard';
+  private readonly dashboardPage = '/wallet/dashboard';
   private bottomBtns: Button[] = [
     {
       icon: 'fa-history',
-      link: '/restore-wallet-1',
+      link: '/start/restore-wallet-1',
       text: 'Restore',
       disabled: false,
     },

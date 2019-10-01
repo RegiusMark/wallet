@@ -61,7 +61,7 @@ function createStartWindow(): void {
     backgroundColor: '#12233f',
   });
 
-  loadAppURL('/');
+  loadAppURL('/start');
   installWindowHooks();
 }
 
@@ -82,7 +82,7 @@ export function createDashboardWindow(): void {
     backgroundColor: '#1C0C2F',
   });
 
-  loadAppURL('/dashboard');
+  loadAppURL('/wallet/dashboard');
   installWindowHooks();
 }
 

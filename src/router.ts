@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Welcome from './views/Welcome.vue';
+import Welcome from './views/start/Welcome.vue';
 
 Vue.use(Router);
 
@@ -9,39 +9,32 @@ const DEFAULT_TITLE = 'GODcoin Wallet';
 const router = new Router({
   routes: [
     {
-      path: '/',
-      name: 'welcome',
+      path: '/start',
       component: Welcome,
     },
     {
-      path: '/create-wallet-1',
-      name: 'create-wallet-1',
-      component: (): any => import(/* webpackChunkName: "create-wallet" */ './views/CreateWallet-1.vue'),
+      path: '/start/create-wallet-1',
+      component: (): any => import(/* webpackChunkName: "start" */ './views/start/CreateWallet-1.vue'),
     },
     {
-      path: '/create-wallet-2',
-      name: 'create-wallet-2',
-      component: (): any => import(/* webpackChunkName: "create-wallet" */ './views/CreateWallet-2.vue'),
+      path: '/start/create-wallet-2',
+      component: (): any => import(/* webpackChunkName: "start" */ './views/start/CreateWallet-2.vue'),
     },
     {
-      path: '/restore-wallet-1',
-      name: 'restore-wallet-1',
-      component: (): any => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet-1.vue'),
+      path: '/start/restore-wallet-1',
+      component: (): any => import(/* webpackChunkName: "start" */ './views/start/RestoreWallet-1.vue'),
     },
     {
-      path: '/restore-wallet-2',
-      name: 'restore-wallet-2',
-      component: (): any => import(/* webpackChunkName: "restore-wallet" */ './views/RestoreWallet-2.vue'),
+      path: '/start/restore-wallet-2',
+      component: (): any => import(/* webpackChunkName: "start" */ './views/start/RestoreWallet-2.vue'),
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: (): any => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue'),
+      path: '/wallet/dashboard',
+      component: (): any => import(/* webpackChunkName: "wallet" */ './views/wallet/Dashboard.vue'),
     },
     {
-      path: '/backup',
-      name: 'backup',
-      component: (): any => import(/* webpackChunkName: "dashboard" */ './views/Backup.vue'),
+      path: '/wallet/backup',
+      component: (): any => import(/* webpackChunkName: "wallet" */ './views/wallet/Backup.vue'),
     },
   ],
 });

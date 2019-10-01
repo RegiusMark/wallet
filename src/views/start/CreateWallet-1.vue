@@ -23,8 +23,8 @@ import { RootStore } from '@/store';
   },
 })
 export default class CreateWallet1 extends Vue {
-  private readonly restorePage = '/restore-wallet-2';
-  private readonly nextStepPage = '/create-wallet-2';
+  private readonly restorePage = '/start/restore-wallet-2';
+  private readonly nextStepPage = '/start/create-wallet-2';
 
   private bottomBtns: Button[] = [
     {
