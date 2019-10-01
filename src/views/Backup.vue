@@ -1,5 +1,5 @@
 <template>
-  <DashArea>Dashboard</DashArea>
+  <DashArea>Backup</DashArea>
 </template>
 
 <script lang="ts">
@@ -11,7 +11,7 @@ import DashArea from '@/components/DashArea.vue';
     DashArea,
   },
 })
-export default class Dashboard extends Vue {}
+export default class Backup extends Vue {}
 </script>
 
 <style lang="scss" scoped></style>

@@ -10,32 +10,27 @@ const log = new Logger('main');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let window: BrowserWindow | null;
+let window: BrowserWindow | null = null;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
-function createWindow(): void {
-  // Create the browser window.
-  window = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-    resizable: false,
-    show: false,
-  });
-
+async function loadAppURL(loc: string): Promise<void> {
+  let url: string;
   if (isDevelopment || process.env.IS_TEST) {
-    // Load the url of the dev server if in development mode
-    window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    if (!process.env.IS_TEST) window.webContents.openDevTools();
+    url = process.env.WEBPACK_DEV_SERVER_URL as string;
+    if (!process.env.IS_TEST && window !== null) window.webContents.openDevTools();
   } else {
-    createProtocol('app');
-    // Load the index.html when not in development
-    window.loadURL('app://./index.html');
+    url = 'app://./index.html';
   }
+  url += '#' + loc;
+  if (window !== null) {
+    await window.loadURL(url);
+  }
+}
+
+function installWindowHooks(): void {
+  if (!window) throw new Error('no window found');
 
   window.once('ready-to-show', () => {
     if (window) {
@@ -48,6 +43,49 @@ function createWindow(): void {
   });
 }
 
+function createStartWindow(): void {
+  if (window !== null) {
+    window.destroy();
+    window = null;
+  }
+
+  window = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    resizable: false,
+    show: false,
+    // Color relatively close to the background image
+    backgroundColor: '#12233f',
+  });
+
+  loadAppURL('/');
+  installWindowHooks();
+}
+
+export function createDashboardWindow(): void {
+  if (window !== null) {
+    window.destroy();
+    window = null;
+  }
+
+  window = new BrowserWindow({
+    width: 1200,
+    height: 760,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    show: false,
+    // Same color as the components/DashArea.vue background color
+    backgroundColor: '#1C0C2F',
+  });
+
+  loadAppURL('/dashboard');
+  installWindowHooks();
+}
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -58,7 +96,7 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (window === null) {
-    createWindow();
+    createStartWindow();
   }
 });
 
@@ -92,11 +130,12 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     try {
+      createProtocol('app');
+
       await WalletDb.init();
       setupIpc();
 
-      // Create the window
-      createWindow();
+      createStartWindow();
     } catch (e) {
       dialog.showErrorBox('Fatal startup error', e.toString());
     }
@@ -121,7 +160,7 @@ function uncaughtHandler(err: any, _prom?: Promise<any>): void {
 }
 
 if (!isDevelopment) {
-  // Only enable during production so the errors get printed to console
+  // Only enable during production so the development errors get printed to console
   process.on('uncaughtException', uncaughtHandler);
   process.on('unhandledRejection', uncaughtHandler);
 }

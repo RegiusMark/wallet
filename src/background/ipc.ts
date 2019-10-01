@@ -1,7 +1,8 @@
+import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
+import { Settings, NoAvailableSettings } from './settings';
+import { createDashboardWindow } from './index';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
-import { Settings, NoAvailableSettings } from './settings';
-import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { randomBytes } from 'crypto';
 import { ipcMain } from 'electron';
 import { KeyPair } from 'godcoin';
@@ -31,6 +32,8 @@ export default function(): void {
           response = {
             type: 'settings:first_setup',
           };
+
+          createDashboardWindow();
           break;
         }
         case 'settings:does_exist': {
@@ -49,6 +52,7 @@ export default function(): void {
               type: 'settings:load_settings',
               status: 'success',
             };
+            createDashboardWindow();
           } catch (e) {
             // The error is logged from Settings.load()
             let status: 'success' | 'incorrect_password' | 'invalid_checksum' | 'no_settings_available' | 'unknown';

@@ -77,6 +77,8 @@ export default class CreateWallet2 extends Vue {
 
   private async buttonClick(evt: ButtonClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage) return;
+    evt.canceled = true;
+
     const password = RootStore.password!;
     const keyPair = RootStore.keyPair!;
     RootStore.reset();

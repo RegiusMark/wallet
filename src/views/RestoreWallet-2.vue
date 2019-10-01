@@ -95,7 +95,10 @@ export default class RestoreWallet2 extends Vue {
   }
 
   private async buttonClick(evt: ButtonClickEvent): Promise<void> {
-    if (evt.target.link !== this.dashboardPage || !this.ready) return;
+    if (evt.target.link !== this.dashboardPage) return;
+    evt.canceled = true;
+    if (!this.ready) return;
+
     const password = RootStore.password!;
     const privateKey = this.privateKey;
     RootStore.reset();
