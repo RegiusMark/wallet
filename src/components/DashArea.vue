@@ -14,9 +14,7 @@
       </div>
     </div>
     <div class="dash-content">
-      <div class="dash-content-slot">
-        <slot />
-      </div>
+      <slot />
     </div>
   </div>
 </template>
@@ -62,11 +60,14 @@ export default class DashArea extends Vue {
 </script>
 
 <style lang="scss" scoped>
-$sidebar-width: 12em;
 // The backgroundColor also needs to change in the BrowserWindow instantiation
 $background-color: hsla(267, 74, 18, 1);
 
 .dash-area {
+  display: flex;
+  flex-flow: row nowrap;
+  height: 100%;
+
   color: white;
 
   &::before {
@@ -83,10 +84,7 @@ $background-color: hsla(267, 74, 18, 1);
 }
 
 .dash-sidebar {
-  width: $sidebar-width;
-  height: 100%;
-  margin: 0 auto;
-  position: absolute;
+  flex: 0 0 12em;
   background-color: darken($background-color, 5%);
 
   .dash-logo {
@@ -123,11 +121,7 @@ $background-color: hsla(267, 74, 18, 1);
 }
 
 .dash-content {
-  position: absolute;
-  margin-left: $sidebar-width;
-
-  .dash-content-slot {
-    margin: 1em;
-  }
+  flex: 1;
+  overflow-y: auto;
 }
 </style>
