@@ -2,7 +2,7 @@
   <div class="dash-area">
     <div class="dash-sidebar">
       <div class="dash-logo">
-        <img src="../assets/logo.png" width="80" />
+        <img src="../assets/logo.png" width="60" />
       </div>
       <div class="dash-buttons">
         <span v-for="btn in buttons" :key="btn.link">
