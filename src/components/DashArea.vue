@@ -61,7 +61,7 @@ export default class DashArea extends Vue {
 
 <style lang="scss" scoped>
 // The backgroundColor also needs to change in the BrowserWindow instantiation
-$background-color: hsla(267, 74, 18, 1);
+$background-color: hsla(267, 59, 12, 1);
 
 .dash-area {
   display: flex;
@@ -108,7 +108,7 @@ $background-color: hsla(267, 74, 18, 1);
       }
 
       &.active {
-        background-color: darken($background-color, 10%);
+        background-color: $background-color;
         color: hsla(0, 0, 100, 0.8);
         cursor: default;
 
