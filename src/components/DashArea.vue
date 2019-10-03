@@ -69,18 +69,6 @@ $background-color: hsla(267, 59, 12, 1);
   height: 100%;
 
   color: white;
-
-  &::before {
-    background-color: $background-color;
-    content: '';
-    width: 100%;
-    height: 100%;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-  }
 }
 
 .dash-sidebar {
