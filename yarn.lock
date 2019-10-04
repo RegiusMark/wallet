@@ -5110,9 +5110,9 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
-"godcoin@https://github.com/GODcoin/godcoin-js.git#ec6d367":
+"godcoin@https://github.com/GODcoin/godcoin-js.git#51cd77d":
   version "0.1.0"
-  resolved "https://github.com/GODcoin/godcoin-js.git#ec6d367be81b99e44e731d4a62c9e52ea78ee501"
+  resolved "https://github.com/GODcoin/godcoin-js.git#51cd77d74495cf4c79468f27b4b31ff8b3c022b1"
   dependencies:
     big.js "^5.2.2"
     bs58 "^4.0.1"

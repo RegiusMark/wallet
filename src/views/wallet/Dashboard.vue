@@ -114,7 +114,7 @@ export default class Dashboard extends Vue {
       time: tx.time.toLocaleString(),
       to: tx.to.toWif(),
       incoming: tx.incoming,
-      amount: tx.amount.toString().split(' ')[0],
+      amount: tx.amount.toString(false),
       expanded: false,
     };
   }
