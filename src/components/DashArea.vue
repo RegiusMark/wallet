@@ -74,6 +74,7 @@ $background-color: hsla(267, 59, 12, 1);
 .dash-sidebar {
   flex: 0 0 12em;
   background-color: darken($background-color, 5%);
+  user-select: none;
 
   .dash-logo {
     text-align: center;
@@ -82,7 +83,6 @@ $background-color: hsla(267, 59, 12, 1);
 
   .dash-buttons {
     margin-top: 1.5em;
-    user-select: none;
 
     & > span div {
       color: hsla(0, 0, 100, 0.65);
