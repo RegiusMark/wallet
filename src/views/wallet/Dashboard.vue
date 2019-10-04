@@ -9,12 +9,8 @@
         <span>GRAEL</span>
       </div>
       <div class="actions">
-        <div>
-          <span>Send</span>
-        </div>
-        <div>
-          <span>Receive</span>
-        </div>
+        <div>Send</div>
+        <div>Receive</div>
       </div>
       <div class="container-separator"></div>
       <div class="transaction-history">
@@ -34,7 +30,7 @@
                 <span>Sent</span>
               </div>
               <div>
-                <span>{{ tx.amount }}</span>
+                <span>{{ tx.incoming ? '+ ' + tx.amount : tx.amount }}</span>
                 <i
                   class="fas fa-chevron-up right-icon"
                   :style="{ transform: tx.expanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
@@ -207,7 +203,7 @@ export default class Dashboard extends Vue {
       cursor: pointer;
       padding: 1em;
 
-      color: hsla(0, 0, 100, 0.75);
+      color: hsla(0, 0, 100, 0.8);
 
       &.incoming {
         color: hsla(0, 0, 100, 0.55);
