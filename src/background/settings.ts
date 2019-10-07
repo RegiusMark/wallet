@@ -5,7 +5,7 @@ import { Logger } from '../log';
 import { app } from 'electron';
 import path from 'path';
 
-const log = new Logger('settings');
+const log = new Logger('main:settings');
 
 const CRYPTO_VERSION = 1;
 
