@@ -7,6 +7,7 @@ import { Table } from './table';
 
 export { Table } from './table';
 
+let isInitialized = false;
 let dbInstance: WalletDb | null = null;
 
 export class WalletDb {
@@ -41,7 +42,9 @@ export class WalletDb {
   }
 
   public static async init(): Promise<void> {
-    if (dbInstance) throw new Error('database already open');
+    if (isInitialized) throw new Error('database already open');
+    isInitialized = true;
+
     const dbLoc = path.join(app.getPath('userData'), 'db.sqlite');
     const dbWrapper = await DbWrapper.open(dbLoc);
     dbInstance = new WalletDb(dbWrapper);
