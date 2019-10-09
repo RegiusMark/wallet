@@ -55,26 +55,6 @@ export default class Welcome extends Vue {
   private helpMsg: string = this.helpMsgs.emptyForm;
   private helpUpdateTimer: NodeJS.Timer | null = null;
 
-  /* Vue lifecycle hook */
-  private beforeMount(): void {
-    (async (): Promise<void> => {
-      try {
-        const ipcRes = await ipc.send({
-          type: 'settings:does_exist',
-        });
-        if (ipcRes.type !== 'settings:does_exist') {
-          throw new Error('invalid response type: ' + JSON.stringify(ipcRes));
-        }
-
-        if (!ipcRes.exists) {
-          this.$router.push('/start/create-wallet-1');
-        }
-      } catch (e) {
-        log.error('Failed to init welcome page properly:', e);
-      }
-    })();
-  }
-
   @Watch('password')
   private onPasswordChange(newPassVal: string): void {
     if (this.helpUpdateTimer) {

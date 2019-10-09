@@ -11,8 +11,8 @@ export interface AppActionRes {
   res: ResModel;
 }
 
-export type ReqModel = FirstSetupReq | SettingsExistReq | LoadSettingsReq;
-export type ResModel = FirstSetupRes | SettingsExistRes | LoadSettingsRes;
+export type ReqModel = FirstSetupReq | LoadSettingsReq;
+export type ResModel = FirstSetupRes | LoadSettingsRes;
 
 export interface FirstSetupReq {
   type: 'settings:first_setup';
@@ -22,15 +22,6 @@ export interface FirstSetupReq {
 
 export interface FirstSetupRes {
   type: 'settings:first_setup';
-}
-
-export interface SettingsExistReq {
-  type: 'settings:does_exist';
-}
-
-export interface SettingsExistRes {
-  type: 'settings:does_exist';
-  exists: boolean;
 }
 
 export interface LoadSettingsReq {

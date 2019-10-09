@@ -38,14 +38,6 @@ export default function(): void {
           };
           break;
         }
-        case 'settings:does_exist': {
-          const exists = Settings.existsOnDisk();
-          response = {
-            type: 'settings:does_exist',
-            exists,
-          };
-          break;
-        }
         case 'settings:load_settings': {
           const password = req.password;
           try {

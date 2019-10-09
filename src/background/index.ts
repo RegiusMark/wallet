@@ -1,6 +1,7 @@
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { app, protocol, BrowserWindow, dialog } from 'electron';
 import sodium from 'libsodium-wrappers';
+import { Settings } from './settings';
 import { Logger } from '../log';
 import setupIpc from './ipc';
 
@@ -60,7 +61,12 @@ function createStartWindow(): void {
     backgroundColor: '#12233f',
   });
 
-  loadAppURL('/start');
+  if (Settings.existsOnDisk()) {
+    loadAppURL('/start');
+  } else {
+    loadAppURL('/start/create-wallet-1');
+  }
+
   installWindowHooks();
 }
 
