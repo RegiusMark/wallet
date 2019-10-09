@@ -19,7 +19,7 @@
     "vue-cli-plugin-electron-builder/spectron": "^8.0.0"
   },
   "dependencies": {
-    "core-js": "^3.2.1",
+    "core-js": "^2.6.9",
     "godcoin": "https://github.com/GODcoin/godcoin-js.git#24ab691",
     "libsodium-wrappers": "^0.7.5",
     "long": "^4.0.0",
