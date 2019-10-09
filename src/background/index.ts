@@ -1,7 +1,6 @@
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { app, protocol, BrowserWindow, dialog } from 'electron';
 import sodium from 'libsodium-wrappers';
-import { WalletDb } from './db';
 import { Logger } from '../log';
 import setupIpc from './ipc';
 
@@ -131,10 +130,7 @@ if (!app.requestSingleInstanceLock()) {
 
     try {
       createProtocol('app');
-
-      await WalletDb.init();
       setupIpc();
-
       createStartWindow();
     } catch (e) {
       dialog.showErrorBox('Fatal startup error', e.toString());

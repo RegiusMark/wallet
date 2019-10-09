@@ -1,5 +1,6 @@
 import * as models from '@/ipc-models';
 import { ipcRenderer } from 'electron';
+import { KeyPair } from 'godcoin';
 import { Logger } from '@/log';
 
 const log = new Logger('renderer:ipc');
@@ -19,6 +20,24 @@ class IpcManager {
         log.error('Received unknown IPC payload:', payload);
       }
     });
+  }
+
+  public async firstSetup(password: string, keyPair: string | KeyPair): Promise<void> {
+    await this.send({
+      type: 'settings:first_setup',
+      password,
+      privateKey: typeof keyPair === 'string' ? keyPair : keyPair.privateKey.toWif(),
+    });
+    const ipcRes = await this.send({
+      type: 'settings:load_settings',
+      password,
+    });
+    if (ipcRes.type !== 'settings:load_settings') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+    if (ipcRes.status !== 'success') {
+      throw new Error('Failed to complete load settings after setup: ' + ipcRes.status);
+    }
   }
 
   public send(req: models.ReqModel): Promise<models.ResModel> {

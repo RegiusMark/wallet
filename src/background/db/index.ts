@@ -1,6 +1,8 @@
+import { SecretKey } from '../crypto';
 import { app } from 'electron';
 import sql from 'sqlite3';
 import path from 'path';
+import fs from 'fs';
 
 import { runMigrations } from './migrations';
 import { Table } from './table';
@@ -12,10 +14,12 @@ let dbInstance: WalletDb | null = null;
 
 export class WalletDb {
   private db: DbWrapper;
+  private secretKey: SecretKey;
   private tables: { [key: string]: Table } = {};
 
-  private constructor(db: DbWrapper) {
+  private constructor(db: DbWrapper, secretKey: SecretKey) {
     this.db = db;
+    this.secretKey = secretKey;
   }
 
   public getTable<T extends Table>(table: T & Function): T {
@@ -41,14 +45,26 @@ export class WalletDb {
     return dbInstance;
   }
 
-  public static async init(): Promise<void> {
+  public static async init(key: SecretKey): Promise<void> {
     if (isInitialized) throw new Error('database already open');
     isInitialized = true;
 
-    const dbLoc = path.join(app.getPath('userData'), 'db.sqlite');
+    const dbLoc = WalletDb.getLoc();
     const dbWrapper = await DbWrapper.open(dbLoc);
-    dbInstance = new WalletDb(dbWrapper);
+    dbInstance = new WalletDb(dbWrapper, key);
     await runMigrations(dbInstance);
+  }
+
+  public static delete(): void {
+    if (isInitialized) throw new Error('cannot delete db when initialized');
+    const dbLoc = WalletDb.getLoc();
+    if (fs.existsSync(dbLoc)) {
+      fs.unlinkSync(dbLoc);
+    }
+  }
+
+  private static getLoc(): string {
+    return path.join(app.getPath('userData'), 'db.sqlite');
   }
 }
 

@@ -1,16 +1,17 @@
+import { Settings, NoAvailableSettings, setGlobalSettings } from './settings';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
-import { Settings, NoAvailableSettings } from './settings';
+import { initSynchronizer } from './synchronizer';
 import { createDashboardWindow } from './index';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
+import { initClient } from './client';
 import { randomBytes } from 'crypto';
 import { ipcMain } from 'electron';
 import { KeyPair } from 'godcoin';
 import { Logger } from '../log';
+import { WalletDb } from './db';
 
 const log = new Logger('main:ipc');
-
-let settings: Settings | undefined;
 
 export default function(): void {
   ipcMain.on(models.APP_ACTION_REQ, async (evt, payload: models.AppActionReq) => {
@@ -23,21 +24,22 @@ export default function(): void {
           const secretKey = new SecretKey(randomBytes(sodium.crypto_secretbox_KEYBYTES));
           const keyPair = KeyPair.fromWif(req.privateKey);
 
-          settings = new Settings({
-            secretKey,
+          const settings = new Settings({
+            dbSecretKey: secretKey,
             keyPair,
           });
           settings.save(req.password);
 
+          // Reset the database because we have a new encryption key and any cached data is now invalid
+          WalletDb.delete();
+
           response = {
             type: 'settings:first_setup',
           };
-
-          createDashboardWindow();
           break;
         }
         case 'settings:does_exist': {
-          const exists = Settings.exists();
+          const exists = Settings.existsOnDisk();
           response = {
             type: 'settings:does_exist',
             exists,
@@ -47,18 +49,30 @@ export default function(): void {
         case 'settings:load_settings': {
           const password = req.password;
           try {
-            settings = Settings.load(password);
+            const settings = Settings.load(password);
+            setGlobalSettings(settings);
+
             response = {
               type: 'settings:load_settings',
               status: 'success',
             };
-            createDashboardWindow();
+
+            try {
+              await WalletDb.init(settings.dbSecretKey);
+              initClient('ws://127.0.0.1:7777');
+              initSynchronizer([settings.keyPair.publicKey.toScript().hash()]);
+              createDashboardWindow();
+            } catch (e) {
+              log.error('A severe error has occurred:', e);
+              // This error won't be logged from the outer catch
+              throw new Error();
+            }
           } catch (e) {
-            // The error is logged from Settings.load()
+            // Errors from Settings.load() are logged
             let status: 'success' | 'incorrect_password' | 'invalid_checksum' | 'no_settings_available' | 'unknown';
             if (e instanceof NoAvailableSettings) {
               status = 'no_settings_available';
-            } else if (e instanceof DecryptError && e.type == DecryptErrorType.INCORRECT_PASSWORD) {
+            } else if (e instanceof DecryptError && e.type === DecryptErrorType.INCORRECT_PASSWORD) {
               status = 'incorrect_password';
             } else if (e instanceof DecryptError && e.type === DecryptErrorType.INVALID_CHECKSUM) {
               status = 'invalid_checksum';

@@ -104,11 +104,7 @@ export default class RestoreWallet2 extends Vue {
     RootStore.reset();
 
     try {
-      await ipc.send({
-        type: 'settings:first_setup',
-        password,
-        privateKey,
-      });
+      await ipc.firstSetup(password, privateKey);
     } catch (e) {
       log.error('Failed to restore wallet', e);
     }

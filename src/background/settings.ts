@@ -9,17 +9,19 @@ const log = new Logger('main:settings');
 
 const CRYPTO_VERSION = 1;
 
+let globalSettings: Settings;
+
 interface SettingsData {
-  secretKey: SecretKey;
+  dbSecretKey: SecretKey;
   keyPair: KeyPair;
 }
 
 export class Settings implements SettingsData {
-  public readonly secretKey: SecretKey;
+  public readonly dbSecretKey: SecretKey;
   public readonly keyPair: KeyPair;
 
   public constructor(data: SettingsData) {
-    this.secretKey = data.secretKey;
+    this.dbSecretKey = data.dbSecretKey;
     this.keyPair = data.keyPair;
   }
 
@@ -54,7 +56,7 @@ export class Settings implements SettingsData {
 
     const unencryptedData = Buffer.from(
       JSON.stringify({
-        secretKey: Buffer.from(this.secretKey.bytes()).toString('base64'),
+        secretKey: Buffer.from(this.dbSecretKey.bytes()).toString('base64'),
         privateKey: this.keyPair.privateKey.toWif(),
       }),
       'utf8',
@@ -111,7 +113,6 @@ export class Settings implements SettingsData {
   }
 
   private static deserializeEnc(loc: string, password: string): Settings {
-    // TODO: handle invalid password error
     const fileData = readFileSync(loc);
     const version = fileData.readUInt16BE(0);
     const encData = fileData.slice(2);
@@ -123,7 +124,7 @@ export class Settings implements SettingsData {
         try {
           const obj = JSON.parse(localKey.decrypt(encData).toString('utf8'));
           data = {
-            secretKey: new SecretKey(Buffer.from(obj.secretKey, 'base64')),
+            dbSecretKey: new SecretKey(Buffer.from(obj.secretKey, 'base64')),
             keyPair: KeyPair.fromWif(obj.privateKey),
           };
         } finally {
@@ -138,7 +139,7 @@ export class Settings implements SettingsData {
     return new Settings(data);
   }
 
-  public static exists(): boolean {
+  public static existsOnDisk(): boolean {
     const locs = Settings.settingsLoc();
     return existsSync(locs.primary) || existsSync(locs.backup);
   }
@@ -158,4 +159,12 @@ export class NoAvailableSettings extends Error {
     super('No available settings to read from');
     Object.setPrototypeOf(this, NoAvailableSettings.prototype);
   }
+}
+
+export function setGlobalSettings(val: Settings): void {
+  globalSettings = val;
+}
+
+export function getGlobalSettings(): Settings {
+  return globalSettings;
 }

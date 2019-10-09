@@ -67,7 +67,7 @@ export default class Welcome extends Vue {
         }
 
         if (!ipcRes.exists) {
-          this.$router.push('/create-wallet-1');
+          this.$router.push('/start/create-wallet-1');
         }
       } catch (e) {
         log.error('Failed to init welcome page properly:', e);
