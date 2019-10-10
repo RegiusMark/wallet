@@ -9,7 +9,13 @@ import { Table } from './table';
 
 export { Table } from './table';
 
-let isInitialized = false;
+enum DbState {
+  Open,
+  Initializing,
+  Closed,
+}
+
+let state = DbState.Closed;
 let dbInstance: WalletDb | null = null;
 
 export class WalletDb {
@@ -40,23 +46,27 @@ export class WalletDb {
     return this.db.get(sql, params);
   }
 
-  public static getConnection(): WalletDb {
-    if (!dbInstance) throw new Error('database not open');
+  public static getInstance(): WalletDb {
+    if (!(dbInstance && state === DbState.Open)) throw new Error('database not open');
     return dbInstance;
   }
 
   public static async init(key: SecretKey): Promise<void> {
-    if (isInitialized) throw new Error('database already open');
-    isInitialized = true;
+    // Atomic check and update happens here to prevent race condition with initialization
+    if (state !== DbState.Closed) throw new Error('database already open');
+    state = DbState.Initializing;
 
     const dbLoc = WalletDb.getLoc();
     const dbWrapper = await DbWrapper.open(dbLoc);
     dbInstance = new WalletDb(dbWrapper, key);
     await runMigrations(dbInstance);
+
+    // eslint-disable-next-line require-atomic-updates
+    state = DbState.Open;
   }
 
   public static delete(): void {
-    if (isInitialized) throw new Error('cannot delete db when initialized');
+    if (state !== DbState.Closed) throw new Error('cannot delete db when initialized');
     const dbLoc = WalletDb.getLoc();
     if (fs.existsSync(dbLoc)) {
       fs.unlinkSync(dbLoc);
