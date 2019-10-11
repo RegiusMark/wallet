@@ -4,10 +4,11 @@ import sql from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 
+import { Table, CryptoManager, TableConstructor } from './table';
 import { runMigrations } from './migrations';
-import { Table } from './table';
 
 export { Table } from './table';
+export * from './tables';
 
 enum DbState {
   Open,
@@ -20,30 +21,30 @@ let dbInstance: WalletDb | null = null;
 
 export class WalletDb {
   private db: DbWrapper;
-  private secretKey: SecretKey;
+  private crypto: DbCrypto;
   private tables: { [key: string]: Table } = {};
 
   private constructor(db: DbWrapper, secretKey: SecretKey) {
     this.db = db;
-    this.secretKey = secretKey;
+    this.crypto = new DbCrypto(secretKey);
   }
 
-  public getTable<T extends Table>(table: T & Function): T {
+  public getTable<T extends Table>(table: TableConstructor<T>): T {
     const name = table.name;
-    let tbl = this.tables[name];
+    let tbl = this.tables[name] as T;
     if (!tbl) {
-      // `table` is a class that is constructable
-      tbl = this.tables[name] = new (table as any)();
+      tbl = this.tables[name] = new table(this.crypto);
     }
-    return tbl as T;
+    return tbl;
   }
 
   public run(sql: string, params?: any): Promise<void> {
     return this.db.run(sql, params);
   }
 
-  public get(sql: string, params?: any): Promise<any> {
-    return this.db.get(sql, params);
+  public async get(sql: string, params?: any, isBlob = false): Promise<any> {
+    const val = await this.db.get(sql, params);
+    return val && isBlob ? val.value : val;
   }
 
   public static getInstance(): WalletDb {
@@ -110,5 +111,21 @@ class DbWrapper {
         resolve(new DbWrapper(db));
       });
     });
+  }
+}
+
+class DbCrypto implements CryptoManager {
+  private secretKey: SecretKey;
+
+  public constructor(secretKey: SecretKey) {
+    this.secretKey = secretKey;
+  }
+
+  public encrypt(data: Buffer | Uint8Array): Buffer {
+    return this.secretKey.encrypt(data);
+  }
+
+  public decrypt(data: Buffer | Uint8Array): Buffer {
+    return this.secretKey.decrypt(data);
   }
 }
