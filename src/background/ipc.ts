@@ -52,7 +52,7 @@ export default function(): void {
             try {
               await WalletDb.init(settings.dbSecretKey);
               initClient('ws://127.0.0.1:7777');
-              initSynchronizer([settings.keyPair.publicKey.toScript().hash()]);
+              await initSynchronizer([settings.keyPair.publicKey.toScript().hash()]);
               createDashboardWindow();
             } catch (e) {
               log.error('A severe error has occurred:', e);

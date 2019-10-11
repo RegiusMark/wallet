@@ -1,4 +1,5 @@
 import { BodyType, ScriptHash, Block, BlockHeader, SigPair } from 'godcoin';
+import { WalletDb, KvTable } from './db';
 import { getClient } from './client';
 import { Logger } from '../log';
 import Long from 'long';
@@ -8,12 +9,14 @@ let instance: ChainSynchronizer;
 
 class ChainSynchronizer {
   private readonly watchAddrs: ScriptHash[];
+  private currentHeight: Long;
 
-  private currentHeight = Long.fromNumber(0, true);
   private pendingBlocks: Block[] = [];
   private synchronizing = false;
 
-  public constructor(watchAddrs: ScriptHash[]) {
+  public constructor(watchAddrs: ScriptHash[], syncHeight: Long) {
+    if (!syncHeight.unsigned) throw new Error('syncHeight must be unsigned');
+    this.currentHeight = syncHeight;
     this.watchAddrs = watchAddrs;
 
     const client = getClient();
@@ -25,17 +28,25 @@ class ChainSynchronizer {
       this.start();
     });
 
-    client.on('sub_msg', (res): void => {
-      if (res.type === BodyType.GetBlock) {
-        const block = res.block as Block;
-        if (this.synchronizing) {
-          this.pendingBlocks.push(block);
-        } else {
-          log.info('Received block update:', block.block.header.height.toString());
-          this.applyBlock(block);
+    client.on(
+      'sub_msg',
+      async (res): Promise<void> => {
+        if (res.type === BodyType.GetBlock) {
+          const block = res.block as Block;
+          if (this.synchronizing) {
+            this.pendingBlocks.push(block);
+          } else {
+            log.info('Received block update:', block.block.header.height.toString());
+            try {
+              await this.applyBlock(block);
+              await this.updateIndex();
+            } catch (e) {
+              log.error('Failed to apply block\n', block, e);
+            }
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   private async start(): Promise<void> {
@@ -72,7 +83,7 @@ class ChainSynchronizer {
         if (blockBody.type !== BodyType.GetBlock) throw new Error('expected GetBlock response');
 
         const block = blockBody.block;
-        this.applyBlock(block);
+        await this.applyBlock(block);
 
         if (this.currentHeight.mod(10000).eq(0)) {
           log.info('Current sync height:', this.currentHeight.toString());
@@ -85,11 +96,12 @@ class ChainSynchronizer {
         // as the loop will still iterate over new blocks regardless if the body waits for promises to finish.
         for (const block of this.pendingBlocks) {
           log.info('Applying pending block:', block.block.header.height.toString());
-          this.applyBlock(block);
+          await this.applyBlock(block);
         }
         this.pendingBlocks = [];
       }
 
+      await this.updateIndex();
       log.info('Synchronization completed:', this.currentHeight.toString());
     } catch (e) {
       log.error('Failure during the synchronization process:', e);
@@ -98,19 +110,34 @@ class ChainSynchronizer {
     }
   }
 
-  private applyBlock(block: [BlockHeader, SigPair] | Block): void {
-    // TODO: store in the database
+  private async applyBlock(block: [BlockHeader, SigPair] | Block): Promise<void> {
+    let height: Long;
     if (block instanceof Block) {
-      this.currentHeight = block.block.header.height;
+      height = block.block.header.height;
     } else {
       // Block header + signature (no relevant transactions)
-      this.currentHeight = block[0].header.height;
+      height = block[0].header.height;
     }
+    if (!this.currentHeight.add(1).eq(height)) {
+      log.error('Missed block:', this.currentHeight.toString);
+    }
+    this.currentHeight = height;
+  }
+
+  private async updateIndex(): Promise<void> {
+    const store = WalletDb.getInstance().getTable(KvTable);
+    await store.setSyncHeight(this.currentHeight);
   }
 }
 
-export function initSynchronizer(watchAddrs: ScriptHash[]): void {
+export async function initSynchronizer(watchAddrs: ScriptHash[]): Promise<void> {
   if (getClient() === undefined) throw new Error('client not initialized');
+
+  let syncHeight = await WalletDb.getInstance()
+    .getTable(KvTable)
+    .getSyncHeight();
+  if (!syncHeight) syncHeight = Long.fromNumber(0, true);
+
   if (instance !== undefined) throw new Error('synchronizer already initialized');
-  instance = new ChainSynchronizer(watchAddrs);
+  instance = new ChainSynchronizer(watchAddrs, syncHeight);
 }
