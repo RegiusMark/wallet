@@ -9,8 +9,6 @@ export const KV_TABLE_NAME = 'kvstore';
  * Table for storing data in a key-value fashion
  */
 export class KvTable extends Table {
-  public crypto!: CryptoManager;
-
   public constructor(crypto: CryptoManager) {
     super(crypto);
   }

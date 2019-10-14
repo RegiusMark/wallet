@@ -1,4 +1,4 @@
-import { KV_TABLE_NAME } from './tables';
+import { KV_TABLE_NAME, TXS_TABLE_NAME } from './tables';
 import { WalletDb } from './index';
 import { Logger } from '../../log';
 import util from 'util';
@@ -31,6 +31,7 @@ export async function runMigrations(db: WalletDb): Promise<void> {
   switch (data.version) {
     case 0: // Upgrade to version 1
       await db.run(`CREATE TABLE ${KV_TABLE_NAME}(key TEXT PRIMARY KEY NOT NULL, value BLOB NOT NULL)`);
+      await db.run(`CREATE TABLE ${TXS_TABLE_NAME}(id INTEGER PRIMARY KEY AUTOINCREMENT, tx BLOB NOT NULL, desc BLOB)`);
 
       // Create migration table and set the version number
       await db.run(`CREATE TABLE ${migTblName}(id INTEGER PRIMARY KEY UNIQUE CHECK(id == 0), version INTEGER)`);

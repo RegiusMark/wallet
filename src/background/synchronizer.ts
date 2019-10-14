@@ -1,5 +1,16 @@
-import { BodyType, ScriptHash, Block, BlockHeader, SigPair } from 'godcoin';
-import { WalletDb, KvTable } from './db';
+import {
+  BodyType,
+  ScriptHash,
+  Block,
+  BlockHeader,
+  SigPair,
+  TxVariant,
+  MintTxV0,
+  RewardTxV0,
+  TransferTxV0,
+  OwnerTxV0,
+} from 'godcoin';
+import { WalletDb, KvTable, TxsTable } from './db';
 import { getClient } from './client';
 import { Logger } from '../log';
 import Long from 'long';
@@ -114,6 +125,14 @@ class ChainSynchronizer {
     let height: Long;
     if (block instanceof Block) {
       height = block.block.header.height;
+      const txsTable = WalletDb.getInstance().getTable(TxsTable);
+      for (const wrapper of block.block.transactions) {
+        const hasMatch = this.txHasMatch(wrapper);
+        if (hasMatch) {
+          // TODO emit an event to the renderer with the full tx
+          await txsTable.insert(wrapper);
+        }
+      }
     } else {
       // Block header + signature (no relevant transactions)
       height = block[0].header.height;
@@ -127,6 +146,28 @@ class ChainSynchronizer {
   private async updateIndex(): Promise<void> {
     const store = WalletDb.getInstance().getTable(KvTable);
     await store.setSyncHeight(this.currentHeight);
+  }
+
+  private txHasMatch(txVariant: TxVariant): boolean {
+    const tx = txVariant.tx;
+    if (tx instanceof OwnerTxV0) {
+      return this.isWatched(tx.minter.toScript().hash()) || this.isWatched(tx.script.hash());
+    } else if (tx instanceof MintTxV0) {
+      return this.isWatched(tx.to);
+    } else if (tx instanceof RewardTxV0) {
+      return this.isWatched(tx.to);
+    } else if (tx instanceof TransferTxV0) {
+      return this.isWatched(tx.from) || this.isWatched(tx.to);
+    }
+    const _exhaustiveCheck: never = tx;
+    throw new Error('exhaustive check failed tx: ' + _exhaustiveCheck);
+  }
+
+  private isWatched(addr: ScriptHash): boolean {
+    const index = this.watchAddrs.findIndex(watchAddr => {
+      return Buffer.compare(addr, watchAddr) === 0;
+    });
+    return index > -1;
   }
 }
 
