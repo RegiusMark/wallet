@@ -1,57 +1,78 @@
 <template>
-  <DashArea>
-    <div class="container">
-      <div style="margin-top: 0.85em; user-select: none;">
-        <img src="../../assets/coin-front.png" width="120" />
-      </div>
-      <div class="funds">
-        <span class="amount">1.00000</span>
-        <span>GRAEL</span>
-      </div>
-      <div class="actions">
-        <div>Send</div>
-        <div>Receive</div>
-      </div>
-      <div class="container-separator"></div>
-      <div class="transaction-history">
-        <div class="info-header">
-          <span v-if="txs.length <= 0">No transaction history</span>
-          <span v-else>Transactions</span>
+  <div style="height: 100%;">
+    <Dialog class="dialog-send-funds" v-model="dialogs.sendFunds.active">
+      <div style="text-align: center;">
+        <div style="user-select: none;">
+          <img src="../../assets/coin-front.png" width="80" />
         </div>
-        <div class="history">
-          <div v-for="tx of txs" :key="tx.time" :class="{ expanded: tx.expanded }">
-            <div class="tx-header" :class="{ incoming: tx.incoming }" @click="txClick(tx)">
-              <div v-if="tx.incoming">
-                <i class="fas fa-arrow-down left-icon"></i>
-                <span>Received</span>
+        <div class="funds" style="margin-top: 1em; font-size: 0.6em;">
+          <div style="font-size: 1.5em; user-select: none;">Available</div>
+          <span class="amount">{{ availableBal.toString() }}</span>
+        </div>
+        <div class="text-inputs">
+          <TextInput icon="fa-address-card" placeholder="Send to GODcoin address..." />
+          <TextInput icon="fa-coins" placeholder="Amount to send..." />
+        </div>
+        <div style="padding-bottom: 2em; height: 0.1px"></div>
+      </div>
+    </Dialog>
+    <DashArea>
+      <div class="container">
+        <div style="margin-top: 0.85em; user-select: none;">
+          <img src="../../assets/coin-front.png" width="120" />
+        </div>
+        <div class="funds">
+          <span class="amount">{{ availableBal.toString(false) }}</span>
+          <span>GRAEL</span>
+        </div>
+        <div class="actions">
+          <div @click="sendBtnClick">Send</div>
+          <div>Receive</div>
+        </div>
+        <div class="container-separator"></div>
+        <div class="transaction-history">
+          <div class="info-header">
+            <span v-if="txs.length <= 0">No transaction history</span>
+            <span v-else>Transactions</span>
+          </div>
+          <div class="history">
+            <div v-for="tx of txs" :key="tx.time" :class="{ expanded: tx.expanded }">
+              <div class="tx-header" :class="{ incoming: tx.incoming }" @click="txClick(tx)">
+                <div v-if="tx.incoming">
+                  <i class="fas fa-arrow-down left-icon"></i>
+                  <span>Received</span>
+                </div>
+                <div v-else>
+                  <i class="fas fa-arrow-up left-icon"></i>
+                  <span>Sent</span>
+                </div>
+                <div>
+                  <span>{{ tx.incoming ? '+ ' + tx.amount : tx.amount }}</span>
+                  <i
+                    class="fas fa-chevron-up right-icon"
+                    :style="{ transform: tx.expanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                  ></i>
+                </div>
               </div>
-              <div v-else>
-                <i class="fas fa-arrow-up left-icon"></i>
-                <span>Sent</span>
+              <div class="tx-body" v-if="tx.expanded">
+                <span>TODO</span>
               </div>
-              <div>
-                <span>{{ tx.incoming ? '+ ' + tx.amount : tx.amount }}</span>
-                <i
-                  class="fas fa-chevron-up right-icon"
-                  :style="{ transform: tx.expanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
-                ></i>
-              </div>
+              <div class="tx-separator" style="width: 100%;" />
             </div>
-            <div class="tx-body" v-if="tx.expanded">
-              <span>TODO</span>
-            </div>
-            <div class="tx-separator" style="width: 100%;" />
           </div>
         </div>
       </div>
-    </div>
-  </DashArea>
+    </DashArea>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import DashArea from '@/components/DashArea.vue';
 import { PublicKey, generateKeyPair, Asset } from 'godcoin';
+import { Component, Vue } from 'vue-property-decorator';
+import TextInput from '@/components/TextInput.vue';
+import DashArea from '@/components/DashArea.vue';
+import Dialog from '@/components/Dialog.vue';
+import big from 'big.js';
 
 export interface Transaction {
   time: Date;
@@ -72,13 +93,26 @@ interface DisplayableTransaction {
   expanded: boolean;
 }
 
+interface DialogData {
+  active: boolean;
+}
+
 @Component({
   components: {
+    TextInput,
     DashArea,
+    Dialog,
   },
 })
 export default class Dashboard extends Vue {
+  private dialogs: { sendFunds: DialogData } = {
+    sendFunds: {
+      active: false,
+    },
+  };
+
   private txs: DisplayableTransaction[] = [];
+  private availableBal = new Asset(big(0));
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
@@ -98,6 +132,7 @@ export default class Dashboard extends Vue {
       },
     ];
 
+    this.availableBal = Asset.fromString('1.00000 GRAEL');
     this.txs = mock_txs
       .sort((a, b): number => {
         return b.time.getTime() - a.time.getTime();
@@ -117,6 +152,10 @@ export default class Dashboard extends Vue {
 
   private txClick(tx: DisplayableTransaction): void {
     tx.expanded = !tx.expanded;
+  }
+
+  private sendBtnClick(): void {
+    this.dialogs.sendFunds.active = true;
   }
 }
 </script>
@@ -237,6 +276,16 @@ export default class Dashboard extends Vue {
     &:hover {
       background-color: $bg-color;
     }
+  }
+}
+
+.dialog-send-funds {
+  .funds > *:first-child {
+    color: hsla(55, 83, 70, 0.8);
+  }
+
+  .text-inputs > * {
+    margin-top: 1.5em;
   }
 }
 </style>
