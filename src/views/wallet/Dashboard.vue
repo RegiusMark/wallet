@@ -26,8 +26,8 @@
           <span>GRAEL</span>
         </div>
         <div class="actions">
-          <div @click="sendBtnClick">Send</div>
-          <div>Receive</div>
+          <Btn @click="sendBtnClick">Send</Btn>
+          <Btn>Receive</Btn>
         </div>
         <div class="container-separator"></div>
         <div class="transaction-history">
@@ -72,6 +72,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
 import Dialog from '@/components/Dialog.vue';
+import Btn from '@/components/Btn.vue';
 import big from 'big.js';
 
 export interface Transaction {
@@ -102,6 +103,7 @@ interface DialogData {
     TextInput,
     DashArea,
     Dialog,
+    Btn,
   },
 })
 export default class Dashboard extends Vue {
@@ -186,25 +188,6 @@ export default class Dashboard extends Vue {
 
   & > div {
     flex: 0 0 6em;
-    margin: 1em;
-    padding: 0.4em 1em;
-    background-color: hsla(275, 50, 40, 0.5);
-    border: solid 2px hsla(275, 50, 40, 0.8);
-    border-radius: 4px;
-
-    color: hsla(0, 0, 100, 0.9);
-    font-size: 1.15em;
-    text-align: center;
-
-    user-select: none;
-    cursor: pointer;
-
-    transition: background-color 250ms;
-
-    &:hover {
-      background-color: hsla(275, 50, 40, 0.8);
-      border-color: hsla(275, 50, 40, 1);
-    }
   }
 }
 
