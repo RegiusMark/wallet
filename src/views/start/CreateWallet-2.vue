@@ -81,9 +81,9 @@ export default class CreateWallet2 extends Vue {
 
     const password = RootStore.password!;
     const keyPair = RootStore.keyPair!;
-    RootStore.reset();
 
     try {
+      // A new window will be created afterwards
       await ipc.firstSetup(password, keyPair);
     } catch (e) {
       log.error('Failed to create wallet', e);

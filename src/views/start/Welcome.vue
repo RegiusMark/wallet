@@ -104,8 +104,7 @@ export default class Welcome extends Vue {
         const status = ipcRes.status;
         switch (status) {
           case 'success':
-            RootStore.reset();
-            this.$router.push(this.dashboardPage);
+            // A new window will be created on success
             break;
           case 'incorrect_password':
             this.helpMsg = this.helpMsgs.incorrectPassword;
