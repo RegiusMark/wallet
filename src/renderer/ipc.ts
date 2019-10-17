@@ -29,10 +29,10 @@ class IpcManager {
       privateKey: typeof keyPair === 'string' ? keyPair : keyPair.privateKey.toWif(),
     });
     const ipcRes = await this.send({
-      type: 'settings:load_settings',
+      type: 'settings:init_wallet',
       password,
     });
-    if (ipcRes.type !== 'settings:load_settings') {
+    if (ipcRes.type !== 'settings:init_wallet') {
       throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
     }
     if (ipcRes.status !== 'success') {

@@ -11,8 +11,8 @@ export interface AppActionRes {
   res: ResModel;
 }
 
-export type ReqModel = FirstSetupReq | LoadSettingsReq;
-export type ResModel = FirstSetupRes | LoadSettingsRes;
+export type ReqModel = FirstSetupReq | InitWalletReq;
+export type ResModel = FirstSetupRes | InitWalletRes;
 
 export interface FirstSetupReq {
   type: 'settings:first_setup';
@@ -24,12 +24,12 @@ export interface FirstSetupRes {
   type: 'settings:first_setup';
 }
 
-export interface LoadSettingsReq {
-  type: 'settings:load_settings';
+export interface InitWalletReq {
+  type: 'settings:init_wallet';
   password: string;
 }
 
-export interface LoadSettingsRes {
-  type: 'settings:load_settings';
+export interface InitWalletRes {
+  type: 'settings:init_wallet';
   status: 'success' | 'incorrect_password' | 'invalid_checksum' | 'no_settings_available' | 'unknown';
 }

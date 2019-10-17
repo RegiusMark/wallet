@@ -13,7 +13,6 @@
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
-import { LoadSettingsRes } from '@/ipc-models';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
@@ -96,10 +95,10 @@ export default class Welcome extends Vue {
         if (!this.isReady) return;
         const password = this.password;
         const ipcRes = await ipc.send({
-          type: 'settings:load_settings',
+          type: 'settings:init_wallet',
           password,
         });
-        if (ipcRes.type !== 'settings:load_settings') {
+        if (ipcRes.type !== 'settings:init_wallet') {
           throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
         }
         const status = ipcRes.status;

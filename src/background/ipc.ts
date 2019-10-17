@@ -38,14 +38,14 @@ export default function(): void {
           };
           break;
         }
-        case 'settings:load_settings': {
+        case 'settings:init_wallet': {
           const password = req.password;
           try {
             const settings = Settings.load(password);
             setGlobalSettings(settings);
 
             response = {
-              type: 'settings:load_settings',
+              type: 'settings:init_wallet',
               status: 'success',
             };
 
@@ -72,7 +72,7 @@ export default function(): void {
               status = 'unknown';
             }
             response = {
-              type: 'settings:load_settings',
+              type: 'settings:init_wallet',
               status,
             };
           }
