@@ -47,6 +47,10 @@ export class WalletDb {
     return val && isBlob ? val.value : val;
   }
 
+  public all(sql: string, params?: any): Promise<any> {
+    return this.db.all(sql, params);
+  }
+
   public static getInstance(): WalletDb {
     if (!(dbInstance && state === DbState.Open)) throw new Error('database not open');
     return dbInstance;
@@ -91,6 +95,15 @@ class DbWrapper {
       this.inner.run(sql, params, err => {
         if (err) return reject(err);
         resolve();
+      });
+    });
+  }
+
+  public all(sql: string, params: any = []): Promise<any[]> {
+    return new Promise((resolve, reject): void => {
+      this.inner.all(sql, params, function(this: sql.Statement, err, rows) {
+        if (err) return reject(err);
+        resolve(rows);
       });
     });
   }
