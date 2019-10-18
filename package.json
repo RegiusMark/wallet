@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.9",
-    "godcoin": "https://github.com/GODcoin/godcoin-js.git#24ab691",
+    "godcoin": "https://github.com/GODcoin/godcoin-js.git#3c8f1f7",
     "libsodium-wrappers": "^0.7.5",
     "long": "^4.0.0",
     "sqlite3": "^4.1.0",
@@ -29,6 +29,7 @@
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
+    "vuex-class": "^0.3.2",
     "ws": "^7.1.2"
   },
   "devDependencies": {

@@ -95,10 +95,10 @@ export default class Welcome extends Vue {
         if (!this.isReady) return;
         const password = this.password;
         const ipcRes = await ipc.send({
-          type: 'settings:init_wallet',
+          type: 'wallet:pre_init',
           password,
         });
-        if (ipcRes.type !== 'settings:init_wallet') {
+        if (ipcRes.type !== 'wallet:pre_init') {
           throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
         }
         const status = ipcRes.status;

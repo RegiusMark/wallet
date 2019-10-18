@@ -5137,9 +5137,9 @@ globule@^1.0.0:
     lodash "~4.17.10"
     minimatch "~3.0.2"
 
-"godcoin@https://github.com/GODcoin/godcoin-js.git#24ab691":
+"godcoin@https://github.com/GODcoin/godcoin-js.git#3c8f1f7":
   version "0.1.0"
-  resolved "https://github.com/GODcoin/godcoin-js.git#24ab691985fa07e86d073eab07fba71bd11c0f06"
+  resolved "https://github.com/GODcoin/godcoin-js.git#3c8f1f70e58a83688e428b2f2621ad07f7ed3c89"
   dependencies:
     big.js "^5.2.2"
     bs58 "^4.0.1"
@@ -11263,6 +11263,11 @@ vue@^2.6.10:
   version "2.6.10"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
+
+vuex-class@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/vuex-class/-/vuex-class-0.3.2.tgz#c7e96a076c1682137d4d23a8dcfdc63f220e17a8"
+  integrity sha512-m0w7/FMsNcwJgunJeM+wcNaHzK2KX1K1rw2WUQf7Q16ndXHo7pflRyOV/E8795JO/7fstyjH3EgqBI4h4n4qXQ==
 
 vuex-module-decorators@^0.10.1:
   version "0.10.1"

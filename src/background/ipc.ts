@@ -1,7 +1,8 @@
-import { Settings, NoAvailableSettings, setGlobalSettings } from './settings';
+import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { initSynchronizer } from './synchronizer';
 import { createDashboardWindow } from './index';
+import { WalletDb, TxsTable } from './db';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
 import { initClient } from './client';
@@ -9,7 +10,6 @@ import { randomBytes } from 'crypto';
 import { ipcMain } from 'electron';
 import { KeyPair } from 'godcoin';
 import { Logger } from '../log';
-import { WalletDb } from './db';
 
 const log = new Logger('main:ipc');
 
@@ -20,7 +20,7 @@ export default function(): void {
       let response: models.ResModel;
 
       switch (req.type) {
-        case 'settings:first_setup': {
+        case 'wallet:first_setup': {
           const secretKey = new SecretKey(randomBytes(sodium.crypto_secretbox_KEYBYTES));
           const keyPair = KeyPair.fromWif(req.privateKey);
 
@@ -34,18 +34,18 @@ export default function(): void {
           WalletDb.delete();
 
           response = {
-            type: 'settings:first_setup',
+            type: 'wallet:first_setup',
           };
           break;
         }
-        case 'settings:init_wallet': {
+        case 'wallet:pre_init': {
           const password = req.password;
           try {
             const settings = Settings.load(password);
             setGlobalSettings(settings);
 
             response = {
-              type: 'settings:init_wallet',
+              type: 'wallet:pre_init',
               status: 'success',
             };
 
@@ -72,10 +72,24 @@ export default function(): void {
               status = 'unknown';
             }
             response = {
-              type: 'settings:init_wallet',
+              type: 'wallet:pre_init',
               status,
             };
           }
+          break;
+        }
+        case 'wallet:post_init': {
+          const db = WalletDb.getInstance();
+          const table = db.getTable(TxsTable);
+
+          const txs = await table.getAll();
+          const publicKey = getGlobalSettings().keyPair.publicKey.buffer;
+
+          response = {
+            type: 'wallet:post_init',
+            txs,
+            publicKey,
+          };
           break;
         }
         default: {

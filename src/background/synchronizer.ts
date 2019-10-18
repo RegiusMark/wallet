@@ -165,7 +165,7 @@ class ChainSynchronizer {
 
   private isWatched(addr: ScriptHash): boolean {
     const index = this.watchAddrs.findIndex(watchAddr => {
-      return Buffer.compare(addr, watchAddr) === 0;
+      return Buffer.compare(addr.bytes, watchAddr.bytes) === 0;
     });
     return index > -1;
   }

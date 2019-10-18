@@ -1,6 +1,7 @@
+import { KeyPair, PublicKey, TxVariant, ByteBuffer } from 'godcoin';
+import { TxRow } from '@/background/db';
 import * as models from '@/ipc-models';
 import { ipcRenderer } from 'electron';
-import { KeyPair } from 'godcoin';
 import { Logger } from '@/log';
 
 const log = new Logger('renderer:ipc');
@@ -24,20 +25,43 @@ class IpcManager {
 
   public async firstSetup(password: string, keyPair: string | KeyPair): Promise<void> {
     await this.send({
-      type: 'settings:first_setup',
+      type: 'wallet:first_setup',
       password,
       privateKey: typeof keyPair === 'string' ? keyPair : keyPair.privateKey.toWif(),
     });
     const ipcRes = await this.send({
-      type: 'settings:init_wallet',
+      type: 'wallet:pre_init',
       password,
     });
-    if (ipcRes.type !== 'settings:init_wallet') {
+    if (ipcRes.type !== 'wallet:pre_init') {
       throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
     }
     if (ipcRes.status !== 'success') {
       throw new Error('Failed to complete load settings after setup: ' + ipcRes.status);
     }
+  }
+
+  public async postInit(): Promise<models.PostInitWalletRes> {
+    const ipcRes = await this.send({
+      type: 'wallet:post_init',
+    });
+    if (ipcRes.type !== 'wallet:post_init') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+
+    const txs: TxRow[] = [];
+    for (const txRow of ipcRes.txs) {
+      txs.push({
+        id: txRow.id,
+        desc: txRow.desc,
+        tx: TxVariant.deserialize(ByteBuffer.from(txRow.tx)),
+      });
+    }
+
+    return {
+      publicKey: new PublicKey(ipcRes.publicKey),
+      txs,
+    };
   }
 
   public send(req: models.ReqModel): Promise<models.ResModel> {

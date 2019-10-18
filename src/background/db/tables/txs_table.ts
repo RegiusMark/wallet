@@ -1,13 +1,19 @@
 import { Table, CryptoManager } from '../table';
-import { TxVariant, ByteBuffer } from 'godcoin';
+import { TxVariant } from 'godcoin';
 import { WalletDb } from '..';
 
 export const TXS_TABLE_NAME = 'transactions';
 
+export interface TxRawRow {
+  id: number;
+  desc: string | null;
+  tx: Buffer;
+}
+
 export interface TxRow {
   id: number;
-  tx: TxVariant;
   desc: string | null;
+  tx: TxVariant;
 }
 
 /**
@@ -22,17 +28,16 @@ export class TxsTable extends Table {
     return TXS_TABLE_NAME;
   }
 
-  public async getAll(): Promise<TxRow[]> {
+  public async getAll(): Promise<TxRawRow[]> {
     const db = WalletDb.getInstance();
     const dbRows = await db.all(`SELECT * FROM ${this.tableName()}`);
 
-    const rows: TxRow[] = [];
+    const rows: TxRawRow[] = [];
     for (const dbRow of dbRows) {
-      rows.push({
-        id: dbRow.id,
-        tx: TxVariant.deserialize(ByteBuffer.from(this.crypto.decrypt(dbRow.tx))),
-        desc: dbRow.desc !== null ? this.crypto.decrypt(dbRow.desc).toString('utf8') : null,
-      });
+      const id = dbRow.id;
+      const desc = dbRow.desc !== null ? this.crypto.decrypt(dbRow.desc).toString('utf8') : null;
+      const tx = this.crypto.decrypt(dbRow.tx);
+      rows.push({ id, desc, tx });
     }
     return rows;
   }

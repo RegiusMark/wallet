@@ -36,8 +36,8 @@
             <span v-else>Transactions</span>
           </div>
           <div class="history">
-            <div v-for="tx of txs" :key="tx.time" :class="{ expanded: tx.expanded }">
-              <div class="tx-header" :class="{ incoming: tx.incoming }" @click="txClick(tx)">
+            <div v-for="(tx, index) of txs" :key="tx.id" :class="{ expanded: tx.expanded }">
+              <div class="tx-header" :class="{ incoming: tx.incoming }" @click="txClick(index, tx)">
                 <div v-if="tx.incoming">
                   <i class="fas fa-arrow-down left-icon"></i>
                   <span>Received</span>
@@ -67,32 +67,20 @@
 </template>
 
 <script lang="ts">
-import { PublicKey, generateKeyPair, Asset } from 'godcoin';
+import { generateKeyPair, Asset } from 'godcoin';
 import { Component, Vue } from 'vue-property-decorator';
+import { WalletStore, DisplayableTx } from '@/store';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
 import Dialog from '@/components/Dialog.vue';
+import { TxRow } from '@/background/db';
 import Btn from '@/components/Btn.vue';
+import { State } from 'vuex-class';
+import ipc from '@/renderer/ipc';
+import { Logger } from '@/log';
 import big from 'big.js';
 
-export interface Transaction {
-  time: Date;
-  to: PublicKey;
-  incoming: boolean;
-  amount: Asset;
-}
-
-interface DisplayableTransaction {
-  /* Formatted Date string */
-  time: string;
-  /* Public key WIF */
-  to: string;
-  incoming: boolean;
-  /* Asset number as string without ticker */
-  amount: string;
-  /* Whether or not the description is expanded */
-  expanded: boolean;
-}
+const log = new Logger('renderer:dashboard');
 
 interface DialogData {
   active: boolean;
@@ -113,47 +101,34 @@ export default class Dashboard extends Vue {
     },
   };
 
-  private txs: DisplayableTransaction[] = [];
+  @State(state => state.wallet.txs) private txs!: DisplayableTx[];
   private availableBal = new Asset(big(0));
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
     // Mock data
-    const mock_txs: Transaction[] = [
-      {
-        time: new Date(0),
-        to: generateKeyPair().publicKey,
-        incoming: true,
-        amount: Asset.fromString('2.00000 GRAEL'),
-      },
-      {
-        time: new Date(1000),
-        to: generateKeyPair().publicKey,
-        incoming: false,
-        amount: Asset.fromString('1.00000 GRAEL'),
-      },
-    ];
-
     this.availableBal = Asset.fromString('1.00000 GRAEL');
-    this.txs = mock_txs
-      .sort((a, b): number => {
-        return b.time.getTime() - a.time.getTime();
-      })
-      .map(this.toDisplayableTransaction.bind(this));
+
+    if (WalletStore.initialized) return;
+    WalletStore.setInitialized(true);
+    (async (): Promise<void> => {
+      try {
+        const ipcRes = await ipc.postInit();
+        WalletStore.setData({
+          txs: ipcRes.txs,
+          publicKey: ipcRes.publicKey,
+        });
+      } catch (e) {
+        log.error('Error during post wallet initialization', e);
+      }
+    })();
   }
 
-  private toDisplayableTransaction(tx: Transaction): DisplayableTransaction {
-    return {
-      time: tx.time.toLocaleString(),
-      to: tx.to.toWif(),
-      incoming: tx.incoming,
-      amount: tx.amount.toString(false),
-      expanded: false,
-    };
-  }
-
-  private txClick(tx: DisplayableTransaction): void {
-    tx.expanded = !tx.expanded;
+  private txClick(index: number, tx: DisplayableTx): void {
+    WalletStore.setExpandState({
+      index,
+      expanded: !tx.expanded,
+    });
   }
 
   private sendBtnClick(): void {
