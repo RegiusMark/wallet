@@ -36,7 +36,7 @@
             <span v-else>Transactions</span>
           </div>
           <div class="history">
-            <div v-for="(tx, index) of txs" :key="tx.id" :class="{ expanded: tx.expanded }">
+            <div v-for="(tx, index) of txs" :key="tx.id" :class="{ expanded: tx.meta.expanded }">
               <div class="tx-header" :class="{ incoming: tx.incoming }" @click="txClick(index, tx)">
                 <div v-if="tx.incoming">
                   <i class="fas fa-arrow-down left-icon"></i>
@@ -50,11 +50,11 @@
                   <span>{{ tx.incoming ? '+ ' + tx.amount : tx.amount }}</span>
                   <i
                     class="fas fa-chevron-up right-icon"
-                    :style="{ transform: tx.expanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                    :style="{ transform: tx.meta.expanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
                   ></i>
                 </div>
               </div>
-              <div class="tx-body" v-if="tx.expanded">
+              <div class="tx-body" v-if="tx.meta.expanded">
                 <span>TODO</span>
               </div>
               <div class="tx-separator" style="width: 100%;" />
@@ -127,7 +127,7 @@ export default class Dashboard extends Vue {
   private txClick(index: number, tx: DisplayableTx): void {
     WalletStore.setExpandState({
       index,
-      expanded: !tx.expanded,
+      expanded: !tx.meta.expanded,
     });
   }
 

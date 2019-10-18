@@ -3,17 +3,22 @@ import { PublicKey, ScriptHash, TransferTxV0 } from 'godcoin';
 import { TxRow } from '@/background/db';
 
 export interface DisplayableTx {
-  /* DB row ID */
-  id: number;
+  meta: {
+    /* DB row ID */
+    id: number;
+    /* Whether or not the transaction is expanded */
+    expanded: boolean;
+    /* User provided description about the transaction */
+    desc: string | null;
+  };
   /* Formatted Date string */
   time: string;
-  /* Public key WIF */
-  to: string;
+  /* Incoming or outgoing P2SH address */
+  address: string;
+  /* Whether or not the transaction was sent (true) or received (false) */
   incoming: boolean;
   /* Asset number as string without ticker */
   amount: string;
-  /* Whether or not the description is expanded */
-  expanded: boolean;
 }
 
 export interface UpdateExpandState {
@@ -64,19 +69,23 @@ export default class WalletStore extends VuexModule {
 
   @Mutation
   public setExpandState(data: UpdateExpandState): void {
-    this.txs[data.index].expanded = data.expanded;
+    this.txs[data.index].meta.expanded = data.expanded;
   }
 }
 
 function toDisplayableTx(addr: ScriptHash, txRow: TxRow): DisplayableTx | undefined {
   const tx = txRow.tx.tx;
   if (!(tx instanceof TransferTxV0)) return;
+  const incoming = Buffer.compare(tx.to.bytes, addr.bytes) === 0;
   return {
-    id: txRow.id,
+    meta: {
+      id: txRow.id,
+      expanded: false,
+      desc: txRow.desc,
+    },
     time: new Date(tx.timestamp.toNumber()).toLocaleString(),
-    to: tx.to.toWif(),
-    incoming: Buffer.compare(tx.to.bytes, addr.bytes) === 0,
+    address: incoming ? tx.from.toWif() : tx.to.toWif(),
+    incoming,
     amount: tx.amount.toString(false),
-    expanded: false,
   };
 }
