@@ -186,10 +186,12 @@ class ChainSynchronizer {
   private async updateTotalBalance(): Promise<void> {
     const proms = [];
     for (const addr of this.watchAddrs) {
-      proms.push(getClient().sendReq({
-        type: BodyType.GetAddressInfo,
-        addr
-      }));
+      proms.push(
+        getClient().sendReq({
+          type: BodyType.GetAddressInfo,
+          addr,
+        }),
+      );
     }
     const responses = await Promise.all(proms);
     let totalBal = new Asset(Big(0));

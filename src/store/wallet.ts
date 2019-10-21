@@ -22,6 +22,12 @@ export interface DisplayableTx {
   amount: string;
 }
 
+export interface InitData {
+  txs: TxRow[];
+  publicKey: PublicKey;
+  totalBal: Asset;
+}
+
 export interface UpdateExpandState {
   index: number;
   expanded: boolean;
@@ -47,7 +53,7 @@ export default class WalletStore extends VuexModule {
   }
 
   @Mutation
-  public setData(data: { txs: TxRow[]; publicKey: PublicKey; totalBal: Asset; }): void {
+  public setData(data: InitData): void {
     this.publicKey = data.publicKey;
     this.p2shAddr = data.publicKey.toScript().hash();
     this.totalBal = data.totalBal;
