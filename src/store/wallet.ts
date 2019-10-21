@@ -65,7 +65,7 @@ export default class WalletStore extends VuexModule {
         txs.push(dtx);
       }
     }
-    this.txs = txs;
+    this.txs = txs.reverse();
   }
 
   @Mutation
@@ -74,11 +74,17 @@ export default class WalletStore extends VuexModule {
   }
 
   @Mutation
-  public insertTx(tx: TxRow): void {
-    const dtx = toDisplayableTx(this.p2shAddr!, tx);
-    if (dtx) {
-      this.txs.push(dtx);
+  public insertTxs(txs: TxRow[]): void {
+    const dtxs = [];
+    for (const tx of txs) {
+      const dtx = toDisplayableTx(this.p2shAddr!, tx);
+      if (dtx) {
+        dtxs.push(dtx);
+      }
     }
+    dtxs.reverse();
+
+    this.txs.unshift(...dtxs);
   }
 
   @Mutation

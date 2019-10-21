@@ -122,9 +122,7 @@ export default class Dashboard extends Vue {
         ipc.onSyncUpdate((update): void => {
           if (update.newData) {
             WalletStore.setTotalBalance(update.newData.totalBalance);
-            for (const txRow of update.newData.txs) {
-              WalletStore.insertTx(txRow);
-            }
+            WalletStore.insertTxs(update.newData.txs);
           }
         });
       } catch (e) {
