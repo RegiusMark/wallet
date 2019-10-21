@@ -112,7 +112,7 @@ export default function(): void {
   });
 }
 
-export function emitSyncUpdate(update: models.SyncUpdateRaw) {
+export function emitSyncUpdate(update: models.SyncUpdateRaw): void {
   const window = getWindowInstance();
   if (window === null) {
     log.error('No active window to send update');
