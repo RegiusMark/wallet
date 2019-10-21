@@ -2,7 +2,7 @@
   <div style="height: 100%;">
     <Dialog class="dialog-send-funds" v-model="dialogs.sendFunds.active">
       <div style="text-align: center;">
-        <div style="user-select: none;">
+        <div style="user-select: none; filter: brightness(0.85)">
           <img src="../../assets/coin-front.png" width="80" />
         </div>
         <div class="funds" style="margin-top: 1em; font-size: 0.6em;">
@@ -18,7 +18,7 @@
     </Dialog>
     <DashArea>
       <div class="container">
-        <div style="margin-top: 0.85em; user-select: none;">
+        <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
           <img src="../../assets/coin-front.png" width="120" />
         </div>
         <div class="funds">
