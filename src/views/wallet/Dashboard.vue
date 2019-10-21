@@ -68,13 +68,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { WalletStore, DisplayableTx } from '@/store';
+import { DisplayableTx } from '@/store/wallet';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
 import { generateKeyPair, Asset } from 'godcoin';
 import Dialog from '@/components/Dialog.vue';
 import { TxRow } from '@/background/db';
 import Btn from '@/components/Btn.vue';
+import { WalletStore } from '@/store';
 import { State } from 'vuex-class';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
@@ -120,6 +121,7 @@ export default class Dashboard extends Vue {
         });
 
         ipc.onSyncUpdate((update): void => {
+          WalletStore.setSyncStatus(update.status);
           if (update.newData) {
             WalletStore.setTotalBalance(update.newData.totalBalance);
             WalletStore.insertTxs(update.newData.txs);

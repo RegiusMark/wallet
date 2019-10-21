@@ -4,8 +4,6 @@ import _RootStore from './root';
 import Vuex from 'vuex';
 import Vue from 'vue';
 
-export { DisplayableTx } from './wallet';
-
 Vue.use(Vuex);
 
 const store = new Vuex.Store({

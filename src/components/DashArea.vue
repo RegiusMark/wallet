@@ -4,6 +4,11 @@
       <div class="dash-logo">
         <img src="../assets/logo.png" width="60" />
       </div>
+      <div class="dash-sync-status">
+        <div v-if="syncStatus === SyncStatus.Complete">Sync complete</div>
+        <div v-else-if="syncStatus === SyncStatus.InProgress">Synchronizing...</div>
+        <div v-else>Unknown sync state.</div>
+      </div>
       <div class="dash-buttons">
         <span v-for="btn in buttons" :key="btn.link">
           <router-link :to="btn.link" tag="div" :class="{ active: btn.active }">
@@ -21,6 +26,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { SyncStatus } from '@/ipc-models';
+import { State } from 'vuex-class';
 
 interface MenuButton {
   icon: string;
@@ -31,6 +38,9 @@ interface MenuButton {
 
 @Component
 export default class DashArea extends Vue {
+  // Allow referencing in the template
+  private readonly SyncStatus = SyncStatus;
+
   private readonly buttons: MenuButton[] = [
     {
       icon: 'fa-wallet',
@@ -45,6 +55,9 @@ export default class DashArea extends Vue {
       active: false,
     },
   ];
+
+  @State(state => state.wallet.syncStatus)
+  private syncStatus!: SyncStatus;
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
@@ -79,6 +92,12 @@ $background-color: hsla(267, 59, 12, 1);
   .dash-logo {
     text-align: center;
     padding-top: 1em;
+  }
+
+  .dash-sync-status {
+    text-align: center;
+    color: hsla(0, 0, 100, 0.55);
+    margin-top: 1em;
   }
 
   .dash-buttons {
