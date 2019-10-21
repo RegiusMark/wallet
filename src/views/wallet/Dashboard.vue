@@ -55,7 +55,7 @@
                 </div>
               </div>
               <div class="tx-body" v-if="tx.meta.expanded">
-                <span>TODO</span>
+                <div>Date: {{ tx.time }}</div>
               </div>
               <div class="tx-separator" style="width: 100%;" />
             </div>
