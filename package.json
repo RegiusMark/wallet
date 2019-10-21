@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.9",
-    "godcoin": "https://github.com/GODcoin/godcoin-js.git#3c8f1f7",
+    "godcoin": "https://github.com/GODcoin/godcoin-js.git#9999df3",
     "libsodium-wrappers": "^0.7.5",
     "long": "^4.0.0",
     "sqlite3": "^4.1.0",
