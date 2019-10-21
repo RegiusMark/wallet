@@ -9,10 +9,12 @@ import {
   RewardTxV0,
   TransferTxV0,
   OwnerTxV0,
+  Asset,
 } from 'godcoin';
 import { WalletDb, KvTable, TxsTable } from './db';
 import { getClient } from './client';
 import { Logger } from '../log';
+import Big from 'big.js';
 import Long from 'long';
 
 let log = new Logger('main:chain_synchronizer');
@@ -49,10 +51,13 @@ class ChainSynchronizer {
           } else {
             log.info('Received block update:', block.block.header.height.toString());
             try {
-              await this.applyBlock(block);
+              const updateBal = await this.applyBlock(block);
+              if (updateBal) {
+                await this.updateTotalBalance();
+              }
               await this.updateIndex();
             } catch (e) {
-              log.error('Failed to apply block\n', block, e);
+              log.error('Failed to handle incoming block\n', block, e);
             }
           }
         }
@@ -113,6 +118,7 @@ class ChainSynchronizer {
       }
 
       await this.updateIndex();
+      await this.updateTotalBalance();
       log.info('Synchronization completed:', this.currentHeight.toString());
     } catch (e) {
       log.error('Failure during the synchronization process:', e);
@@ -121,8 +127,11 @@ class ChainSynchronizer {
     }
   }
 
-  private async applyBlock(block: [BlockHeader, SigPair] | Block): Promise<void> {
+  private async applyBlock(block: [BlockHeader, SigPair] | Block): Promise<boolean> {
+    // Whether or not the applied block matches a watched address
+    let match = false;
     let height: Long;
+
     if (block instanceof Block) {
       height = block.block.header.height;
       const txsTable = WalletDb.getInstance().getTable(TxsTable);
@@ -130,6 +139,7 @@ class ChainSynchronizer {
         const hasMatch = this.txHasMatch(wrapper);
         if (hasMatch) {
           // TODO emit an event to the renderer with the full tx
+          match = true;
           await txsTable.insert(wrapper);
         }
       }
@@ -137,15 +147,13 @@ class ChainSynchronizer {
       // Block header + signature (no relevant transactions)
       height = block[0].header.height;
     }
+
     if (!this.currentHeight.add(1).eq(height)) {
       log.error('Missed block:', this.currentHeight.toString);
     }
     this.currentHeight = height;
-  }
 
-  private async updateIndex(): Promise<void> {
-    const store = WalletDb.getInstance().getTable(KvTable);
-    await store.setSyncHeight(this.currentHeight);
+    return match;
   }
 
   private txHasMatch(txVariant: TxVariant): boolean {
@@ -168,6 +176,30 @@ class ChainSynchronizer {
       return Buffer.compare(addr.bytes, watchAddr.bytes) === 0;
     });
     return index > -1;
+  }
+
+  private async updateIndex(): Promise<void> {
+    const store = WalletDb.getInstance().getTable(KvTable);
+    await store.setSyncHeight(this.currentHeight);
+  }
+
+  private async updateTotalBalance(): Promise<void> {
+    const proms = [];
+    for (const addr of this.watchAddrs) {
+      proms.push(getClient().sendReq({
+        type: BodyType.GetAddressInfo,
+        addr
+      }));
+    }
+    const responses = await Promise.all(proms);
+    let totalBal = new Asset(Big(0));
+    for (const res of responses) {
+      if (res.type !== BodyType.GetAddressInfo) throw new Error('unexpected RPC response: ' + res.type);
+      totalBal = totalBal.add(res.info.balance);
+    }
+
+    const store = WalletDb.getInstance().getTable(KvTable);
+    await store.setTotalBalance(totalBal);
   }
 }
 

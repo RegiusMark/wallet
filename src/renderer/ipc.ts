@@ -1,8 +1,9 @@
-import { KeyPair, PublicKey, TxVariant, ByteBuffer } from 'godcoin';
+import { KeyPair, PublicKey, TxVariant, ByteBuffer, Asset } from 'godcoin';
 import { TxRow } from '@/background/db';
 import * as models from '@/ipc-models';
 import { ipcRenderer } from 'electron';
 import { Logger } from '@/log';
+import Big from 'big.js';
 
 const log = new Logger('renderer:ipc');
 
@@ -60,6 +61,7 @@ class IpcManager {
 
     return {
       publicKey: new PublicKey(ipcRes.publicKey),
+      totalBalance: new Asset(Big(ipcRes.totalBalance)),
       txs,
     };
   }

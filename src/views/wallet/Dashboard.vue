@@ -7,7 +7,7 @@
         </div>
         <div class="funds" style="margin-top: 1em; font-size: 0.6em;">
           <div style="font-size: 1.5em; user-select: none;">Available</div>
-          <span class="amount">{{ availableBal.toString() }}</span>
+          <span class="amount">{{ totalBal.toString() }}</span>
         </div>
         <div class="text-inputs">
           <TextInput icon="fa-address-card" placeholder="Send to GODcoin address..." />
@@ -22,7 +22,7 @@
           <img src="../../assets/coin-front.png" width="120" />
         </div>
         <div class="funds">
-          <span class="amount">{{ availableBal.toString(false) }}</span>
+          <span class="amount">{{ totalBal.toString(false) }}</span>
           <span>GRAEL</span>
         </div>
         <div class="actions">
@@ -67,18 +67,17 @@
 </template>
 
 <script lang="ts">
-import { generateKeyPair, Asset } from 'godcoin';
 import { Component, Vue } from 'vue-property-decorator';
 import { WalletStore, DisplayableTx } from '@/store';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
+import { generateKeyPair, Asset } from 'godcoin';
 import Dialog from '@/components/Dialog.vue';
 import { TxRow } from '@/background/db';
 import Btn from '@/components/Btn.vue';
 import { State } from 'vuex-class';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
-import big from 'big.js';
 
 const log = new Logger('renderer:dashboard');
 
@@ -101,22 +100,23 @@ export default class Dashboard extends Vue {
     },
   };
 
-  @State(state => state.wallet.txs) private txs!: DisplayableTx[];
-  private availableBal = new Asset(big(0));
+  @State(state => state.wallet.txs)
+  private txs!: DisplayableTx[];
+
+  @State(state => state.wallet.totalBal)
+  private totalBal!: Asset;
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
-    // Mock data
-    this.availableBal = Asset.fromString('1.00000 GRAEL');
-
     if (WalletStore.initialized) return;
     WalletStore.setInitialized(true);
     (async (): Promise<void> => {
       try {
         const ipcRes = await ipc.postInit();
         WalletStore.setData({
-          txs: ipcRes.txs,
           publicKey: ipcRes.publicKey,
+          totalBal: ipcRes.totalBalance,
+          txs: ipcRes.txs,
         });
       } catch (e) {
         log.error('Error during post wallet initialization', e);

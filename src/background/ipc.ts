@@ -1,8 +1,8 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
+import { WalletDb, TxsTable, KvTable } from './db';
 import { initSynchronizer } from './synchronizer';
 import { createDashboardWindow } from './index';
-import { WalletDb, TxsTable } from './db';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
 import { initClient } from './client';
@@ -80,15 +80,18 @@ export default function(): void {
         }
         case 'wallet:post_init': {
           const db = WalletDb.getInstance();
-          const table = db.getTable(TxsTable);
+          const txsTable = db.getTable(TxsTable);
+          const kvTable = db.getTable(KvTable);
 
-          const txs = await table.getAll();
           const publicKey = getGlobalSettings().keyPair.publicKey.buffer;
+          const totalBalance = (await kvTable.getTotalBalance()).amount.toString();
+          const txs = await txsTable.getAll();
 
           response = {
             type: 'wallet:post_init',
-            txs,
             publicKey,
+            totalBalance,
+            txs,
           };
           break;
         }

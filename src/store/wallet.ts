@@ -1,6 +1,7 @@
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { PublicKey, ScriptHash, TransferTxV0 } from 'godcoin';
+import { PublicKey, ScriptHash, TransferTxV0, Asset } from 'godcoin';
 import { TxRow } from '@/background/db';
+import Big from 'big.js';
 
 export interface DisplayableTx {
   meta: {
@@ -38,6 +39,7 @@ export default class WalletStore extends VuexModule {
 
   // Dynamic data
   public txs: DisplayableTx[] = [];
+  public totalBal: Asset = new Asset(Big(0));
 
   @Mutation
   public setInitialized(initialized: boolean): void {
@@ -45,9 +47,10 @@ export default class WalletStore extends VuexModule {
   }
 
   @Mutation
-  public setData(data: { txs: TxRow[]; publicKey: PublicKey }): void {
+  public setData(data: { txs: TxRow[]; publicKey: PublicKey; totalBal: Asset; }): void {
     this.publicKey = data.publicKey;
     this.p2shAddr = data.publicKey.toScript().hash();
+    this.totalBal = data.totalBal;
 
     const txs = [];
     for (const tx of data.txs) {

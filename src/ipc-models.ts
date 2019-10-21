@@ -1,5 +1,5 @@
 import { TxRow, TxRawRow } from './background/db';
-import { PublicKey } from 'godcoin';
+import { PublicKey, Asset } from 'godcoin';
 
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';
 export const APP_ACTION_RES = 'APP_ACTION_RES';
@@ -44,10 +44,12 @@ export interface PostInitWalletRawReq {
 export interface PostInitWalletRawRes {
   type: 'wallet:post_init';
   publicKey: Uint8Array;
+  totalBalance: string;
   txs: TxRawRow[];
 }
 
 export interface PostInitWalletRes {
   publicKey: PublicKey;
+  totalBalance: Asset;
   txs: TxRow[];
 }
