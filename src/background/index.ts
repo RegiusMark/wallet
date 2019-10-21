@@ -91,6 +91,10 @@ export function createDashboardWindow(): void {
   installWindowHooks();
 }
 
+export function getWindowInstance(): BrowserWindow | null {
+  return window;
+}
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();

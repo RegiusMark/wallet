@@ -4,6 +4,8 @@ import { PublicKey, Asset } from 'godcoin';
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';
 export const APP_ACTION_RES = 'APP_ACTION_RES';
 
+/*** RPC models ***/
+
 export interface AppActionReq {
   id: number;
   req: ReqModel;
@@ -52,4 +54,27 @@ export interface PostInitWalletRes {
   publicKey: PublicKey;
   totalBalance: Asset;
   txs: TxRow[];
+}
+
+/*** IPC events (main -> renderer) ***/
+
+export enum SyncStatus {
+  Complete,
+  InProgress,
+}
+
+export interface SyncUpdateRaw {
+  status: SyncStatus;
+  newData?: {
+    totalBalance: string;
+    txs: TxRawRow[];
+  };
+}
+
+export interface SyncUpdate {
+  status: SyncStatus;
+  newData?: {
+    totalBalance: Asset;
+    txs: TxRow[];
+  };
 }

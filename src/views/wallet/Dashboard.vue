@@ -118,6 +118,15 @@ export default class Dashboard extends Vue {
           totalBal: ipcRes.totalBalance,
           txs: ipcRes.txs,
         });
+
+        ipc.onSyncUpdate((update): void => {
+          if (update.newData) {
+            WalletStore.setTotalBalance(update.newData.totalBalance);
+            for (const txRow of update.newData.txs) {
+              WalletStore.insertTx(txRow);
+            }
+          }
+        });
       } catch (e) {
         log.error('Error during post wallet initialization', e);
       }

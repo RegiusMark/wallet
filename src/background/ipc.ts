@@ -1,8 +1,8 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
+import { createDashboardWindow, getWindowInstance } from './index';
 import { WalletDb, TxsTable, KvTable } from './db';
 import { initSynchronizer } from './synchronizer';
-import { createDashboardWindow } from './index';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
 import { initClient } from './client';
@@ -110,4 +110,14 @@ export default function(): void {
       log.error('Failed to handle IPC request:', e);
     }
   });
+}
+
+export function emitSyncUpdate(update: models.SyncUpdateRaw) {
+  const window = getWindowInstance();
+  if (window === null) {
+    log.error('No active window to send update');
+    return;
+  }
+
+  window.webContents.send('sync_update', update);
 }

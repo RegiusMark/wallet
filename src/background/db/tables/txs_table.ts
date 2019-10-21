@@ -42,11 +42,18 @@ export class TxsTable extends Table {
     return rows;
   }
 
-  public async insert(tx: TxVariant, desc?: string): Promise<void> {
-    const txBuf = this.crypto.encrypt(tx.serialize().sharedView());
+  public async insert(tx: TxVariant, desc?: string): Promise<TxRawRow> {
+    const txUnencryptedBuf = tx.serialize().sharedView();
+    const txBuf = this.crypto.encrypt(txUnencryptedBuf);
     const descBuf = desc !== undefined ? this.crypto.encrypt(Buffer.from(desc, 'utf8')) : null;
 
     const db = WalletDb.getInstance();
-    await db.run(`INSERT INTO ${this.tableName()}(tx, desc) VALUES(?,?)`, [txBuf, descBuf]);
+    const res = await db.run(`INSERT INTO ${this.tableName()}(tx, desc) VALUES(?,?)`, [txBuf, descBuf]);
+
+    return {
+      id: res.lastID,
+      desc: desc || null,
+      tx: Buffer.from(txUnencryptedBuf),
+    };
   }
 }

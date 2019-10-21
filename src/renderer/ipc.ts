@@ -66,6 +66,36 @@ class IpcManager {
     };
   }
 
+  public onSyncUpdate(handler: (update: models.SyncUpdate) => void): void {
+    ipcRenderer.on('sync_update', (_evt, rawData: models.SyncUpdateRaw) => {
+      const data: models.SyncUpdate = {
+        status: rawData.status,
+      };
+      if (rawData.newData) {
+        const totalBalance = new Asset(Big(rawData.newData.totalBalance));
+        const txs: TxRow[] = [];
+        for (const txRow of rawData.newData.txs) {
+          txs.push({
+            id: txRow.id,
+            desc: txRow.desc,
+            tx: TxVariant.deserialize(ByteBuffer.from(txRow.tx)),
+          });
+        }
+
+        data.newData = {
+          totalBalance,
+          txs,
+        };
+      }
+
+      try {
+        handler(data);
+      } catch (e) {
+        log.error('Error invoking onSyncUpdate handler', e);
+      }
+    });
+  }
+
   public send(req: models.ReqModel): Promise<models.ResModel> {
     return new Promise((resolve, reject): void => {
       const id = this.id++;

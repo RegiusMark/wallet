@@ -11,7 +11,9 @@ import {
   OwnerTxV0,
   Asset,
 } from 'godcoin';
-import { WalletDb, KvTable, TxsTable } from './db';
+import { WalletDb, KvTable, TxsTable, TxRawRow } from './db';
+import { SyncStatus } from '../ipc-models';
+import { emitSyncUpdate } from './ipc';
 import { getClient } from './client';
 import { Logger } from '../log';
 import Big from 'big.js';
@@ -51,11 +53,22 @@ class ChainSynchronizer {
           } else {
             log.info('Received block update:', block.block.header.height.toString());
             try {
-              const updateBal = await this.applyBlock(block);
-              if (updateBal) {
-                await this.updateTotalBalance();
+              const updatedTxs = await this.applyBlock(block);
+              if (updatedTxs && updatedTxs.length > 0) {
+                const totalBalance = await this.updateTotalBalance();
+                emitSyncUpdate({
+                  status: SyncStatus.Complete,
+                  newData: {
+                    totalBalance: totalBalance.amount.toString(),
+                    txs: updatedTxs,
+                  },
+                });
+              } else {
+                emitSyncUpdate({
+                  status: SyncStatus.Complete,
+                });
               }
-              await this.updateIndex();
+              await this.updateSyncHeight();
             } catch (e) {
               log.error('Failed to handle incoming block\n', block, e);
             }
@@ -91,6 +104,7 @@ class ChainSynchronizer {
       const height = chainPropsBody.properties.height;
 
       // Start retrieving blocks and apply them.
+      const txs: TxRawRow[] = [];
       while (this.currentHeight.lt(height)) {
         const blockBody = await client.sendReq({
           type: BodyType.GetBlock,
@@ -99,7 +113,10 @@ class ChainSynchronizer {
         if (blockBody.type !== BodyType.GetBlock) throw new Error('expected GetBlock response');
 
         const block = blockBody.block;
-        await this.applyBlock(block);
+        const updatedTxs = await this.applyBlock(block);
+        if (updatedTxs && updatedTxs.length > 0) {
+          txs.push(...updatedTxs);
+        }
 
         if (this.currentHeight.mod(10000).eq(0)) {
           log.info('Current sync height:', this.currentHeight.toString());
@@ -112,13 +129,25 @@ class ChainSynchronizer {
         // as the loop will still iterate over new blocks regardless if the body waits for promises to finish.
         for (const block of this.pendingBlocks) {
           log.info('Applying pending block:', block.block.header.height.toString());
-          await this.applyBlock(block);
+          const updatedTxs = await this.applyBlock(block);
+          if (updatedTxs && updatedTxs.length > 0) {
+            txs.push(...updatedTxs);
+          }
         }
         this.pendingBlocks = [];
       }
 
-      await this.updateIndex();
-      await this.updateTotalBalance();
+      await this.updateSyncHeight();
+
+      const totalBalance = await this.updateTotalBalance();
+      emitSyncUpdate({
+        status: SyncStatus.Complete,
+        newData: {
+          totalBalance: totalBalance.amount.toString(),
+          txs,
+        },
+      });
+
       log.info('Synchronization completed:', this.currentHeight.toString());
     } catch (e) {
       log.error('Failure during the synchronization process:', e);
@@ -127,21 +156,17 @@ class ChainSynchronizer {
     }
   }
 
-  private async applyBlock(block: [BlockHeader, SigPair] | Block): Promise<boolean> {
-    // Whether or not the applied block matches a watched address
-    let match = false;
+  private async applyBlock(block: [BlockHeader, SigPair] | Block): Promise<TxRawRow[] | undefined> {
+    let txs: TxRawRow[] | undefined;
     let height: Long;
 
     if (block instanceof Block) {
       height = block.block.header.height;
       const txsTable = WalletDb.getInstance().getTable(TxsTable);
       for (const wrapper of block.block.transactions) {
-        const hasMatch = this.txHasMatch(wrapper);
-        if (hasMatch) {
-          // TODO emit an event to the renderer with the full tx
-          match = true;
-          await txsTable.insert(wrapper);
-        }
+        if (!this.txHasMatch(wrapper)) continue;
+        if (txs === undefined) txs = [];
+        txs.push(await txsTable.insert(wrapper));
       }
     } else {
       // Block header + signature (no relevant transactions)
@@ -153,7 +178,7 @@ class ChainSynchronizer {
     }
     this.currentHeight = height;
 
-    return match;
+    return txs;
   }
 
   private txHasMatch(txVariant: TxVariant): boolean {
@@ -178,16 +203,17 @@ class ChainSynchronizer {
     return index > -1;
   }
 
-  private async updateIndex(): Promise<void> {
+  private async updateSyncHeight(): Promise<void> {
     const store = WalletDb.getInstance().getTable(KvTable);
     await store.setSyncHeight(this.currentHeight);
   }
 
-  private async updateTotalBalance(): Promise<void> {
+  private async updateTotalBalance(): Promise<Asset> {
+    const client = getClient();
     const proms = [];
     for (const addr of this.watchAddrs) {
       proms.push(
-        getClient().sendReq({
+        client.sendReq({
           type: BodyType.GetAddressInfo,
           addr,
         }),
@@ -202,6 +228,7 @@ class ChainSynchronizer {
 
     const store = WalletDb.getInstance().getTable(KvTable);
     await store.setTotalBalance(totalBal);
+    return totalBal;
   }
 }
 

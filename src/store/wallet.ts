@@ -69,6 +69,11 @@ export default class WalletStore extends VuexModule {
   }
 
   @Mutation
+  public setTotalBalance(bal: Asset): void {
+    this.totalBal = bal;
+  }
+
+  @Mutation
   public insertTx(tx: TxRow): void {
     const dtx = toDisplayableTx(this.p2shAddr!, tx);
     if (dtx) {

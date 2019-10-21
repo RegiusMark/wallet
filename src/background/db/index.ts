@@ -1,6 +1,6 @@
 import { SecretKey } from '../crypto';
 import { app } from 'electron';
-import sql from 'sqlite3';
+import sql, { RunResult } from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 
@@ -38,7 +38,7 @@ export class WalletDb {
     return tbl;
   }
 
-  public run(sql: string, params?: any): Promise<void> {
+  public run(sql: string, params?: any): Promise<RunResult> {
     return this.db.run(sql, params);
   }
 
@@ -90,11 +90,11 @@ class DbWrapper {
     this.inner = inner;
   }
 
-  public run(sql: string, params: any = []): Promise<void> {
-    return new Promise<void>((resolve, reject): void => {
-      this.inner.run(sql, params, err => {
+  public run(sql: string, params: any = []): Promise<RunResult> {
+    return new Promise<RunResult>((resolve, reject): void => {
+      this.inner.run(sql, params, function(err): void {
         if (err) return reject(err);
-        resolve();
+        resolve(this);
       });
     });
   }
