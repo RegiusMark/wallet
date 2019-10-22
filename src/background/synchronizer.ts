@@ -12,7 +12,7 @@ import {
   Asset,
 } from 'godcoin';
 import { WalletDb, KvTable, TxsTable, TxRawRow } from './db';
-import { SyncStatus } from '../ipc-models';
+import { SyncStatus, SyncUpdateRaw } from '../ipc-models';
 import { emitSyncUpdate } from './ipc';
 import { getClient } from './client';
 import { Logger } from '../log';
@@ -27,7 +27,7 @@ class ChainSynchronizer {
   private currentHeight: Long;
 
   private pendingBlocks: Block[] = [];
-  private synchronizing = false;
+  private syncStatus = SyncStatus.Connecting;
 
   public constructor(watchAddrs: ScriptHash[], syncHeight: Long) {
     if (!syncHeight.unsigned) throw new Error('syncHeight must be unsigned');
@@ -43,31 +43,35 @@ class ChainSynchronizer {
       this.start();
     });
 
+    client.on('close', (): void => {
+      this.syncStatus = SyncStatus.Connecting;
+      emitSyncUpdate({
+        status: this.syncStatus,
+      });
+    });
+
     client.on(
       'sub_msg',
       async (res): Promise<void> => {
         if (res.type === BodyType.GetBlock) {
           const block = res.block as Block;
-          if (this.synchronizing) {
+          if (this.syncStatus !== SyncStatus.Complete) {
             this.pendingBlocks.push(block);
           } else {
             log.info('Received block update:', block.block.header.height.toString());
             try {
               const updatedTxs = await this.applyBlock(block);
+              const update: SyncUpdateRaw = {
+                status: this.syncStatus,
+              };
               if (updatedTxs && updatedTxs.length > 0) {
                 const totalBalance = await this.updateTotalBalance();
-                emitSyncUpdate({
-                  status: SyncStatus.Complete,
-                  newData: {
-                    totalBalance: totalBalance.amount.toString(),
-                    txs: updatedTxs,
-                  },
-                });
-              } else {
-                emitSyncUpdate({
-                  status: SyncStatus.Complete,
-                });
+                update.newData = {
+                  totalBalance: totalBalance.amount.toString(),
+                  txs: updatedTxs,
+                };
               }
+              emitSyncUpdate(update);
               await this.updateSyncHeight();
             } catch (e) {
               log.error('Failed to handle incoming block\n', block, e);
@@ -78,10 +82,18 @@ class ChainSynchronizer {
     );
   }
 
+  public getSyncStatus(): SyncStatus {
+    return this.syncStatus;
+  }
+
   private async start(): Promise<void> {
-    if (this.synchronizing) return;
+    if (this.syncStatus !== SyncStatus.Connecting) return;
+    this.syncStatus = SyncStatus.InProgress;
+    emitSyncUpdate({
+      status: this.syncStatus,
+    });
+
     log.info('Starting synchronization process');
-    this.synchronizing = true;
     try {
       const client = getClient();
 
@@ -152,7 +164,7 @@ class ChainSynchronizer {
     } catch (e) {
       log.error('Failure during the synchronization process:', e);
     } finally {
-      this.synchronizing = false;
+      this.syncStatus = SyncStatus.Complete;
     }
   }
 
@@ -174,7 +186,7 @@ class ChainSynchronizer {
     }
 
     if (!this.currentHeight.add(1).eq(height)) {
-      log.error('Missed block:', this.currentHeight.toString);
+      log.error('Missed block:', this.currentHeight.toString());
     }
     this.currentHeight = height;
 
@@ -230,6 +242,11 @@ class ChainSynchronizer {
     await store.setTotalBalance(totalBal);
     return totalBal;
   }
+}
+
+export function getSynchronizer(): ChainSynchronizer {
+  if (instance === undefined) throw new Error('synchronizer not initialized');
+  return instance;
 }
 
 export async function initSynchronizer(watchAddrs: ScriptHash[]): Promise<void> {

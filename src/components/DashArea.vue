@@ -7,6 +7,7 @@
       <div class="dash-sync-status">
         <div v-if="syncStatus === SyncStatus.Complete">Sync complete</div>
         <div v-else-if="syncStatus === SyncStatus.InProgress">Synchronizing...</div>
+        <div v-else-if="syncStatus === SyncStatus.Connecting">Connecting...</div>
         <div v-else>Unknown sync state.</div>
       </div>
       <div class="dash-buttons">

@@ -45,12 +45,14 @@ export interface PostInitWalletRawReq {
 
 export interface PostInitWalletRawRes {
   type: 'wallet:post_init';
+  syncStatus: SyncStatus;
   publicKey: Uint8Array;
   totalBalance: string;
   txs: TxRawRow[];
 }
 
 export interface PostInitWalletRes {
+  syncStatus: SyncStatus;
   publicKey: PublicKey;
   totalBalance: Asset;
   txs: TxRow[];
@@ -61,6 +63,7 @@ export interface PostInitWalletRes {
 export enum SyncStatus {
   Complete,
   InProgress,
+  Connecting,
 }
 
 export interface SyncUpdateRaw {

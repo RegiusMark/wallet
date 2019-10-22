@@ -24,6 +24,7 @@ export interface DisplayableTx {
 }
 
 export interface InitData {
+  syncStatus: SyncStatus;
   txs: TxRow[];
   publicKey: PublicKey;
   totalBal: Asset;
@@ -45,7 +46,7 @@ export default class WalletStore extends VuexModule {
   public p2shAddr: ScriptHash | null = null;
 
   // Dynamic data
-  public syncStatus = SyncStatus.InProgress;
+  public syncStatus = SyncStatus.Connecting;
   public txs: DisplayableTx[] = [];
   public totalBal: Asset = new Asset(Big(0));
 
@@ -56,6 +57,7 @@ export default class WalletStore extends VuexModule {
 
   @Mutation
   public setData(data: InitData): void {
+    this.syncStatus = data.syncStatus;
     this.publicKey = data.publicKey;
     this.p2shAddr = data.publicKey.toScript().hash();
     this.totalBal = data.totalBal;

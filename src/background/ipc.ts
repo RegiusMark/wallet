@@ -1,8 +1,8 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
+import { initSynchronizer, getSynchronizer } from './synchronizer';
 import { WalletDb, TxsTable, KvTable } from './db';
-import { initSynchronizer } from './synchronizer';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
 import { initClient } from './client';
@@ -79,6 +79,8 @@ export default function(): void {
           break;
         }
         case 'wallet:post_init': {
+          const syncStatus = getSynchronizer().getSyncStatus();
+
           const db = WalletDb.getInstance();
           const txsTable = db.getTable(TxsTable);
           const kvTable = db.getTable(KvTable);
@@ -89,6 +91,7 @@ export default function(): void {
 
           response = {
             type: 'wallet:post_init',
+            syncStatus,
             publicKey,
             totalBalance,
             txs,

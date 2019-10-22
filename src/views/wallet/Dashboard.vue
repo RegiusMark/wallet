@@ -115,6 +115,7 @@ export default class Dashboard extends Vue {
       try {
         const ipcRes = await ipc.postInit();
         WalletStore.setData({
+          syncStatus: ipcRes.syncStatus,
           publicKey: ipcRes.publicKey,
           totalBal: ipcRes.totalBalance,
           txs: ipcRes.txs,

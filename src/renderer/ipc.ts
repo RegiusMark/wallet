@@ -60,6 +60,7 @@ class IpcManager {
     }
 
     return {
+      syncStatus: ipcRes.syncStatus,
       publicKey: new PublicKey(ipcRes.publicKey),
       totalBalance: new Asset(Big(ipcRes.totalBalance)),
       txs,
