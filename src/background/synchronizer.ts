@@ -113,11 +113,11 @@ class ChainSynchronizer {
         type: BodyType.GetProperties,
       });
       if (chainPropsBody.type !== BodyType.GetProperties) throw new Error('expected GetProperties response');
-      const height = chainPropsBody.properties.height;
+      const chainHeight = chainPropsBody.properties.height;
 
       // Start retrieving blocks and apply them.
       const txs: TxRawRow[] = [];
-      while (this.currentHeight.lt(height)) {
+      while (this.currentHeight.lt(chainHeight)) {
         const blockBody = await client.sendReq({
           type: BodyType.GetBlock,
           height: this.currentHeight.add(1),
@@ -135,25 +135,24 @@ class ChainSynchronizer {
         }
       }
 
-      {
-        // Apply any pending blocks received from block subscription updates while we were previously synchronizing
-        // up to the currently known height. There is no race condition even if blocks are pushed during iteration
-        // as the loop will still iterate over new blocks regardless if the body waits for promises to finish.
-        for (const block of this.pendingBlocks) {
-          log.info('Applying pending block:', block.block.header.height.toString());
-          const updatedTxs = await this.applyBlock(block);
-          if (updatedTxs && updatedTxs.length > 0) {
-            txs.push(...updatedTxs);
-          }
+      // Grab and update the total balance before the pending blocks are applied. This is to help mitigate any
+      // potential issues when a block is received *during* the balance update.
+      const totalBalance = await this.updateTotalBalance();
+
+      // Apply any pending blocks received from block subscription updates while we were previously synchronizing
+      // up to the currently known height. There is no race condition even if blocks are pushed during iteration
+      // as the loop will still iterate over new blocks regardless if the body waits for promises to finish.
+      for (const block of this.pendingBlocks) {
+        log.info('Applying pending block:', block.block.header.height.toString());
+        const updatedTxs = await this.applyBlock(block);
+        if (updatedTxs && updatedTxs.length > 0) {
+          txs.push(...updatedTxs);
         }
-        this.pendingBlocks = [];
       }
 
       await this.updateSyncHeight();
-
-      const totalBalance = await this.updateTotalBalance();
       emitSyncUpdate({
-        status: SyncStatus.Complete,
+        status: this.syncStatus,
         newData: {
           totalBalance: totalBalance.amount.toString(),
           txs,
@@ -164,6 +163,9 @@ class ChainSynchronizer {
     } catch (e) {
       log.error('Failure during the synchronization process:', e);
     } finally {
+      // Reset the pending blocks here in case there's any error to avoid reapplying already applied blocks upon
+      // reconnection.
+      this.pendingBlocks = [];
       this.syncStatus = SyncStatus.Complete;
     }
   }
@@ -186,7 +188,7 @@ class ChainSynchronizer {
     }
 
     if (!this.currentHeight.add(1).eq(height)) {
-      log.error('Missed block:', this.currentHeight.toString());
+      log.error('Missed block:', this.currentHeight.add(1).toString(), ' got height,', height.toString());
     }
     this.currentHeight = height;
 
