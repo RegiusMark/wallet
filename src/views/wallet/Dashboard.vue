@@ -68,10 +68,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { DisplayableTx } from '@/store/wallet';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
 import { generateKeyPair, Asset } from 'godcoin';
+import { DisplayableTx } from '@/store/wallet';
 import Dialog from '@/components/Dialog.vue';
 import { TxRow } from '@/background/db';
 import Btn from '@/components/Btn.vue';
@@ -116,7 +116,7 @@ export default class Dashboard extends Vue {
         const ipcRes = await ipc.postInit();
         WalletStore.setData({
           syncStatus: ipcRes.syncStatus,
-          publicKey: ipcRes.publicKey,
+          script: ipcRes.script,
           totalBal: ipcRes.totalBalance,
           txs: ipcRes.txs,
         });

@@ -1,6 +1,6 @@
 import { readFileSync, unlinkSync, renameSync, existsSync, writeFileSync } from 'fs';
+import { KeyPair, Script, ScriptHash } from 'godcoin';
 import { SecretKey } from './crypto';
-import { KeyPair } from 'godcoin';
 import { Logger } from '../log';
 import { app } from 'electron';
 import path from 'path';
@@ -19,10 +19,14 @@ interface SettingsData {
 export class Settings implements SettingsData {
   public readonly dbSecretKey: SecretKey;
   public readonly keyPair: KeyPair;
+  public readonly p2shScript: Script;
+  public readonly p2shAddr: ScriptHash;
 
   public constructor(data: SettingsData) {
     this.dbSecretKey = data.dbSecretKey;
     this.keyPair = data.keyPair;
+    this.p2shScript = this.keyPair.publicKey.toScript();
+    this.p2shAddr = this.p2shScript.hash();
   }
 
   public save(password: string): void {

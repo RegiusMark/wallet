@@ -1,4 +1,4 @@
-import { KeyPair, PublicKey, TxVariant, ByteBuffer, Asset } from 'godcoin';
+import { KeyPair, TxVariant, ByteBuffer, Asset, Script } from 'godcoin';
 import { TxRow } from '@/background/db';
 import * as models from '@/ipc-models';
 import { ipcRenderer } from 'electron';
@@ -61,7 +61,7 @@ class IpcManager {
 
     return {
       syncStatus: ipcRes.syncStatus,
-      publicKey: new PublicKey(ipcRes.publicKey),
+      script: new Script(ipcRes.script),
       totalBalance: new Asset(Big(ipcRes.totalBalance)),
       txs,
     };

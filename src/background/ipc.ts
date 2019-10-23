@@ -52,7 +52,7 @@ export default function(): void {
             try {
               await WalletDb.init(settings.dbSecretKey);
               initClient('ws://127.0.0.1:7777');
-              await initSynchronizer([settings.keyPair.publicKey.toScript().hash()]);
+              await initSynchronizer([settings.p2shAddr]);
               createDashboardWindow();
             } catch (e) {
               log.error('A severe error has occurred:', e);
@@ -85,14 +85,14 @@ export default function(): void {
           const txsTable = db.getTable(TxsTable);
           const kvTable = db.getTable(KvTable);
 
-          const publicKey = getGlobalSettings().keyPair.publicKey.buffer;
+          const script = getGlobalSettings().p2shScript.bytes;
           const totalBalance = (await kvTable.getTotalBalance()).amount.toString();
           const txs = await txsTable.getAll();
 
           response = {
             type: 'wallet:post_init',
             syncStatus,
-            publicKey,
+            script,
             totalBalance,
             txs,
           };

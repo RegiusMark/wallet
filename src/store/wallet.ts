@@ -1,5 +1,5 @@
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { PublicKey, ScriptHash, TransferTxV0, Asset } from 'godcoin';
+import { ScriptHash, TransferTxV0, Asset, Script } from 'godcoin';
 import { SyncStatus } from '@/ipc-models';
 import { TxRow } from '@/background/db';
 import Big from 'big.js';
@@ -26,7 +26,7 @@ export interface DisplayableTx {
 export interface InitData {
   syncStatus: SyncStatus;
   txs: TxRow[];
-  publicKey: PublicKey;
+  script: Script;
   totalBal: Asset;
 }
 
@@ -42,7 +42,7 @@ export interface UpdateExpandState {
 export default class WalletStore extends VuexModule {
   // Static data once initialized
   public initialized: boolean = false;
-  public publicKey: PublicKey | null = null;
+  public p2shScript: Script | null = null;
   public p2shAddr: ScriptHash | null = null;
 
   // Dynamic data
@@ -58,8 +58,8 @@ export default class WalletStore extends VuexModule {
   @Mutation
   public setData(data: InitData): void {
     this.syncStatus = data.syncStatus;
-    this.publicKey = data.publicKey;
-    this.p2shAddr = data.publicKey.toScript().hash();
+    this.p2shScript = data.script;
+    this.p2shAddr = data.script.hash();
     this.totalBal = data.totalBal;
 
     const txs = [];
