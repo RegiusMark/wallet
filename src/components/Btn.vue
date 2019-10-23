@@ -1,14 +1,24 @@
 <template>
-  <div class="btn" @click="$emit('click', $event)">
+  <div class="btn" :class="{ disabled }" @click="onClick">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ButtonClickEvent } from './StartArea.vue';
 
 @Component
-export default class Btn extends Vue {}
+export default class Btn extends Vue {
+  @Prop({ default: () => false })
+  private disabled!: boolean;
+
+  private onClick(evt: MouseEvent): void {
+    if (!this.disabled) {
+      this.$emit('click', evt);
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -19,7 +29,7 @@ export default class Btn extends Vue {}
   border-radius: 4px;
 
   background-color: hsla(275, 50, 40, 0.5);
-  color: hsla(0, 0, 100, 0.9);
+  color: hsla(0, 0, 100, 0.8);
   font-size: 1.15em;
   text-align: center;
 
@@ -31,6 +41,14 @@ export default class Btn extends Vue {}
   &:hover {
     background-color: hsla(275, 50, 40, 0.8);
     border-color: hsla(275, 50, 40, 1);
+  }
+
+  &.disabled {
+    background-color: hsla(275, 50, 40, 0.3);
+    border-color: hsla(275, 50, 40, 0.5);
+    color: hsla(0, 0, 100, 0.5);
+
+    cursor: not-allowed;
   }
 }
 </style>
