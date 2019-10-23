@@ -67,6 +67,25 @@ class IpcManager {
     };
   }
 
+  public async getFee(): Promise<models.GetFeeRes> {
+    const ipcRes = await this.send({
+      type: 'wallet:get_fee',
+    });
+    if (ipcRes.type !== 'wallet:get_fee') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+
+    return {
+      data: ipcRes.data
+        ? {
+            netFee: new Asset(Big(ipcRes.data.netFee)),
+            addrFee: new Asset(Big(ipcRes.data.addrFee)),
+          }
+        : undefined,
+      error: ipcRes.error,
+    };
+  }
+
   public onSyncUpdate(handler: (update: models.SyncUpdate) => void): void {
     ipcRenderer.on('sync_update', (_evt, rawData: models.SyncUpdateRaw) => {
       const data: models.SyncUpdate = {

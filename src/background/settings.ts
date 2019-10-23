@@ -98,7 +98,7 @@ export class Settings implements SettingsData {
         log.info('Successfully recovered from backup');
 
         if (primaryExists) {
-          const newLoc = locs.primary + '.' + new Date().getTime();
+          const newLoc = locs.primary + '.' + Date.now();
           renameSync(locs.primary, newLoc);
           log.info('Moved the potentially corrupt data store to ' + newLoc);
         }

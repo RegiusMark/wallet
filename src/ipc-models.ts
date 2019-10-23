@@ -16,8 +16,8 @@ export interface AppActionRes {
   res: ResModel;
 }
 
-export type ReqModel = FirstSetupReq | PreInitWalletReq | PostInitWalletRawReq;
-export type ResModel = FirstSetupRes | PreInitWalletRes | PostInitWalletRawRes;
+export type ReqModel = FirstSetupReq | PreInitWalletReq | PostInitWalletRawReq | GetFeeRawReq;
+export type ResModel = FirstSetupRes | PreInitWalletRes | PostInitWalletRawRes | GetFeeRawRes;
 
 export interface FirstSetupReq {
   type: 'wallet:first_setup';
@@ -56,6 +56,27 @@ export interface PostInitWalletRes {
   script: Script;
   totalBalance: Asset;
   txs: TxRow[];
+}
+
+export interface GetFeeRawReq {
+  type: 'wallet:get_fee';
+}
+
+export interface GetFeeRawRes {
+  type: 'wallet:get_fee';
+  data?: {
+    netFee: string;
+    addrFee: string;
+  };
+  error?: string;
+}
+
+export interface GetFeeRes {
+  data?: {
+    netFee: Asset;
+    addrFee: Asset;
+  };
+  error?: string;
 }
 
 /*** IPC events (main -> renderer) ***/

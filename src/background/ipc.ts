@@ -3,12 +3,12 @@ import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
 import { initSynchronizer, getSynchronizer } from './synchronizer';
 import { WalletDb, TxsTable, KvTable } from './db';
+import { initClient, getClient } from './client';
+import { KeyPair, BodyType } from 'godcoin';
 import * as models from '../ipc-models';
 import sodium from 'libsodium-wrappers';
-import { initClient } from './client';
 import { randomBytes } from 'crypto';
 import { ipcMain } from 'electron';
-import { KeyPair } from 'godcoin';
 import { Logger } from '../log';
 
 const log = new Logger('main:ipc');
@@ -96,6 +96,33 @@ export default function(): void {
             totalBalance,
             txs,
           };
+          break;
+        }
+        case 'wallet:get_fee': {
+          const client = getClient();
+          const settings = getGlobalSettings();
+          try {
+            const res = await client.sendReq({
+              type: BodyType.GetAddressInfo,
+              addr: settings.p2shAddr,
+            });
+            if (res.type !== BodyType.GetAddressInfo) {
+              throw new Error('unexpected RPC response: ' + res.type);
+            }
+
+            response = {
+              type: 'wallet:get_fee',
+              data: {
+                netFee: res.info.netFee.amount.toString(),
+                addrFee: res.info.addrFee.amount.toString(),
+              },
+            };
+          } catch (e) {
+            response = {
+              type: 'wallet:get_fee',
+              error: e.message,
+            };
+          }
           break;
         }
         default: {
