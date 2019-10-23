@@ -1,7 +1,7 @@
 <template>
   <div v-if="value">
     <div class="dialog" ref="dialog" tabindex="0" @keyup.esc="$emit('input', false)">
-      <div class="dialog-content">
+      <div class="dialog-content" :style="{ width }">
         <div style="height: 0.1px">
           <!-- Empty div to allow margins to be used in the slot while preserving the background-color -->
         </div>
@@ -18,7 +18,11 @@ import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Dialog extends Vue {
-  @Prop({ default: () => false }) value!: boolean;
+  @Prop({ default: () => false })
+  value!: boolean;
+
+  @Prop({ default: () => 'auto' })
+  width!: string | number;
 
   @Watch('value')
   private onActiveChange(value: boolean): void {
@@ -49,7 +53,6 @@ export default class Dialog extends Vue {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 70%;
 
   background-color: hsla(267, 59, 12, 0.85);
   border-radius: 4px;

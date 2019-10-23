@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%;">
-    <Dialog class="dialog-send-funds" v-model="dialogs.sendFunds.active">
+    <Dialog class="dialog-send-funds" width="70%" v-model="dialogs.sendFunds.active">
       <div style="text-align: center;">
         <div style="user-select: none; filter: brightness(0.85)">
           <img src="../../assets/coin-front.png" width="80" />
