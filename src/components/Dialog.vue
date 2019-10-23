@@ -45,8 +45,13 @@ export default class Dialog extends Vue {
 }
 
 .dialog-content {
-  margin: 5% 20%;
-  background-color: hsla(267, 59, 12, 0.95);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+
+  background-color: hsla(267, 59, 12, 0.85);
   border-radius: 4px;
 }
 </style>

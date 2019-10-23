@@ -26,7 +26,6 @@
           <Btn @click="transferFunds" :disabled="!sendBtnEnabled">Send</Btn>
           <Btn @click="sendDialogActive(false)">Cancel</Btn>
         </div>
-        <div style="padding-bottom: 2em; height: 0.1px"></div>
       </div>
     </Dialog>
     <DashArea>
