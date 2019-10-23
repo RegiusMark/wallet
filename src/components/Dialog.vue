@@ -43,6 +43,7 @@ export default class Dialog extends Vue {
   left: 0;
   top: 0;
   z-index: 5;
+  outline: none;
 
   background-color: hsla(267, 59, 6, 0.95);
   color: hsla(0, 0, 100, 0.7);
