@@ -1,6 +1,6 @@
 <template>
   <div v-if="value">
-    <div class="dialog" ref="dialog" tabindex="0" @keyup.esc="$emit('input', false)">
+    <div class="dialog" ref="dialog" tabindex="0" @keyup.esc="onEscKeyUp">
       <div class="dialog-content" :style="{ width }">
         <div style="height: 0.1px">
           <!-- Empty div to allow margins to be used in the slot while preserving the background-color -->
@@ -24,12 +24,21 @@ export default class Dialog extends Vue {
   @Prop({ default: () => 'auto' })
   width!: string | number;
 
+  @Prop({ default: () => false })
+  disableEsc!: boolean;
+
   @Watch('value')
   private onActiveChange(value: boolean): void {
     if (value === true) {
       this.$nextTick(() => {
         (this.$refs.dialog as HTMLElement).focus();
       });
+    }
+  }
+
+  private onEscKeyUp(): void {
+    if (!this.disableEsc) {
+      this.$emit('input', false);
     }
   }
 }

@@ -28,7 +28,7 @@
         </div>
       </div>
     </Dialog>
-    <Dialog width="25%" v-model="dialogs.transferredFunds.active" class="dialog-transferred-funds">
+    <Dialog width="25%" v-model="dialogs.transferredFunds.active" class="dialog-transferred-funds" :disable-esc="true">
       <div v-if="dialogs.transferredFunds.state === TransferState.Success">
         <div class="icon success">
           <i class="fas fa-check"></i>
