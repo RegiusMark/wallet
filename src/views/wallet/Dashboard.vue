@@ -28,6 +28,32 @@
         </div>
       </div>
     </Dialog>
+    <Dialog width="25%" v-model="dialogs.transferredFunds.active" class="dialog-transferred-funds">
+      <div v-if="dialogs.transferredFunds.state === TransferState.Success">
+        <div class="icon success">
+          <i class="fas fa-check"></i>
+        </div>
+        <div class="msg">Sent!</div>
+      </div>
+      <div v-else-if="dialogs.transferredFunds.state === TransferState.Pending">
+        <div class="icon pending">
+          <i class="fas fa-sync-alt"></i>
+        </div>
+        <div class="msg">Pending...</div>
+      </div>
+      <div v-else-if="dialogs.transferredFunds.state === TransferState.Error">
+        <div class="icon error">
+          <i class="fas fa-times"></i>
+        </div>
+        <div class="msg">Broadcast error</div>
+      </div>
+      <div v-else>
+        <div class="icon error">
+          <i class="fas fa-times"></i>
+        </div>
+        <div class="msg">Unknown transfer state</div>
+      </div>
+    </Dialog>
     <DashArea>
       <div class="container">
         <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
@@ -96,6 +122,12 @@ import Big from 'big.js';
 
 const log = new Logger('renderer:dashboard');
 
+enum TransferState {
+  Success,
+  Pending,
+  Error,
+}
+
 interface SendFundsForm {
   address: string;
   amount: string;
@@ -110,8 +142,14 @@ interface SendFundsDialog {
   form: SendFundsForm;
 }
 
+interface TransferredFundsDialog {
+  active: boolean;
+  state: TransferState;
+}
+
 interface Dialogs {
   sendFunds: SendFundsDialog;
+  transferredFunds: TransferredFundsDialog;
 }
 
 @Component({
@@ -123,6 +161,9 @@ interface Dialogs {
   },
 })
 export default class Dashboard extends Vue {
+  // Allow referencing in the template
+  private readonly TransferState = TransferState;
+
   private dialogs: Dialogs = {
     sendFunds: {
       active: false,
@@ -134,6 +175,10 @@ export default class Dashboard extends Vue {
         amount: '',
         error: null,
       },
+    },
+    transferredFunds: {
+      active: false,
+      state: TransferState.Pending,
     },
   };
 
@@ -147,7 +192,10 @@ export default class Dashboard extends Vue {
     if (!(fee && this.dialogs.sendFunds.formValid)) return 'Determining...';
     const amt = Asset.fromString(this.dialogs.sendFunds.form.amount.trim() + ' ' + ASSET_SYMBOL);
     if (amt.amount.lt(0)) return 'Amount cannot be negative.';
-    return this.totalBal.sub(amt).sub(fee).toString(false);
+    return this.totalBal
+      .sub(amt)
+      .sub(fee)
+      .toString(false);
   }
 
   private get sendBtnEnabled(): boolean {
@@ -299,13 +347,24 @@ export default class Dashboard extends Vue {
   }
 
   private transferFunds(): void {
-    const dialog = this.dialogs.sendFunds;
-    if (!dialog.formValid) return;
+    const sendFundsDialog = this.dialogs.sendFunds;
+    if (!sendFundsDialog.formValid) return;
     try {
-      const addr = ScriptHash.fromWif(dialog.form.address.trim());
-      const amount = Asset.fromString(dialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
+      const addr = ScriptHash.fromWif(sendFundsDialog.form.address.trim());
+      const amount = Asset.fromString(sendFundsDialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
 
-      // TODO mock send transaction...how should this work?
+      const dialog = this.dialogs.transferredFunds;
+      dialog.state = TransferState.Pending;
+      dialog.active = true;
+
+      setTimeout(() => {
+        dialog.state = TransferState.Success;
+
+        setTimeout(() => {
+          sendFundsDialog.active = false;
+          dialog.active = false;
+        }, 2000);
+      }, 1000);
       // TODO broadcast to the blockchain
     } catch (e) {
       log.error('Failed to send funds:', e);
@@ -442,6 +501,32 @@ export default class Dashboard extends Vue {
     & > * {
       padding: 0.2em 0.2em;
     }
+  }
+}
+
+.dialog-transferred-funds {
+  text-align: center;
+
+  .icon {
+    font-size: 3em;
+
+    &.success i {
+      color: hsla(123, 75, 50, 0.5);
+    }
+
+    &.pending i {
+      color: hsla(55, 83, 45, 0.75);
+      animation: fa-spin 2.5s ease-in-out infinite;
+    }
+
+    &.error i {
+      color: hsla(0, 75, 50, 0.5);
+    }
+  }
+
+  .msg {
+    margin-top: 1em;
+    font-size: 1.4em;
   }
 }
 </style>
