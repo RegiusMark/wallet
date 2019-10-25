@@ -62,7 +62,7 @@
         </div>
         <div class="funds">
           <span class="amount">{{ totalBal.toString(false) }}</span>
-          <span>GRAEL</span>
+          <span>{{ ASSET_SYMBOL }}</span>
         </div>
         <div class="actions">
           <Btn @click="sendDialogActive(true)">Send</Btn>
@@ -186,6 +186,7 @@ function parseAmount(amount: string): Asset {
 export default class Dashboard extends Vue {
   // Allow referencing in the template
   private readonly TransferState = TransferState;
+  private readonly ASSET_SYMBOL = ASSET_SYMBOL;
 
   private dialogs: Dialogs = {
     sendFunds: {
