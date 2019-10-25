@@ -12,10 +12,10 @@
         <div class="text-inputs">
           <TextInput
             icon="fa-address-card"
-            v-model="dialogs.sendFunds.form.address"
+            v-model.trim="dialogs.sendFunds.form.address"
             placeholder="Send to GODcoin address..."
           />
-          <TextInput icon="fa-coins" v-model="dialogs.sendFunds.form.amount" placeholder="Amount to send..." />
+          <TextInput icon="fa-coins" v-model.trim="dialogs.sendFunds.form.amount" placeholder="Amount to send..." />
         </div>
         <div class="error-msg">{{ dialogs.sendFunds.form.error }}</div>
         <div class="balances">
@@ -154,6 +154,16 @@ interface Dialogs {
   transferredFunds: TransferredFundsDialog;
 }
 
+function parseAddress(address: string): ScriptHash {
+  address = address.trim();
+  return ScriptHash.fromWif(address);
+}
+
+function parseAmount(amount: string): Asset {
+  amount = amount.trim();
+  return Asset.fromString(amount + ' ' + ASSET_SYMBOL);
+}
+
 @Component({
   components: {
     TextInput,
@@ -284,22 +294,22 @@ export default class Dashboard extends Vue {
   private sendFundsFormChange(form: SendFundsForm): void {
     this.dialogs.sendFunds.formValid = false;
     const fee = this.dialogs.sendFunds.fee;
-    const addr = form.address.trim();
-    const amt = form.amount.trim();
+    const addr = form.address;
+    const amt = form.amount;
 
     try {
       if (addr.length > 0) {
-        ScriptHash.fromWif(form.address);
+        parseAddress(addr);
       }
     } catch (e) {
-      log.error('Error parsing address:', form.address, e.message);
+      log.error('Error parsing address:', addr, e.message);
       this.dialogs.sendFunds.form.error = 'Invalid address.';
       return;
     }
 
     try {
       if (amt.length > 0) {
-        const sendAmtAsset = Asset.fromString(amt + ' ' + ASSET_SYMBOL);
+        const sendAmtAsset = parseAmount(amt);
         if (
           fee &&
           WalletStore.totalBal
@@ -357,8 +367,8 @@ export default class Dashboard extends Vue {
       dialog.state = TransferState.Pending;
       dialog.active = true;
 
-      const addr = ScriptHash.fromWif(sendFundsDialog.form.address.trim());
-      const amount = Asset.fromString(sendFundsDialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
+      const addr = parseAddress(sendFundsDialog.form.address);
+      const amount = parseAmount(sendFundsDialog.form.amount);
       const fee = sendFundsDialog.fee!;
 
       const res = await ipc.transferFunds({
