@@ -12,17 +12,23 @@ import {
   Asset,
 } from 'godcoin';
 import { WalletDb, KvTable, TxsTable, TxRawRow } from './db';
+import { emitSyncUpdate as ipcEmitSyncUpdate } from './ipc';
 import { SyncStatus, SyncUpdateRaw } from '../ipc-models';
-import { emitSyncUpdate } from './ipc';
+import { EventEmitter } from 'events';
 import { getClient } from './client';
 import { Logger } from '../log';
 import Big from 'big.js';
 import Long from 'long';
 
 let log = new Logger('main:chain_synchronizer');
-let instance: ChainSynchronizer;
+let instance: Synchronizer;
 
-class ChainSynchronizer {
+export interface ChainSynchronizer extends EventEmitter {
+  getSyncStatus(): SyncStatus;
+  on(event: 'sync_update', listener: (update: SyncUpdateRaw) => void): this;
+}
+
+class Synchronizer extends EventEmitter {
   private readonly watchAddrs: ScriptHash[];
   private currentHeight: Long;
 
@@ -30,6 +36,7 @@ class ChainSynchronizer {
   private syncStatus = SyncStatus.Connecting;
 
   public constructor(watchAddrs: ScriptHash[], syncHeight: Long) {
+    super();
     if (!syncHeight.unsigned) throw new Error('syncHeight must be unsigned');
     this.currentHeight = syncHeight;
     this.watchAddrs = watchAddrs;
@@ -45,7 +52,7 @@ class ChainSynchronizer {
 
     client.on('close', (): void => {
       this.syncStatus = SyncStatus.Connecting;
-      emitSyncUpdate({
+      this.emitSyncUpdate({
         status: this.syncStatus,
       });
     });
@@ -71,7 +78,7 @@ class ChainSynchronizer {
                   txs: updatedTxs,
                 };
               }
-              emitSyncUpdate(update);
+              this.emitSyncUpdate(update);
               await this.updateSyncHeight();
             } catch (e) {
               log.error('Failed to handle incoming block\n', block, e);
@@ -89,7 +96,7 @@ class ChainSynchronizer {
   private async start(): Promise<void> {
     if (this.syncStatus !== SyncStatus.Connecting) return;
     this.syncStatus = SyncStatus.InProgress;
-    emitSyncUpdate({
+    this.emitSyncUpdate({
       status: this.syncStatus,
     });
 
@@ -151,7 +158,7 @@ class ChainSynchronizer {
       }
 
       await this.updateSyncHeight();
-      emitSyncUpdate({
+      this.emitSyncUpdate({
         status: this.syncStatus,
         newData: {
           totalBalance: totalBalance.amount.toString(),
@@ -217,6 +224,11 @@ class ChainSynchronizer {
     return index > -1;
   }
 
+  private emitSyncUpdate(update: SyncUpdateRaw): void {
+    this.emit('sync_update', update);
+    ipcEmitSyncUpdate(update);
+  }
+
   private async updateSyncHeight(): Promise<void> {
     const store = WalletDb.getInstance().getTable(KvTable);
     await store.setSyncHeight(this.currentHeight);
@@ -260,5 +272,5 @@ export async function initSynchronizer(watchAddrs: ScriptHash[]): Promise<void> 
   if (!syncHeight) syncHeight = Long.fromNumber(0, true);
 
   if (instance !== undefined) throw new Error('synchronizer already initialized');
-  instance = new ChainSynchronizer(watchAddrs, syncHeight);
+  instance = new Synchronizer(watchAddrs, syncHeight);
 }

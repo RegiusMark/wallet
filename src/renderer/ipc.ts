@@ -86,6 +86,24 @@ class IpcManager {
     };
   }
 
+  public async transferFunds(req: models.TransferFundsReq): Promise<models.TransferFundsRawRes> {
+    const ipcRes = await this.send(
+      {
+        type: 'wallet:transfer_funds',
+        toAddress: req.toAddress.bytes,
+        amount: req.amount.amount.toString(),
+        fee: req.fee.amount.toString(),
+        memo: req.memo,
+      },
+      30000,
+    );
+    if (ipcRes.type !== 'wallet:transfer_funds') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+
+    return ipcRes;
+  }
+
   public onSyncUpdate(handler: (update: models.SyncUpdate) => void): void {
     ipcRenderer.on('sync_update', (_evt, rawData: models.SyncUpdateRaw) => {
       const data: models.SyncUpdate = {
@@ -116,7 +134,7 @@ class IpcManager {
     });
   }
 
-  public send(req: models.ReqModel): Promise<models.ResModel> {
+  public send(req: models.ReqModel, timeout = 5000): Promise<models.ResModel> {
     return new Promise((resolve, reject): void => {
       const id = this.id++;
       const rpcReq: models.AppActionReq = {
@@ -129,7 +147,7 @@ class IpcManager {
         if (this.promises[id]) {
           reject(new Error('IPC request timeout (req: ' + JSON.stringify(rpcReq) + ')'));
         }
-      }, 5000);
+      }, timeout);
 
       ipcRenderer.send(models.APP_ACTION_REQ, rpcReq);
     });

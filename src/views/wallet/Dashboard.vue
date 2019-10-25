@@ -33,25 +33,26 @@
         <div class="icon success">
           <i class="fas fa-check"></i>
         </div>
-        <div class="msg">Sent!</div>
+        <div class="msg-header">Sent!</div>
       </div>
       <div v-else-if="dialogs.transferredFunds.state === TransferState.Pending">
         <div class="icon pending">
           <i class="fas fa-sync-alt"></i>
         </div>
-        <div class="msg">Pending...</div>
+        <div class="msg-header">Pending...</div>
       </div>
       <div v-else-if="dialogs.transferredFunds.state === TransferState.Error">
         <div class="icon error">
           <i class="fas fa-times"></i>
         </div>
-        <div class="msg">Broadcast error</div>
+        <div class="msg-header">Broadcast error</div>
+        <div class="msg">{{ dialogs.transferredFunds.msg }}</div>
       </div>
       <div v-else>
         <div class="icon error">
           <i class="fas fa-times"></i>
         </div>
-        <div class="msg">Unknown transfer state</div>
+        <div class="msg-header">Unknown transfer state</div>
       </div>
     </Dialog>
     <DashArea>
@@ -145,6 +146,7 @@ interface SendFundsDialog {
 interface TransferredFundsDialog {
   active: boolean;
   state: TransferState;
+  msg: string;
 }
 
 interface Dialogs {
@@ -179,6 +181,7 @@ export default class Dashboard extends Vue {
     transferredFunds: {
       active: false,
       state: TransferState.Pending,
+      msg: '',
     },
   };
 
@@ -346,28 +349,39 @@ export default class Dashboard extends Vue {
     }
   }
 
-  private transferFunds(): void {
+  private async transferFunds(): Promise<void> {
     const sendFundsDialog = this.dialogs.sendFunds;
-    if (!sendFundsDialog.formValid) return;
+    if (!this.sendBtnEnabled) return;
+    const dialog = this.dialogs.transferredFunds;
     try {
-      const addr = ScriptHash.fromWif(sendFundsDialog.form.address.trim());
-      const amount = Asset.fromString(sendFundsDialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
-
-      const dialog = this.dialogs.transferredFunds;
       dialog.state = TransferState.Pending;
       dialog.active = true;
 
-      setTimeout(() => {
-        dialog.state = TransferState.Success;
+      const addr = ScriptHash.fromWif(sendFundsDialog.form.address.trim());
+      const amount = Asset.fromString(sendFundsDialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
+      const fee = sendFundsDialog.fee!;
 
-        setTimeout(() => {
-          sendFundsDialog.active = false;
-          dialog.active = false;
-        }, 2000);
-      }, 1000);
-      // TODO broadcast to the blockchain
+      const res = await ipc.transferFunds({
+        toAddress: addr,
+        amount,
+        fee,
+        memo: new Uint8Array(),
+      });
+
+      if (res.error) throw new Error(res.error);
+      dialog.state = TransferState.Success;
     } catch (e) {
       log.error('Failed to send funds:', e);
+      dialog.state = TransferState.Error;
+      dialog.msg = e.message;
+    } finally {
+      setTimeout(
+        () => {
+          sendFundsDialog.active = false;
+          dialog.active = false;
+        },
+        dialog.state === TransferState.Success ? 1500 : 3000,
+      );
     }
   }
 }
@@ -524,9 +538,15 @@ export default class Dashboard extends Vue {
     }
   }
 
-  .msg {
+  .msg-header {
     margin-top: 1em;
     font-size: 1.4em;
+    color: hsla(0, 0, 100, 0.7);
+  }
+
+  .msg {
+    margin-top: 1.5em;
+    color: hsla(0, 0, 100, 0.55);
   }
 }
 </style>
