@@ -161,6 +161,17 @@ function parseAddress(address: string): ScriptHash {
 
 function parseAmount(amount: string): Asset {
   amount = amount.trim();
+  const pos = amount.indexOf('.');
+  const precision = 5;
+  if (pos === -1) {
+    amount += '.' + '0'.repeat(precision);
+  } else {
+    const missingPrec = precision - (amount.length - 1) + pos;
+    if (missingPrec < 0) {
+      throw new Error('precision too high');
+    }
+    amount += '0'.repeat(missingPrec);
+  }
   return Asset.fromString(amount + ' ' + ASSET_SYMBOL);
 }
 
@@ -203,7 +214,7 @@ export default class Dashboard extends Vue {
   private get sendDialogRemaining(): string {
     const fee = this.dialogs.sendFunds.fee;
     if (!(fee && this.dialogs.sendFunds.formValid)) return 'Determining...';
-    const amt = Asset.fromString(this.dialogs.sendFunds.form.amount.trim() + ' ' + ASSET_SYMBOL);
+    const amt = parseAmount(this.dialogs.sendFunds.form.amount);
     if (amt.amount.lt(0)) return 'Amount cannot be negative.';
     return this.totalBal
       .sub(amt)
@@ -214,7 +225,7 @@ export default class Dashboard extends Vue {
   private get sendBtnEnabled(): boolean {
     const dialog = this.dialogs.sendFunds;
     if (!dialog.formValid) return false;
-    const amt = Asset.fromString(dialog.form.amount.trim() + ' ' + ASSET_SYMBOL);
+    const amt = parseAmount(dialog.form.amount);
     return dialog.fee !== null && amt.amount.gt(0);
   }
 
