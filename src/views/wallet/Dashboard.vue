@@ -28,7 +28,7 @@
         </div>
       </div>
     </Dialog>
-    <Dialog width="25%" v-model="dialogs.transferFunds.active" class="dialog-transfer-funds" :disable-esc="true">
+    <Dialog class="dialog-transfer-funds" width="25%" v-model="dialogs.transferFunds.active" :disable-esc="true">
       <div v-if="dialogs.transferFunds.state === TransferState.Success">
         <div class="icon success">
           <i class="fas fa-check"></i>
@@ -55,6 +55,18 @@
         <div class="msg-header">Unknown transfer state</div>
       </div>
     </Dialog>
+    <Dialog class="dialog-receive-funds" width="70%" v-model="dialogs.receiveFunds.active">
+      <div style="user-select: none; filter: brightness(0.85); padding-bottom: 0.8em;">
+        <img src="../../assets/coin-front.png" width="80" />
+      </div>
+      <div class="header">Your GODcoin Address</div>
+      <div class="address">
+        <span>{{ p2shAddress.toWif() }}</span>
+      </div>
+      <div class="actions">
+        <Btn @click="receiveDialogActive(false)">Close</Btn>
+      </div>
+    </Dialog>
     <DashArea>
       <div class="container">
         <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
@@ -66,7 +78,7 @@
         </div>
         <div class="actions">
           <Btn @click="sendDialogActive(true)">Send</Btn>
-          <Btn>Receive</Btn>
+          <Btn @click="receiveDialogActive(true)">Receive</Btn>
         </div>
         <div class="container-separator"></div>
         <div class="transaction-history">
@@ -152,6 +164,9 @@ interface TransferFundsDialog {
 interface Dialogs {
   sendFunds: SendFundsDialog;
   transferFunds: TransferFundsDialog;
+  receiveFunds: {
+    active: boolean;
+  };
 }
 
 function parseAddress(address: string): ScriptHash {
@@ -205,6 +220,9 @@ export default class Dashboard extends Vue {
       state: TransferState.Pending,
       msg: '',
     },
+    receiveFunds: {
+      active: true, // DEBUG
+    },
   };
 
   private get sendDialogFee(): string {
@@ -238,6 +256,9 @@ export default class Dashboard extends Vue {
 
   @State(state => state.wallet.totalBal)
   private totalBal!: Asset;
+
+  @State(state => state.wallet.p2shAddr)
+  private p2shAddress!: ScriptHash;
 
   /* Vue lifecycle hook */
   private beforeMount(): void {
@@ -406,6 +427,10 @@ export default class Dashboard extends Vue {
       );
     }
   }
+
+  private receiveDialogActive(active: boolean): void {
+    this.dialogs.receiveFunds.active = active;
+  }
 }
 </script>
 
@@ -569,6 +594,32 @@ export default class Dashboard extends Vue {
   .msg {
     margin-top: 1.5em;
     color: hsla(0, 0, 100, 0.55);
+  }
+}
+
+.dialog-receive-funds {
+  text-align: center;
+  font-size: 1.1em;
+
+  .header {
+    user-select: none;
+    color: hsla(0, 0, 100, 0.55);
+  }
+
+  .address {
+    margin-top: 1em;
+    font-size: 1.05em;
+
+    & > :first-child {
+      padding: 0.4em;
+      background-color: hsla(0, 0, 40, 0.2);
+      border-radius: 4px;
+    }
+  }
+
+  .actions {
+    padding-top: 2em;
+    font-size: 0.7em;
   }
 }
 </style>
