@@ -28,25 +28,25 @@
         </div>
       </div>
     </Dialog>
-    <Dialog width="25%" v-model="dialogs.transferredFunds.active" class="dialog-transferred-funds" :disable-esc="true">
-      <div v-if="dialogs.transferredFunds.state === TransferState.Success">
+    <Dialog width="25%" v-model="dialogs.transferFunds.active" class="dialog-transfer-funds" :disable-esc="true">
+      <div v-if="dialogs.transferFunds.state === TransferState.Success">
         <div class="icon success">
           <i class="fas fa-check"></i>
         </div>
         <div class="msg-header">Sent!</div>
       </div>
-      <div v-else-if="dialogs.transferredFunds.state === TransferState.Pending">
+      <div v-else-if="dialogs.transferFunds.state === TransferState.Pending">
         <div class="icon pending">
           <i class="fas fa-sync-alt"></i>
         </div>
         <div class="msg-header">Pending...</div>
       </div>
-      <div v-else-if="dialogs.transferredFunds.state === TransferState.Error">
+      <div v-else-if="dialogs.transferFunds.state === TransferState.Error">
         <div class="icon error">
           <i class="fas fa-times"></i>
         </div>
         <div class="msg-header">Broadcast error</div>
-        <div class="msg">{{ dialogs.transferredFunds.msg }}</div>
+        <div class="msg">{{ dialogs.transferFunds.msg }}</div>
       </div>
       <div v-else>
         <div class="icon error">
@@ -143,7 +143,7 @@ interface SendFundsDialog {
   form: SendFundsForm;
 }
 
-interface TransferredFundsDialog {
+interface TransferFundsDialog {
   active: boolean;
   state: TransferState;
   msg: string;
@@ -151,7 +151,7 @@ interface TransferredFundsDialog {
 
 interface Dialogs {
   sendFunds: SendFundsDialog;
-  transferredFunds: TransferredFundsDialog;
+  transferFunds: TransferFundsDialog;
 }
 
 function parseAddress(address: string): ScriptHash {
@@ -200,7 +200,7 @@ export default class Dashboard extends Vue {
         error: null,
       },
     },
-    transferredFunds: {
+    transferFunds: {
       active: false,
       state: TransferState.Pending,
       msg: '',
@@ -374,7 +374,7 @@ export default class Dashboard extends Vue {
   private async transferFunds(): Promise<void> {
     const sendFundsDialog = this.dialogs.sendFunds;
     if (!this.sendBtnEnabled) return;
-    const dialog = this.dialogs.transferredFunds;
+    const dialog = this.dialogs.transferFunds;
     try {
       dialog.state = TransferState.Pending;
       dialog.active = true;
@@ -540,7 +540,7 @@ export default class Dashboard extends Vue {
   }
 }
 
-.dialog-transferred-funds {
+.dialog-transfer-funds {
   text-align: center;
 
   .icon {
