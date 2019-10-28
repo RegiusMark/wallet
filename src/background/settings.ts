@@ -9,7 +9,7 @@ const log = new Logger('main:settings');
 
 const CRYPTO_VERSION = 1;
 
-let globalSettings: Settings;
+let globalSettings: Settings | undefined;
 
 interface SettingsData {
   dbSecretKey: SecretKey;
@@ -170,5 +170,9 @@ export function setGlobalSettings(val: Settings): void {
 }
 
 export function getGlobalSettings(): Settings {
-  return globalSettings;
+  return globalSettings!;
+}
+
+export function isSettingsLoaded(): boolean {
+  return globalSettings !== undefined;
 }

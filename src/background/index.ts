@@ -1,7 +1,7 @@
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { app, protocol, BrowserWindow, dialog } from 'electron';
 import sodium from 'libsodium-wrappers';
-import { Settings } from './settings';
+import { Settings, isSettingsLoaded } from './settings';
 import { Logger } from '../log';
 import setupIpc from './ipc';
 
@@ -105,7 +105,11 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (window === null) {
-    createStartWindow();
+    if (isSettingsLoaded()) {
+      createDashboardWindow();
+    } else {
+      createStartWindow();
+    }
   }
 });
 
