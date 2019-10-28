@@ -106,7 +106,14 @@
                 </div>
               </div>
               <div class="tx-body" v-if="tx.meta.expanded">
-                <div>Date: {{ tx.time }}</div>
+                <div>
+                  <div>Date</div>
+                  <div>{{ tx.time }}</div>
+                </div>
+                <div>
+                  <div>{{ tx.incoming ? 'From' : 'To' }}</div>
+                  <div>{{ tx.address }}</div>
+                </div>
               </div>
               <div class="tx-separator" style="width: 100%;" />
             </div>
@@ -528,6 +535,22 @@ export default class Dashboard extends Vue {
         .tx-body {
           padding: 0.8em 0.8em 0.8em 0.8em;
           background-color: darken($bg-color, 60%);
+          font-size: 0.9em;
+
+          & > div {
+            margin-bottom: 0.5em;
+
+            // Field name
+            *:nth-child(1) {
+              color: hsla(0, 0, 80, 0.4);
+              margin-bottom: 3px;
+            }
+
+            // Value
+            *:nth-child(2) {
+              color: hsla(0, 0, 100, 0.65);
+            }
+          }
         }
       }
 
