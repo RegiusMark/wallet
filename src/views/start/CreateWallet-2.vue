@@ -24,8 +24,8 @@ import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue'
 import { Component, Vue } from 'vue-property-decorator';
 import { generateKeyPair } from 'godcoin';
 import { RootStore } from '@/store';
-import { Logger } from '@/log';
 import ipc from '@/renderer/ipc';
+import { Logger } from '@/log';
 
 const log = new Logger('create-wallet-2');
 

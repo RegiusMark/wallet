@@ -1,4 +1,4 @@
-import { Asset, Script, ScriptHash } from 'godcoin';
+import { Asset, Script, ScriptHash, KeyPair } from 'godcoin';
 import { TxRow, TxRawRow } from './background/db';
 
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';
@@ -16,8 +16,21 @@ export interface AppActionRes {
   res: ResModel;
 }
 
-export type ReqModel = FirstSetupReq | PreInitWalletReq | PostInitWalletRawReq | GetFeeRawReq | TransferFundsRawReq;
-export type ResModel = FirstSetupRes | PreInitWalletRes | PostInitWalletRawRes | GetFeeRawRes | TransferFundsRawRes;
+export type ReqModel =
+  | FirstSetupReq
+  | PreInitWalletReq
+  | PostInitWalletRawReq
+  | GetFeeRawReq
+  | GetPrivateKeyRawReq
+  | TransferFundsRawReq;
+
+export type ResModel =
+  | FirstSetupRes
+  | PreInitWalletRes
+  | PostInitWalletRawRes
+  | GetFeeRawRes
+  | GetPrivateKeyRawRes
+  | TransferFundsRawRes;
 
 export interface FirstSetupReq {
   type: 'wallet:first_setup';
@@ -77,6 +90,19 @@ export interface GetFeeRes {
     addrFee: Asset;
   };
   error?: string;
+}
+
+export interface GetPrivateKeyRawReq {
+  type: 'wallet:get_private_key';
+}
+
+export interface GetPrivateKeyRawRes {
+  type: 'wallet:get_private_key';
+  seed: Uint8Array;
+}
+
+export interface GetPrivateKeyRes {
+  key: KeyPair;
 }
 
 export interface TransferFundsRawReq {

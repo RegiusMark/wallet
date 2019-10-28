@@ -86,6 +86,18 @@ class IpcManager {
     };
   }
 
+  public async getPrivateKey(): Promise<models.GetPrivateKeyRes> {
+    const ipcRes = await this.send({
+      type: 'wallet:get_private_key',
+    });
+    if (ipcRes.type !== 'wallet:get_private_key') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+    return {
+      key: KeyPair.fromSeed(ipcRes.seed),
+    };
+  }
+
   public async transferFunds(req: models.TransferFundsReq): Promise<models.TransferFundsRawRes> {
     const ipcRes = await this.send(
       {

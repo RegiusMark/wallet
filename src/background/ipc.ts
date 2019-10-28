@@ -1,5 +1,5 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
-import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0 } from 'godcoin';
+import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0, PrivateKey } from 'godcoin';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
 import { initSynchronizer, getSynchronizer } from './synchronizer';
@@ -130,6 +130,14 @@ export default function(): void {
               error: e.message,
             };
           }
+          break;
+        }
+        case 'wallet:get_private_key': {
+          const settings = getGlobalSettings();
+          response = {
+            type: 'wallet:get_private_key',
+            seed: settings.keyPair.privateKey.seed,
+          };
           break;
         }
         case 'wallet:transfer_funds': {
