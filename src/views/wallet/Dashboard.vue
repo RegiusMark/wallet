@@ -61,7 +61,7 @@
       </div>
       <div class="header">Your GODcoin Address</div>
       <div class="address">
-        <span>{{ p2shAddress.toWif() }}</span>
+        <span>{{ p2shAddress ? p2shAddress.toWif() : '' }}</span>
       </div>
       <div class="actions">
         <Btn @click="receiveDialogActive(false)">Close</Btn>
