@@ -221,7 +221,7 @@ export default class Dashboard extends Vue {
       msg: '',
     },
     receiveFunds: {
-      active: true, // DEBUG
+      active: false,
     },
   };
 
