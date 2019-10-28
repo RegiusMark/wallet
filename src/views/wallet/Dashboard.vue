@@ -486,50 +486,54 @@ export default class Dashboard extends Vue {
     font-size: 1.2em;
   }
 
-  .history > div {
-    $bg-color: hsla(275, 50, 40, 0.2);
+  .history {
+    margin-bottom: 4em;
 
-    .tx-header {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      user-select: none;
-      cursor: pointer;
-      padding: 1em;
+    & > div {
+      $bg-color: hsla(275, 50, 40, 0.2);
 
-      color: hsla(0, 0, 100, 0.8);
+      .tx-header {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        user-select: none;
+        cursor: pointer;
+        padding: 1em;
 
-      &.incoming {
-        color: hsla(0, 0, 100, 0.55);
+        color: hsla(0, 0, 100, 0.8);
+
+        &.incoming {
+          color: hsla(0, 0, 100, 0.55);
+        }
+
+        .left-icon {
+          margin-right: 10px;
+          transform: rotate(45deg);
+        }
+
+        .right-icon {
+          margin-left: 10px;
+          transition: transform 200ms;
+        }
       }
 
-      .left-icon {
-        margin-right: 10px;
-        transform: rotate(45deg);
+      .tx-separator {
+        width: 85%;
+        border-top: solid 2px hsla(0, 0, 100, 0.1);
       }
 
-      .right-icon {
-        margin-left: 10px;
-        transition: transform 200ms;
+      &.expanded {
+        background-color: $bg-color;
+
+        .tx-body {
+          padding: 0.8em 0.8em 0.8em 0.8em;
+          background-color: darken($bg-color, 60%);
+        }
       }
-    }
 
-    .tx-separator {
-      width: 85%;
-      border-top: solid 2px hsla(0, 0, 100, 0.1);
-    }
-
-    &.expanded {
-      background-color: $bg-color;
-
-      .tx-body {
-        padding: 0.8em 0.8em 0.8em 0.8em;
-        background-color: darken($bg-color, 60%);
+      &:hover {
+        background-color: $bg-color;
       }
-    }
-
-    &:hover {
-      background-color: $bg-color;
     }
   }
 }
