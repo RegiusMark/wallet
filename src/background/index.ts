@@ -11,6 +11,7 @@ const log = new Logger('main');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let window: BrowserWindow | null = null;
+let preventWindowCloseQuit = false;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
@@ -44,10 +45,12 @@ function installWindowHooks(): void {
 }
 
 function createStartWindow(): void {
+  preventWindowCloseQuit = true;
   if (window !== null) {
     window.destroy();
     window = null;
   }
+  preventWindowCloseQuit = false;
 
   window = new BrowserWindow({
     width: 800,
@@ -71,10 +74,12 @@ function createStartWindow(): void {
 }
 
 export function createDashboardWindow(): void {
+  preventWindowCloseQuit = true;
   if (window !== null) {
     window.destroy();
     window = null;
   }
+  preventWindowCloseQuit = false;
 
   window = new BrowserWindow({
     width: 1200,
@@ -96,7 +101,7 @@ export function getWindowInstance(): BrowserWindow | null {
 }
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (!(preventWindowCloseQuit || process.platform === 'darwin')) {
     app.quit();
   }
 });
