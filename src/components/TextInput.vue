@@ -44,6 +44,7 @@ $icon-width: 35px;
   color: hsla(0, 0, 100%, 0.75);
   font-style: normal;
   font-weight: 100;
+  font-size: 0.9em;
 }
 
 .text-input input:focus::placeholder {
