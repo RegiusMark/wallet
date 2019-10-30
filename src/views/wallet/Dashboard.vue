@@ -119,6 +119,10 @@
                   <div>{{ tx.incoming ? 'From' : 'To' }}</div>
                   <div>{{ tx.address }}</div>
                 </div>
+                <div v-if="!tx.incoming">
+                  <div>Fee</div>
+                  <div>{{ tx.fee }}</div>
+                </div>
                 <div>
                   <div>Memo</div>
                   <div v-if="tx.memo">{{ tx.memo }}</div>

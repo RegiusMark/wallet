@@ -21,6 +21,8 @@ export interface DisplayableTxData {
   incoming: boolean;
   /* Asset number as string without ticker */
   amount: string;
+  /* Asset number as string without ticker */
+  fee: string;
   /* Lazy parsed UTF-8 memo string */
   memo: string | null;
 }
@@ -35,6 +37,7 @@ export class DisplayableTx implements DisplayableTxData {
   public address: string;
   public incoming: boolean;
   public amount: string;
+  public fee: string;
   public memo: string | null;
 
   constructor(data: DisplayableTxData) {
@@ -43,6 +46,7 @@ export class DisplayableTx implements DisplayableTxData {
     this.address = data.address;
     this.incoming = data.incoming;
     this.amount = data.amount;
+    this.fee = data.fee;
     this.memo = data.memo;
   }
 
@@ -162,6 +166,7 @@ function toDisplayableTx(addr: ScriptHash, txRow: TxRow): DisplayableTx | undefi
     address: incoming ? tx.from.toWif() : tx.to.toWif(),
     incoming,
     amount: tx.amount.toString(false),
+    fee: tx.fee.toString(false),
     memo: null,
   });
 }
