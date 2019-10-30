@@ -1,5 +1,5 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
-import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0, PrivateKey } from 'godcoin';
+import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0 } from 'godcoin';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
 import { initSynchronizer, getSynchronizer } from './synchronizer';
@@ -56,7 +56,7 @@ export default function(): void {
 
             try {
               await WalletDb.init(settings.dbSecretKey);
-              initClient('ws://127.0.0.1:7777');
+              initClient(NODE_URL);
               await initSynchronizer([settings.p2shAddr]);
               createDashboardWindow();
 
