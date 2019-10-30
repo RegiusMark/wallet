@@ -16,6 +16,11 @@
             placeholder="Send to GODcoin address..."
           />
           <TextInput icon="fa-coins" v-model.trim="dialogs.sendFunds.form.amount" placeholder="Amount to send..." />
+          <TextInput
+            icon="fa-sticky-note"
+            v-model.trim="dialogs.sendFunds.form.memo"
+            placeholder="Optional public memo..."
+          />
         </div>
         <div class="error-msg">{{ dialogs.sendFunds.form.error }}</div>
         <div class="balances">
@@ -133,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import { generateKeyPair, Asset, ScriptHash, ASSET_SYMBOL } from 'godcoin';
+import { generateKeyPair, Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'godcoin';
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
@@ -159,6 +164,7 @@ enum TransferState {
 interface SendFundsForm {
   address: string;
   amount: string;
+  memo: string;
   error: string | null;
 }
 
@@ -227,6 +233,7 @@ export default class Dashboard extends Vue {
       form: {
         address: '',
         amount: '',
+        memo: '',
         error: null,
       },
     },
@@ -334,6 +341,7 @@ export default class Dashboard extends Vue {
       dialog.formValid = false;
       dialog.form.address = '';
       dialog.form.amount = '0.00000';
+      dialog.form.memo = '';
       dialog.fee = null;
 
       this.updateFee();
@@ -345,8 +353,8 @@ export default class Dashboard extends Vue {
 
   @Watch('dialogs.sendFunds.form', { deep: true })
   private sendFundsFormChange(form: SendFundsForm): void {
-    this.dialogs.sendFunds.formValid = false;
-    const fee = this.dialogs.sendFunds.fee;
+    const sendFunds = this.dialogs.sendFunds;
+    sendFunds.formValid = false;
     const addr = form.address;
     const amt = form.amount;
 
@@ -356,13 +364,14 @@ export default class Dashboard extends Vue {
       }
     } catch (e) {
       log.error('Error parsing address:', addr, e.message);
-      this.dialogs.sendFunds.form.error = 'Invalid address.';
+      form.error = 'Invalid address.';
       return;
     }
 
     try {
       if (amt.length > 0) {
         const sendAmtAsset = parseAmount(amt);
+        const fee = sendFunds.fee;
         if (
           fee &&
           WalletStore.totalBal
@@ -370,20 +379,28 @@ export default class Dashboard extends Vue {
             .sub(fee)
             .lt(new Asset(Big(0)))
         ) {
-          this.dialogs.sendFunds.form.error = 'Insufficient funds.';
+          form.error = 'Insufficient funds.';
           return;
         }
       }
     } catch (e) {
       log.error('Error parsing asset:', form.amount, e.message);
-      this.dialogs.sendFunds.form.error = 'Invalid amount.';
+      form.error = 'Invalid amount.';
       return;
     }
 
-    if (addr.length > 0 && amt.length > 0) {
-      this.dialogs.sendFunds.formValid = true;
+    {
+      const buf = new TextEncoder().encode(form.memo);
+      if (buf.length > MAX_MEMO_BYTE_SIZE) {
+        form.error = 'Memo exceeds the maximum allowed size.';
+        return;
+      }
     }
-    this.dialogs.sendFunds.form.error = null;
+
+    if (addr.length > 0 && amt.length > 0) {
+      sendFunds.formValid = true;
+    }
+    sendFunds.form.error = null;
   }
 
   @Watch('syncStatus')
@@ -422,13 +439,14 @@ export default class Dashboard extends Vue {
 
       const addr = parseAddress(sendFundsDialog.form.address);
       const amount = parseAmount(sendFundsDialog.form.amount);
+      const memo = new TextEncoder().encode(sendFundsDialog.form.memo);
       const fee = sendFundsDialog.fee!;
 
       const res = await ipc.transferFunds({
         toAddress: addr,
         amount,
         fee,
-        memo: new Uint8Array(),
+        memo,
       });
 
       if (res.error) throw new Error(res.error);
