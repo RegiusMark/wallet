@@ -1,6 +1,6 @@
 <template>
   <div class="text-input">
-    <i class="fas fa-sm" :class="icon" style="font-size: 1em"></i>
+    <i class="fas fa-sm" :class="icon"></i>
     <input type="text" :placeholder="placeholder" :value="value" @input="$emit('input', $event.target.value)" />
     <div class="underline"></div>
   </div>
@@ -24,10 +24,11 @@ export default class TextInput extends Vue {
 </script>
 
 <style lang="scss" scoped>
-$icon-width: 35px;
+$icon-width: 30px;
 
 .text-input input {
-  width: 100%;
+  // The width isn't 100% to prevent the text from overhanging
+  width: 95%;
   background-color: transparent;
   border: 0;
   margin-left: $icon-width;
@@ -55,6 +56,7 @@ $icon-width: 35px;
   position: absolute;
   margin: 2px;
   color: hsla(0, 0, 100%, 0.45);
+  font-size: 1em;
 }
 
 .text-input .underline {
