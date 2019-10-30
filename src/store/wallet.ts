@@ -4,10 +4,10 @@ import { SyncStatus } from '@/ipc-models';
 import { TxRow } from '@/background/db';
 import Big from 'big.js';
 
-export interface DisplayableTx {
+export interface DisplayableTxData {
   meta: {
-    /* DB row ID */
-    id: number;
+    /* Transaction row as seen in the database */
+    row: TxRow;
     /* Whether or not the transaction is expanded */
     expanded: boolean;
     /* User provided description about the transaction */
@@ -21,6 +21,52 @@ export interface DisplayableTx {
   incoming: boolean;
   /* Asset number as string without ticker */
   amount: string;
+  /* Lazy parsed UTF-8 memo string */
+  memo: string | null;
+}
+
+export class DisplayableTx implements DisplayableTxData {
+  public meta: {
+    row: TxRow;
+    expanded: boolean;
+    desc: string | null;
+  };
+  public time: string;
+  public address: string;
+  public incoming: boolean;
+  public amount: string;
+  public memo: string | null;
+
+  constructor(data: DisplayableTxData) {
+    this.meta = data.meta;
+    this.time = data.time;
+    this.address = data.address;
+    this.incoming = data.incoming;
+    this.amount = data.amount;
+    this.memo = data.memo;
+  }
+
+  public hasMemo(): boolean {
+    const tx = this.meta.row.tx.tx;
+    return tx instanceof TransferTxV0 && tx.memo.length > 0;
+  }
+
+  public parseMemo(force: boolean): void {
+    // hasMemo is a type guard for TransferTxV0
+    const tx = this.meta.row.tx.tx as TransferTxV0;
+    if (!this.hasMemo()) {
+      throw new Error('cannot parse memo on this transaction');
+    }
+
+    try {
+      const decoder = new TextDecoder('utf8', {
+        fatal: !force,
+      });
+      this.memo = decoder.decode(tx.memo);
+    } catch {
+      // Contains invalid UTF-8 characters
+    }
+  }
 }
 
 export interface InitData {
@@ -106,9 +152,9 @@ function toDisplayableTx(addr: ScriptHash, txRow: TxRow): DisplayableTx | undefi
   const tx = txRow.tx.tx;
   if (!(tx instanceof TransferTxV0)) return;
   const incoming = Buffer.compare(tx.to.bytes, addr.bytes) === 0;
-  return {
+  return new DisplayableTx({
     meta: {
-      id: txRow.id,
+      row: txRow,
       expanded: false,
       desc: txRow.desc,
     },
@@ -116,5 +162,6 @@ function toDisplayableTx(addr: ScriptHash, txRow: TxRow): DisplayableTx | undefi
     address: incoming ? tx.from.toWif() : tx.to.toWif(),
     incoming,
     amount: tx.amount.toString(false),
-  };
+    memo: null,
+  });
 }

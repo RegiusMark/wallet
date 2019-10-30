@@ -114,6 +114,14 @@
                   <div>{{ tx.incoming ? 'From' : 'To' }}</div>
                   <div>{{ tx.address }}</div>
                 </div>
+                <div>
+                  <div>Memo</div>
+                  <div v-if="tx.memo">{{ tx.memo }}</div>
+                  <div v-else-if="!tx.hasMemo()" class="no-memo">This transaction has no memo</div>
+                  <div v-else class="parse-memo">
+                    Memo contains invalid characters, <span @click="tx.parseMemo(true)">click to display anyways</span>
+                  </div>
+                </div>
               </div>
               <div class="tx-separator" style="width: 100%;" />
             </div>
@@ -303,6 +311,11 @@ export default class Dashboard extends Vue {
   }
 
   private txClick(index: number, tx: DisplayableTx): void {
+    if (tx.memo === null && tx.hasMemo()) {
+      // Attempt to parse the memo initially, afterwards we ask the user if they want to display it anyways
+      tx.parseMemo(false);
+    }
+
     WalletStore.setExpandState({
       index,
       expanded: !tx.meta.expanded,
@@ -549,6 +562,23 @@ export default class Dashboard extends Vue {
             // Value
             *:nth-child(2) {
               color: hsla(0, 0, 100, 0.65);
+            }
+
+            .no-memo {
+              color: hsla(0, 0, 100, 0.5);
+              font-style: oblique;
+            }
+
+            .parse-memo {
+              color: hsla(0, 0, 100, 0.5);
+              font-style: oblique;
+
+              span {
+                cursor: pointer;
+
+                color: hsla(0, 0, 100, 0.5);
+                text-decoration: underline;
+              }
             }
           }
         }
