@@ -11,7 +11,7 @@
           <i class="fas fa-exclamation-triangle" style="padding-right: 0.7em"></i>
         </div>
         <div>
-          <span>Write down your private key in a safe place.&nbsp;</span>
+          <span>Write down your private key and store it in a safe place.&nbsp;</span>
           <span>Losing your key will result in the loss of funds.</span>
         </div>
       </div>
