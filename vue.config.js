@@ -27,9 +27,18 @@ module.exports = {
       mainProcessFile: './src/background/index.ts',
       mainProcessWatch: ['./src/background'],
       builderOptions: {
+        artifactName: '${name}-${version}-${os}-x64.${ext}',
         productName: 'GODcoin Wallet',
         mac: {
+          category: 'public.app-category.finance',
           identity: 'GODcoin',
+        },
+        win: {
+          target: [{ target: 'nsis', arch: ['x64'] }],
+        },
+        linux: {
+          category: 'Finance',
+          target: [{ target: 'AppImage', arch: ['x64'] }, { target: 'zip', arch: ['x64'] }],
         },
       },
     },
