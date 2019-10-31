@@ -36,5 +36,5 @@ test('Window Loads Properly', async () => {
   expect(height).toBeGreaterThan(0);
 
   // Redirects to the create wallet setup page for new users
-  expect(new URL(await app.webContents.getURL()).hash).toBe('#/create-wallet-1');
+  expect(new URL(await app.webContents.getURL()).hash).toBe('#/start/create-wallet-1');
 });

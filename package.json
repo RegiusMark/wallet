@@ -12,14 +12,14 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "cross-env IS_SPECTRON=1 vue-cli-service test:unit"
   },
   "main": "background.js",
   "resolutions": {
     "vue-cli-plugin-electron-builder/spectron": "^8.0.0"
   },
   "dependencies": {
-    "core-js": "^2.6.9",
+    "core-js": "^3.3.5",
     "godcoin": "https://github.com/GODcoin/godcoin-js.git#335386d",
     "libsodium-wrappers": "^0.7.6",
     "long": "^4.0.0",
@@ -51,6 +51,7 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
+    "cross-env": "^6.0.3",
     "electron": "^6.0.12",
     "eslint": "^6.6.0",
     "eslint-plugin-prettier": "^3.1.1",
@@ -60,7 +61,7 @@
     "sass-loader": "^8.0.0",
     "ts-jest": "^24.1.0",
     "typescript": "^3.6.4",
-    "vue-cli-plugin-electron-builder": "^1.4.0",
+    "vue-cli-plugin-electron-builder": "^2.0.0-alpha.0",
     "vue-template-compiler": "^2.6.10",
     "vuex-module-decorators": "^0.10.1"
   },
