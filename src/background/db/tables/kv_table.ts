@@ -1,5 +1,5 @@
 import { Table, CryptoManager } from '../table';
-import { ByteBuffer, Asset } from 'godcoin';
+import { ByteBuffer, Asset } from 'regiusmark';
 import { WalletDb } from '..';
 import Big from 'big.js';
 import Long from 'long';

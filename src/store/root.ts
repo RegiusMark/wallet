@@ -1,5 +1,5 @@
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { KeyPair } from 'godcoin';
+import { KeyPair } from 'regiusmark';
 
 @Module({
   name: 'root',

@@ -1,5 +1,5 @@
 import { Module, Mutation, VuexModule } from 'vuex-module-decorators';
-import { ScriptHash, TransferTxV0, Asset, Script } from 'godcoin';
+import { ScriptHash, TransferTxV0, Asset, Script } from 'regiusmark';
 import { SyncStatus } from '@/ipc-models';
 import { TxRow } from '@/background/db';
 import Big from 'big.js';

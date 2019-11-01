@@ -1,5 +1,5 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
-import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0 } from 'godcoin';
+import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0 } from 'regiusmark';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
 import { initSynchronizer, getSynchronizer } from './synchronizer';

@@ -2,7 +2,7 @@
   <div style="height: 100%;">
     <Dialog class="dialog-send-funds" width="70%" v-model="dialogs.sendFunds.active">
       <div style="text-align: center;">
-        <div style="user-select: none; filter: brightness(0.85)">
+        <div style="user-select: none;">
           <img src="../../assets/coin-front.png" width="80" />
         </div>
         <div class="funds" style="margin-top: 1em; font-size: 0.6em;">
@@ -13,7 +13,7 @@
           <TextInput
             icon="fa-address-card"
             v-model.trim="dialogs.sendFunds.form.address"
-            placeholder="Send to GODcoin address..."
+            placeholder="Send to Regius Mark address..."
           />
           <TextInput icon="fa-coins" v-model.trim="dialogs.sendFunds.form.amount" placeholder="Amount to send..." />
           <TextInput
@@ -61,10 +61,10 @@
       </div>
     </Dialog>
     <Dialog class="dialog-receive-funds" width="70%" v-model="dialogs.receiveFunds.active">
-      <div style="user-select: none; filter: brightness(0.85); padding-bottom: 0.8em;">
+      <div style="user-select: none; padding-bottom: 0.8em;">
         <img src="../../assets/coin-front.png" width="80" />
       </div>
-      <div class="header">Your GODcoin Address</div>
+      <div class="header">Your Regius Mark Address</div>
       <div class="address">
         <span>{{ p2shAddress ? p2shAddress.toWif() : '' }}</span>
       </div>
@@ -74,7 +74,7 @@
     </Dialog>
     <DashArea>
       <div class="container">
-        <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
+        <div style="margin-top: 0.85em; user-select: none;">
           <img src="../../assets/coin-front.png" width="120" />
         </div>
         <div class="funds">
@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts">
-import { generateKeyPair, Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'godcoin';
+import { generateKeyPair, Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'regiusmark';
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import TextInput from '@/components/TextInput.vue';
 import DashArea from '@/components/DashArea.vue';
@@ -508,7 +508,7 @@ export default class Dashboard extends Vue {
 .funds {
   margin-top: 0.3em;
   font-size: 1em;
-  color: hsla(55, 83, 50, 1);
+  color: hsla(50, 60, 47, 1);
 
   .amount {
     padding-right: 0.3em;
@@ -615,7 +615,7 @@ export default class Dashboard extends Vue {
 
 .dialog-send-funds {
   .funds > *:first-child {
-    color: hsla(55, 83, 70, 0.8);
+    color: hsla(50, 60, 47, 0.85);
   }
 
   .text-inputs > * {

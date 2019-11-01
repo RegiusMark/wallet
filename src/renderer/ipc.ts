@@ -1,4 +1,4 @@
-import { KeyPair, TxVariant, ByteBuffer, Asset, Script } from 'godcoin';
+import { KeyPair, TxVariant, ByteBuffer, Asset, Script } from 'regiusmark';
 import { TxRow } from '@/background/db';
 import * as models from '@/ipc-models';
 import { ipcRenderer } from 'electron';

@@ -1,8 +1,8 @@
 {
-  "name": "godcoin-wallet",
+  "name": "regiusmark-wallet",
   "version": "0.1.0",
-  "description": "Desktop GODcoin wallet",
-  "repository": "https://github.com/GODcoin/wallet",
+  "description": "Desktop Regius Mark wallet",
+  "repository": "https://github.com/RegiusMark/wallet",
   "author": "Samuel Grenier <samrg472@gmail.com>",
   "license": "MIT",
   "private": true,
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "core-js": "^3.3.5",
-    "godcoin": "https://github.com/GODcoin/godcoin-js.git#335386d",
+    "regiusmark": "https://github.com/RegiusMark/regiusmark-js.git#9932639",
     "libsodium-wrappers": "^0.7.6",
     "long": "^4.0.0",
     "sqlite3": "^4.1.0",

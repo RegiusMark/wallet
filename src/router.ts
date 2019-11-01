@@ -4,7 +4,7 @@ import Welcome from './views/start/Welcome.vue';
 
 Vue.use(Router);
 
-const DEFAULT_TITLE = 'GODcoin Wallet';
+const DEFAULT_TITLE = 'Regius Mark Wallet';
 
 const router = new Router({
   routes: [

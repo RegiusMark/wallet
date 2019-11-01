@@ -93,6 +93,7 @@ $background-color: hsla(267, 59, 12, 1);
   .dash-logo {
     text-align: center;
     padding-top: 1em;
+    filter: brightness(0.8);
   }
 
   .dash-sync-status {

@@ -1,7 +1,7 @@
-# GODcoin Wallet
+# Regius Mark Wallet
 
-The GODcoin desktop wallet built with Electron and Vue. This project is under
-heavy active development.
+The Regius Mark desktop wallet built with Electron and Vue. This project is
+under heavy active development.
 
 ## Project setup
 ```

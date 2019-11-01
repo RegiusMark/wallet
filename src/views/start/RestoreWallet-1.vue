@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="GODcoin Wallet Recovery">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Regius Mark Wallet Recovery">
     <div class="form">
       <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
       <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />

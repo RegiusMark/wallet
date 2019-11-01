@@ -22,7 +22,7 @@
 <script lang="ts">
 import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import { Component, Vue } from 'vue-property-decorator';
-import { generateKeyPair } from 'godcoin';
+import { generateKeyPair } from 'regiusmark';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';

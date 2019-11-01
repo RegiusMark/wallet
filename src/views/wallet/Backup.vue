@@ -1,10 +1,10 @@
 <template>
   <DashArea>
     <div class="container">
-      <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
+      <div style="margin-top: 0.85em; user-select: none;">
         <img src="../../assets/coin-front.png" width="120" />
       </div>
-      <div class="header">Backup your GODcoin key</div>
+      <div class="header">Backup your Regius Mark key</div>
       <div class="info">
         <div class="subheader">Remember when making your backup...</div>
         <div class="msg">

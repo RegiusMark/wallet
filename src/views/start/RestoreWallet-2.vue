@@ -13,7 +13,7 @@
 import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
 import PasswordInput, { MaskMode } from '@/components/PasswordInput.vue';
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import { PrivateKey, KeyPair, InvalidWif } from 'godcoin';
+import { PrivateKey, KeyPair, InvalidWif } from 'regiusmark';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';

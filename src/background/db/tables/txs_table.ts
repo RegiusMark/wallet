@@ -1,5 +1,5 @@
 import { Table, CryptoManager } from '../table';
-import { TxVariant } from 'godcoin';
+import { TxVariant } from 'regiusmark';
 import { WalletDb } from '..';
 
 export const TXS_TABLE_NAME = 'transactions';

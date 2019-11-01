@@ -19,7 +19,7 @@ module.exports = {
       chainWebpackMainProcess: config => {
         config.plugin('define').tap(args => {
           Object.assign(args[0], {
-            NODE_URL: getEnv('GODCOIN_NODE_URL', IS_SPECTRON ? 'ws://localhost:7777' : undefined),
+            NODE_URL: getEnv('REGIUSMARK_NODE_URL', IS_SPECTRON ? 'ws://localhost:7777' : undefined),
           });
           return args;
         });
@@ -28,10 +28,10 @@ module.exports = {
       mainProcessWatch: ['./src/background'],
       builderOptions: {
         artifactName: '${name}-${version}-${os}-x64.${ext}',
-        productName: 'GODcoin Wallet',
+        productName: 'Regius Mark Wallet',
         mac: {
           category: 'public.app-category.finance',
-          identity: 'GODcoin',
+          identity: 'Regius Mark',
         },
         win: {
           target: [{ target: 'nsis', arch: ['x64'] }],

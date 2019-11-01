@@ -1,4 +1,4 @@
-import { Asset, Script, ScriptHash, KeyPair } from 'godcoin';
+import { Asset, Script, ScriptHash, KeyPair } from 'regiusmark';
 import { TxRow, TxRawRow } from './background/db';
 
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';

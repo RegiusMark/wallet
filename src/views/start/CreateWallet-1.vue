@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
+  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to Regius Mark">
     <div class="form">
       <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
       <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />

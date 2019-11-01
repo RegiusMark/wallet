@@ -1,4 +1,4 @@
-import { RequestBody, Request, ByteBuffer, Response, ResponseBody, BodyType, ErrorRes, NetworkError } from 'godcoin';
+import { RequestBody, Request, ByteBuffer, Response, ResponseBody, BodyType, ErrorRes, NetworkError } from 'regiusmark';
 import { EventEmitter } from 'events';
 import { Logger } from '../log';
 import WebSocket from 'ws';

@@ -10,7 +10,7 @@ import {
   TransferTxV0,
   OwnerTxV0,
   Asset,
-} from 'godcoin';
+} from 'regiusmark';
 import { WalletDb, KvTable, TxsTable, TxRawRow } from './db';
 import { emitSyncUpdate as ipcEmitSyncUpdate } from './ipc';
 import { SyncStatus, SyncUpdateRaw } from '../ipc-models';

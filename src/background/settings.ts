@@ -1,5 +1,5 @@
 import { readFileSync, unlinkSync, renameSync, existsSync, writeFileSync } from 'fs';
-import { KeyPair, Script, ScriptHash } from 'godcoin';
+import { KeyPair, Script, ScriptHash } from 'regiusmark';
 import { SecretKey } from './crypto';
 import { Logger } from '../log';
 import { app } from 'electron';
