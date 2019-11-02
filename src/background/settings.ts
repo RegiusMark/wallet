@@ -1,5 +1,6 @@
 import { readFileSync, unlinkSync, renameSync, existsSync, writeFileSync } from 'fs';
 import { KeyPair, Script, ScriptHash } from 'godcoin';
+import { randomBytes, ScryptOptions } from 'crypto';
 import { SecretKey } from './crypto';
 import { Logger } from '../log';
 import { app } from 'electron';
@@ -8,12 +9,23 @@ import path from 'path';
 const log = new Logger('main:settings');
 
 const CRYPTO_VERSION = 1;
+const SALT_BYTES = 64;
 
 let globalSettings: Settings | undefined;
 
 interface SettingsData {
   dbSecretKey: SecretKey;
   keyPair: KeyPair;
+}
+
+function v1ScryptParams(): ScryptOptions {
+  const N = 2 ** 15;
+  return {
+    N,
+    r: 8,
+    p: 1,
+    maxmem: 128 * N * 8 * 2,
+  };
 }
 
 export class Settings implements SettingsData {
@@ -66,11 +78,12 @@ export class Settings implements SettingsData {
       'utf8',
     );
 
-    const localKey = SecretKey.fromString(password);
+    const salt = randomBytes(SALT_BYTES);
+    const localKey = SecretKey.derive(password, salt, v1ScryptParams());
     const encData = localKey.encrypt(unencryptedData);
     localKey.zero();
 
-    return Buffer.concat([version, encData]);
+    return Buffer.concat([version, salt, encData]);
   }
 
   public static load(password: string): Settings {
@@ -119,12 +132,13 @@ export class Settings implements SettingsData {
   private static deserializeEnc(loc: string, password: string): Settings {
     const fileData = readFileSync(loc);
     const version = fileData.readUInt16BE(0);
-    const encData = fileData.slice(2);
 
     let data: SettingsData;
     switch (version) {
       case 1: {
-        const localKey = SecretKey.fromString(password);
+        const salt = fileData.slice(2, 2 + SALT_BYTES);
+        const encData = fileData.slice(2 + SALT_BYTES);
+        const localKey = SecretKey.derive(password, salt, v1ScryptParams());
         try {
           const obj = JSON.parse(localKey.decrypt(encData).toString('utf8'));
           data = {

@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'crypto';
+import { scryptSync, createHash, randomBytes, ScryptOptions } from 'crypto';
 import sodium from 'libsodium-wrappers';
 import assert from 'assert';
 
@@ -61,8 +61,8 @@ export class SecretKey {
     }
   }
 
-  public static fromString(password: string): SecretKey {
-    const h = hash(password);
+  public static derive(password: string, salt: Uint8Array, opts: ScryptOptions): SecretKey {
+    const h = scryptSync(password, salt, 32, opts);
     return new SecretKey(h);
   }
 }
