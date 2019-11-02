@@ -30,16 +30,24 @@ class IpcManager {
       password,
       privateKey: typeof keyPair === 'string' ? keyPair : keyPair.privateKey.toWif(),
     });
-    const ipcRes = await this.send({
-      type: 'wallet:pre_init',
-      password,
-    });
-    if (ipcRes.type !== 'wallet:pre_init') {
-      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
-    }
+    const ipcRes = await this.preInit(password);
     if (ipcRes.status !== 'success') {
       throw new Error('Failed to complete load settings after setup: ' + ipcRes.status);
     }
+  }
+
+  public async preInit(password: string): Promise<models.PreInitWalletRes> {
+    const ipcRes = await this.send(
+      {
+        type: 'wallet:pre_init',
+        password,
+      },
+      15000,
+    );
+    if (ipcRes.type !== 'wallet:pre_init') {
+      throw new Error('Unexpected IPC response: ' + JSON.stringify(ipcRes));
+    }
+    return ipcRes;
   }
 
   public async postInit(): Promise<models.PostInitWalletRes> {
