@@ -159,7 +159,7 @@ class Synchronizer extends EventEmitter {
 
       await this.updateSyncHeight();
       this.emitSyncUpdate({
-        status: this.syncStatus,
+        status: SyncStatus.Complete,
         newData: {
           totalBalance: totalBalance.amount.toString(),
           txs,
