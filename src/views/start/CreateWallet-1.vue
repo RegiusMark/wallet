@@ -92,7 +92,7 @@ export default class CreateWallet1 extends Vue {
     }
 
     const { initial, confirm } = value;
-    if (initial && initial.length > 0 && (confirm && confirm.length > 0)) {
+    if (initial && initial.length > 0 && confirm && confirm.length > 0) {
       // Both passwords supplied
       if (initial === confirm) {
         this.helpMsg = this.helpMsgs.ready;

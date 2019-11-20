@@ -38,7 +38,10 @@ module.exports = {
         },
         linux: {
           category: 'Finance',
-          target: [{ target: 'AppImage', arch: ['x64'] }, { target: 'zip', arch: ['x64'] }],
+          target: [
+            { target: 'AppImage', arch: ['x64'] },
+            { target: 'zip', arch: ['x64'] },
+          ],
         },
       },
     },
