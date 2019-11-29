@@ -2,6 +2,13 @@
 
 # Unreleased
 
+- Use the GetBlockRange API to avoid network round trips when synchronizing.
+
+### Breaking changes
+
+- Previous wallet versions will no longer be able to properly communicate to the
+  network.
+
 # Version 0.1.0 (2019-11-14)
 
 This marks the first release of the project. Basic features include

@@ -124,23 +124,21 @@ class Synchronizer extends EventEmitter {
 
       // Start retrieving blocks and apply them.
       const txs: TxRawRow[] = [];
-      while (this.currentHeight.lt(chainHeight)) {
-        const blockBody = await client.sendReq({
-          type: BodyType.GetBlock,
-          height: this.currentHeight.add(1),
+      await new Promise((resolve, reject) => {
+        client.getBlockRange(this.currentHeight.add(1), chainHeight, async (err, filteredBlock) => {
+          if (err) return reject(err);
+          if (!filteredBlock) return resolve();
+
+          const updatedTxs = await this.applyBlock(filteredBlock);
+          if (updatedTxs && updatedTxs.length > 0) {
+            txs.push(...updatedTxs);
+          }
+
+          if (this.currentHeight.mod(10000).eq(0)) {
+            log.info('Current sync height:', this.currentHeight.toString());
+          }
         });
-        if (blockBody.type !== BodyType.GetBlock) throw new Error('expected GetBlock response');
-
-        const block = blockBody.block;
-        const updatedTxs = await this.applyBlock(block);
-        if (updatedTxs && updatedTxs.length > 0) {
-          txs.push(...updatedTxs);
-        }
-
-        if (this.currentHeight.mod(10000).eq(0)) {
-          log.info('Current sync height:', this.currentHeight.toString());
-        }
-      }
+      });
 
       // Grab and update the total balance before the pending blocks are applied. This is to help mitigate any
       // potential issues when a block is received *during* the balance update.
@@ -150,7 +148,12 @@ class Synchronizer extends EventEmitter {
       // up to the currently known height. There is no race condition even if blocks are pushed during iteration
       // as the loop will still iterate over new blocks regardless if the body waits for promises to finish.
       for (const block of this.pendingBlocks) {
-        log.info('Applying pending block:', block.block.header.height.toString());
+        const height = block.block.header.height;
+        if (height.lte(this.currentHeight)) {
+          log.info('Skipping already applied block:', height.toString());
+          continue;
+        }
+        log.info('Applying pending block:', height.toString());
         const updatedTxs = await this.applyBlock(block);
         if (updatedTxs && updatedTxs.length > 0) {
           txs.push(...updatedTxs);
@@ -265,12 +268,12 @@ export function getSynchronizer(): ChainSynchronizer {
 
 export async function initSynchronizer(watchAddrs: ScriptHash[]): Promise<void> {
   if (getClient() === undefined) throw new Error('client not initialized');
+  if (instance !== undefined) throw new Error('synchronizer already initialized');
 
   let syncHeight = await WalletDb.getInstance()
     .getTable(KvTable)
     .getSyncHeight();
   if (!syncHeight) syncHeight = Long.fromNumber(0, true);
 
-  if (instance !== undefined) throw new Error('synchronizer already initialized');
   instance = new Synchronizer(watchAddrs, syncHeight);
 }
