@@ -1,6 +1,9 @@
 ## Releases
 
-# Unreleased
+# Version 0.2.0 (2019-11-29)
+
+This release updates to the latest network protocol and utilizes the more
+efficient GetBlockRange API for synchronizing blocks.
 
 - Use the GetBlockRange API to avoid network round trips when synchronizing.
 
