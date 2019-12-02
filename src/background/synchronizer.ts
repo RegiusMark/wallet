@@ -125,6 +125,7 @@ class Synchronizer extends EventEmitter {
       // Start retrieving blocks and apply them.
       const txs: TxRawRow[] = [];
       await new Promise((resolve, reject) => {
+        let time = Date.now();
         client.getBlockRange(this.currentHeight.add(1), chainHeight, async (err, filteredBlock) => {
           if (err) return reject(err);
           if (!filteredBlock) return resolve();
@@ -134,8 +135,10 @@ class Synchronizer extends EventEmitter {
             txs.push(...updatedTxs);
           }
 
-          if (this.currentHeight.mod(10000).eq(0)) {
+          const curTime = Date.now();
+          if (curTime - time > 5000) {
             log.info('Current sync height:', this.currentHeight.toString());
+            time = curTime;
           }
         });
       });

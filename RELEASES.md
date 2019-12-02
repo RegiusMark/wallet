@@ -1,5 +1,10 @@
 ## Releases
 
+# Unreleased
+
+- Print out current height every 5 seconds to console rather than every 10000
+  blocks during primary synchronization.
+
 # Version 0.2.0 (2019-11-29)
 
 This release updates to the latest network protocol and utilizes the more
