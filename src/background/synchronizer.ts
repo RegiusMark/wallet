@@ -100,7 +100,7 @@ class Synchronizer extends EventEmitter {
       status: this.syncStatus,
     });
 
-    log.info('Starting synchronization process');
+    log.info('Starting synchronization process (current height: ' + this.currentHeight + ')');
     try {
       const client = getClient();
 
@@ -133,12 +133,17 @@ class Synchronizer extends EventEmitter {
           const updatedTxs = await this.applyBlock(filteredBlock);
           if (updatedTxs && updatedTxs.length > 0) {
             txs.push(...updatedTxs);
+            // Update the height immediately, otherwise during a restart we may resync the block twice and appear as a
+            // duplicate transaction.
+            await this.updateSyncHeight();
           }
 
           const curTime = Date.now();
           if (curTime - time > 5000) {
-            log.info('Current sync height:', this.currentHeight.toString());
+            // Update the height every so often to ensure that during a restart, the sync doesn't restart completely.
+            await this.updateSyncHeight();
             time = curTime;
+            log.info('Current sync height:', this.currentHeight.toString());
           }
         });
       });
