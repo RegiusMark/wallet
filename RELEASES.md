@@ -1,12 +1,13 @@
 ## Releases
 
-# Unreleased
+# Version 0.2.1 (2019-12-03)
 
 - Print out current height every 5 seconds to console rather than every 10000
   blocks during primary synchronization.
-- Update the sync height more often while synchronizing. This will minimize the
-  chances of mistakenly seeing a transaction twice and to ensure a restart of
-  the wallet will not restart synchronization from its initial state.
+- Update the database current sync height more often while synchronizing. This
+  will minimize the chances of mistakenly seeing a transaction twice and to
+  ensure a restart of the wallet will not restart synchronization from its
+  initial state.
 
 # Version 0.2.0 (2019-11-29)
 
