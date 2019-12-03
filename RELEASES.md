@@ -2,6 +2,9 @@
 
 # Version 0.2.1 (2019-12-03)
 
+This release improves the synchronization mechanism reliability and performance
+in some cases.
+
 - Print out current height every 5 seconds to console rather than every 10000
   blocks during primary synchronization.
 - Update the database current sync height more often while synchronizing. This
