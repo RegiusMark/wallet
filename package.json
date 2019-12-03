@@ -1,6 +1,6 @@
 {
   "name": "regiusmark-wallet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Desktop Regius Mark wallet",
   "repository": "https://github.com/RegiusMark/wallet",
   "author": "Samuel Grenier <samrg472@gmail.com>",
