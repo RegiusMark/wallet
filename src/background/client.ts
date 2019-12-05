@@ -59,6 +59,8 @@ class ClientImpl extends EventEmitter {
   private url: string;
   private socket: WebSocket | undefined;
   private socketMsgHandleLock = new Lock();
+  private lastMsgReceived: number = 0;
+  private heartbeatTimer: NodeJS.Timer | undefined;
   private connectTimer: NodeJS.Timer | undefined;
   private prevCloseMsg: string | undefined;
   private prevErrorMsg: string | undefined;
@@ -134,6 +136,11 @@ class ClientImpl extends EventEmitter {
       clearTimeout(this.connectTimer);
       this.connectTimer = undefined;
     }
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = undefined;
+    }
+
     this.socket = new WebSocket(this.url);
 
     this.socket.on('open', () => {
@@ -141,6 +148,15 @@ class ClientImpl extends EventEmitter {
       this.connectTimer = undefined;
       this.prevCloseMsg = undefined;
       this.prevErrorMsg = undefined;
+
+      this.lastMsgReceived = Date.now();
+      this.heartbeatTimer = setInterval(() => {
+        if (Date.now() - this.lastMsgReceived >= 30000) {
+          log.error('Connection heartbeat timed out');
+          this.socket!.terminate();
+        }
+      }, 1000 * 10);
+
       this.emit('open');
     });
 
@@ -151,6 +167,11 @@ class ClientImpl extends EventEmitter {
         this.prevCloseMsg = msg;
       }
       this.socket = undefined;
+      if (this.heartbeatTimer) {
+        clearInterval(this.heartbeatTimer);
+        this.heartbeatTimer = undefined;
+      }
+
       this.currentId = 0;
 
       for (const req of Object.values(this.inflightReqs)) {
@@ -180,11 +201,18 @@ class ClientImpl extends EventEmitter {
       }
     });
 
+    this.socket.on('ping', data => {
+      this.lastMsgReceived = Date.now();
+      this.socket!.pong(data);
+    });
+
     this.socket.on('message', async data => {
       if (!Buffer.isBuffer(data)) {
         log.error('Unexpected ws message:', data);
         return;
       }
+
+      this.lastMsgReceived = Date.now();
       try {
         // We lock the message handler since we are an async function and messages must be processed in order before
         // continuing.
