@@ -150,6 +150,7 @@ class ClientImpl extends EventEmitter {
         this.prevCloseMsg = msg;
       }
       this.socket = undefined;
+      this.currentId = 0;
 
       for (const req of Object.values(this.inflightReqs)) {
         // Reject any pending requests as they are no longer valid
