@@ -138,6 +138,7 @@ class ClientImpl extends EventEmitter {
 
     this.socket.on('open', () => {
       log.info('Connection to blockchain opened on url:', this.url);
+      this.connectTimer = undefined;
       this.prevCloseMsg = undefined;
       this.prevErrorMsg = undefined;
       this.emit('open');
