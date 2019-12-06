@@ -201,9 +201,8 @@ class ClientImpl extends EventEmitter {
       }
     });
 
-    this.socket.on('ping', data => {
+    this.socket.on('ping', _data => {
       this.lastMsgReceived = Date.now();
-      this.socket!.pong(data);
     });
 
     this.socket.on('message', async data => {
