@@ -462,7 +462,7 @@ export default class Dashboard extends Vue {
     } finally {
       setTimeout(
         () => {
-          sendFundsDialog.active = false;
+          this.sendDialogActive(false);
           dialog.active = false;
         },
         dialog.state === TransferState.Success ? 1500 : 3000,

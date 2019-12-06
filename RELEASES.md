@@ -3,7 +3,9 @@
 # Unreleased
 
 - Force retry syncing if there is an error that isn't caused by the client
-  disconnecting
+  disconnecting.
+- Ensure the interval for updating the fee information is cleared after funds
+  have been transferred, saving bandwidth.
 
 # Version 0.2.1 (2019-12-03)
 
