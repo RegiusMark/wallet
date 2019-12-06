@@ -34,6 +34,8 @@ class Synchronizer extends EventEmitter {
 
   private pendingBlocks: Block[] = [];
   private syncStatus = SyncStatus.Connecting;
+  private fullSyncRetryTimer: NodeJS.Timer | undefined;
+  private fullSyncInProgress = false;
 
   public constructor(watchAddrs: ScriptHash[], syncHeight: Long) {
     super();
@@ -43,14 +45,20 @@ class Synchronizer extends EventEmitter {
 
     const client = getClient();
     if (client.isOpen()) {
-      this.start();
+      this.startSync();
     }
 
     client.on('open', (): void => {
-      this.start();
+      this.startSync();
     });
 
     client.on('close', (): void => {
+      this.fullSyncInProgress = false;
+      if (this.fullSyncRetryTimer) {
+        clearInterval(this.fullSyncRetryTimer);
+        this.fullSyncRetryTimer = undefined;
+      }
+
       this.syncStatus = SyncStatus.Connecting;
       this.emitSyncUpdate({
         status: this.syncStatus,
@@ -93,27 +101,55 @@ class Synchronizer extends EventEmitter {
     return this.syncStatus;
   }
 
-  private async start(): Promise<void> {
-    if (this.syncStatus !== SyncStatus.Connecting) return;
+  private async startSync(): Promise<void> {
+    if (this.fullSyncInProgress) return;
+    this.fullSyncInProgress = true;
+    if (this.fullSyncRetryTimer) {
+      clearTimeout(this.fullSyncRetryTimer);
+      this.fullSyncRetryTimer = undefined;
+    }
+
+    const oldStatus = this.syncStatus;
     this.syncStatus = SyncStatus.InProgress;
     this.emitSyncUpdate({
       status: this.syncStatus,
     });
 
+    const client = getClient();
+    if (oldStatus === SyncStatus.Connecting) {
+      // Fresh connection, we need to reinitialize everything
+      try {
+        // Subscribe to new blocks
+        await client.sendReq({
+          type: BodyType.Subscribe,
+        });
+
+        // Configure the filter.
+        await client.sendReq({
+          type: BodyType.SetBlockFilter,
+          addrs: this.watchAddrs,
+        });
+      } catch (e) {
+        log.error('Failed to configure block filter and subscription:', e);
+      }
+    }
+
+    try {
+      await this.performFullSync();
+    } catch (e) {
+      log.error('Failure during the synchronization process:', e);
+      this.fullSyncRetryTimer = setTimeout(() => {
+        this.startSync();
+      }, 5000);
+    } finally {
+      this.fullSyncInProgress = false;
+    }
+  }
+
+  private async performFullSync(): Promise<void> {
     log.info('Starting synchronization process (current height: ' + this.currentHeight + ')');
     try {
       const client = getClient();
-
-      // Subscribe to new blocks.
-      await client.sendReq({
-        type: BodyType.Subscribe,
-      });
-
-      // Configure the filter.
-      await client.sendReq({
-        type: BodyType.SetBlockFilter,
-        addrs: this.watchAddrs,
-      });
 
       // Get the current height that we will sync up to. Any missed blocks will be in the pending queue.
       const chainPropsBody = await client.sendReq({
@@ -169,8 +205,9 @@ class Synchronizer extends EventEmitter {
       }
 
       await this.updateSyncHeight();
+      this.syncStatus = SyncStatus.Complete;
       this.emitSyncUpdate({
-        status: SyncStatus.Complete,
+        status: this.syncStatus,
         newData: {
           totalBalance: totalBalance.amount.toString(),
           txs,
@@ -178,13 +215,10 @@ class Synchronizer extends EventEmitter {
       });
 
       log.info('Synchronization completed:', this.currentHeight.toString());
-    } catch (e) {
-      log.error('Failure during the synchronization process:', e);
     } finally {
       // Reset the pending blocks here in case there's any error to avoid reapplying already applied blocks upon
       // reconnection.
       this.pendingBlocks = [];
-      this.syncStatus = SyncStatus.Complete;
     }
   }
 

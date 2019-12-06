@@ -1,5 +1,10 @@
 ## Releases
 
+# Unreleased
+
+- Force retry syncing if there is an error that isn't caused by the client
+  disconnecting
+
 # Version 0.2.1 (2019-12-03)
 
 This release improves the synchronization mechanism reliability and performance
