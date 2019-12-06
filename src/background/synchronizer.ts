@@ -160,29 +160,31 @@ class Synchronizer extends EventEmitter {
 
       // Start retrieving blocks and apply them.
       const txs: TxRawRow[] = [];
-      await new Promise((resolve, reject) => {
-        let time = Date.now();
-        client.getBlockRange(this.currentHeight.add(1), chainHeight, async (err, filteredBlock) => {
-          if (err) return reject(err);
-          if (!filteredBlock) return resolve();
+      if (this.currentHeight.lt(chainHeight)) {
+        await new Promise((resolve, reject) => {
+          let time = Date.now();
+          client.getBlockRange(this.currentHeight.add(1), chainHeight, async (err, filteredBlock) => {
+            if (err) return reject(err);
+            if (!filteredBlock) return resolve();
 
-          const updatedTxs = await this.applyBlock(filteredBlock);
-          if (updatedTxs && updatedTxs.length > 0) {
-            txs.push(...updatedTxs);
-            // Update the height immediately, otherwise during a restart we may resync the block twice and appear as a
-            // duplicate transaction.
-            await this.updateSyncHeight();
-          }
+            const updatedTxs = await this.applyBlock(filteredBlock);
+            if (updatedTxs && updatedTxs.length > 0) {
+              txs.push(...updatedTxs);
+              // Update the height immediately, otherwise during a restart we may resync the block twice and appear as a
+              // duplicate transaction.
+              await this.updateSyncHeight();
+            }
 
-          const curTime = Date.now();
-          if (curTime - time > 5000) {
-            // Update the height every so often to ensure that during a restart, the sync doesn't restart completely.
-            await this.updateSyncHeight();
-            time = curTime;
-            log.info('Current sync height:', this.currentHeight.toString());
-          }
+            const curTime = Date.now();
+            if (curTime - time > 5000) {
+              // Update the height every so often to ensure that during a restart, the sync doesn't restart completely.
+              await this.updateSyncHeight();
+              time = curTime;
+              log.info('Current sync height:', this.currentHeight.toString());
+            }
+          });
         });
-      });
+      }
 
       // Grab and update the total balance before the pending blocks are applied. This is to help mitigate any
       // potential issues when a block is received *during* the balance update.
