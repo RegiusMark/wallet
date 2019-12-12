@@ -1,0 +1,47 @@
+name: Publish Artifacts
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Import code signing certificate
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "${{ secrets.CERT_PUB_MAC }}" | base64 -D > "$HOME/pub.cer"
+            echo "${{ secrets.CERT_PRIV_MAC }}" | base64 -D > "$HOME/key.p12"
+            sudo security import "$HOME/key.p12" \
+              -P "${{ secrets.CERT_PASSWORD }}" \
+              -k "/Library/Keychains/System.keychain" \
+              -T /usr/bin/codesign
+            sudo security add-trusted-cert -d -k "/Library/Keychains/System.keychain" "$HOME/pub.cer"
+            security find-identity -v
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "${{ secrets.CERT_PAIR_WIN }}" > "$HOME/tmp.b64"
+            certutil -decode "$HOME/tmp.b64" "$HOME/pair.p12"
+            echo "::set-env name=CSC_LINK::$HOME/pair.p12"
+          else
+            echo "Unhandled platform: ${{ matrix.os }}"
+            exit 1
+          fi
+        if: matrix.os != 'ubuntu-latest'
+      - run: yarn install --frozen-lockfile
+      - name: Build and publish artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          CSC_KEY_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        # Build in bash to prevent path oddities when building on Windows
+        shell: bash
+        run: yarn electron:build --publish always
