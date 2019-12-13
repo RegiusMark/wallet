@@ -22,7 +22,7 @@ jobs:
       - name: Setup a virtual framebuffer
         run: Xvfb :99 -screen 0 1920x1080x24 &
         if: matrix.os == 'ubuntu-latest'
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --network-concurrency 1
       # Use npm since yarn causes an open handle to hang instead of correctly quitting on Windows
       - run: npm run test:unit
         env:
