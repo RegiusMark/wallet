@@ -1,5 +1,4 @@
 import { testWithSpectron, Server } from 'vue-cli-plugin-electron-builder';
-import { Application } from 'spectron';
 
 jest.setTimeout(50000);
 
