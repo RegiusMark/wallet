@@ -1,14 +1,10 @@
 import { testWithSpectron, Server } from 'vue-cli-plugin-electron-builder';
 
-jest.setTimeout(50000);
-
 let spectron: Server;
 
 beforeAll(async () => {
-  spectron = await testWithSpectron({
-    mode: 'development',
-  } as any);
-});
+  spectron = await testWithSpectron();
+}, 2 * 60 * 1000);
 
 afterAll(async () => {
   if (spectron) {
