@@ -5,7 +5,9 @@ jest.setTimeout(50000);
 let spectron: Server;
 
 beforeAll(async () => {
-  spectron = await testWithSpectron();
+  spectron = await testWithSpectron({
+    mode: 'development',
+  } as any);
 });
 
 afterAll(async () => {
