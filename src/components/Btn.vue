@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { ButtonClickEvent } from './win-area/Start.vue';
 
 @Component
 export default class extends Vue {
