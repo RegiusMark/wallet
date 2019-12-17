@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import Start, { Button, ButtonClickEvent } from '@/components/win-area/Start.vue';
+import Start, { StartBtn, StartBtnClickEvent } from '@/components/win-area/Start.vue';
 import PasswordInput, { MaskMode } from '@/components/PasswordInput.vue';
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { PrivateKey, KeyPair, InvalidWif } from 'godcoin';
@@ -31,7 +31,7 @@ export default class extends Vue {
   private MaskMode = MaskMode;
 
   private readonly dashboardPage = '/wallet/dashboard';
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-arrow-circle-left',
       go: -1,
@@ -94,7 +94,7 @@ export default class extends Vue {
     btn.disabled = !newReadyVal;
   }
 
-  private async buttonClick(evt: ButtonClickEvent): Promise<void> {
+  private async buttonClick(evt: StartBtnClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage) return;
     evt.canceled = true;
     if (!this.ready) return;

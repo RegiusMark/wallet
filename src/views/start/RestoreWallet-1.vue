@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import Start, { Button } from '@/components/win-area/Start.vue';
+import Start, { StartBtn } from '@/components/win-area/Start.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { RootStore } from '@/store';
 
@@ -25,7 +25,7 @@ import { RootStore } from '@/store';
 export default class extends Vue {
   private readonly nextStepPage = '/start/restore-wallet-2';
 
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-arrow-circle-left',
       go: -1,

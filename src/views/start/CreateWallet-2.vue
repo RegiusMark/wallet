@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import Start, { Button, ButtonClickEvent } from '@/components/win-area/Start.vue';
+import Start, { StartBtn, StartBtnClickEvent } from '@/components/win-area/Start.vue';
 import { Component, Vue } from 'vue-property-decorator';
 import { generateKeyPair } from 'godcoin';
 import { RootStore } from '@/store';
@@ -37,7 +37,7 @@ const log = new Logger('create-wallet-2');
 export default class extends Vue {
   private readonly dashboardPage = '/wallet/dashboard';
 
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-arrow-circle-left',
       go: -1,
@@ -75,7 +75,7 @@ export default class extends Vue {
     }, 5000);
   }
 
-  private async buttonClick(evt: ButtonClickEvent): Promise<void> {
+  private async buttonClick(evt: StartBtnClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage) return;
     evt.canceled = true;
 

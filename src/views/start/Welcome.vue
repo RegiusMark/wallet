@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import Start, { Button, ButtonClickEvent } from '@/components/win-area/Start.vue';
+import Start, { StartBtn, StartBtnClickEvent } from '@/components/win-area/Start.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
@@ -27,7 +27,7 @@ const log = new Logger('welcome');
 })
 export default class extends Vue {
   private readonly dashboardPage = '/wallet/dashboard';
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-history',
       link: '/start/restore-wallet-1',
@@ -77,7 +77,7 @@ export default class extends Vue {
     btn.disabled = !newReadyVal;
   }
 
-  private onButtonClick(evt: ButtonClickEvent): void {
+  private onButtonClick(evt: StartBtnClickEvent): void {
     if (evt.target.link !== this.dashboardPage) return;
     evt.canceled = true;
     this.attemptLogin();

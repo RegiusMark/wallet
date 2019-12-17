@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import Start, { Button } from '@/components/win-area/Start.vue';
+import Start, { StartBtn } from '@/components/win-area/Start.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { RootStore } from '@/store';
 
@@ -26,7 +26,7 @@ export default class extends Vue {
   private readonly restorePage = '/start/restore-wallet-2';
   private readonly nextStepPage = '/start/create-wallet-2';
 
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-history',
       link: this.restorePage,
