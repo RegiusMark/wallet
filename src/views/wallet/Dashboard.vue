@@ -2,18 +2,7 @@
   <div style="height: 100%;">
     <SendFundsDialog v-model="dialogs.sendFunds.active" @transfer-status="sendFundsStatusUpdate" />
     <TxInProgressDialog v-model="dialogs.txInProgress" />
-    <Dialog class="dialog-receive-funds" width="70%" v-model="dialogs.receiveFunds.active">
-      <div style="user-select: none; filter: brightness(0.85); padding-bottom: 0.8em;">
-        <img src="../../assets/coin-front.png" width="80" />
-      </div>
-      <div class="header">Your GODcoin Address</div>
-      <div class="address">
-        <span>{{ p2shAddress ? p2shAddress.toWif() : '' }}</span>
-      </div>
-      <div class="actions">
-        <Btn @click="receiveDialogActive(false)">Close</Btn>
-      </div>
-    </Dialog>
+    <RxFundsDialog v-model="dialogs.receiveFunds.active" />
     <Dashboard>
       <div class="container">
         <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
@@ -25,7 +14,7 @@
         </div>
         <div class="actions">
           <Btn @click="openSendDialog">Send</Btn>
-          <Btn @click="receiveDialogActive(true)">Receive</Btn>
+          <Btn @click="openReceiveDialog">Receive</Btn>
         </div>
         <div class="container-separator"></div>
         <div class="transaction-history">
@@ -84,7 +73,13 @@
 </template>
 
 <script lang="ts">
-import { SendFundsDialog, TxInProgressDialog, TxInProgressModel, TransferState } from '@/components/dialogs';
+import {
+  SendFundsDialog,
+  TxInProgressDialog,
+  TxInProgressModel,
+  TransferState,
+  RxFundsDialog,
+} from '@/components/dialogs';
 import Dashboard from '@/components/win-area/Dashboard.vue';
 import { Asset, ScriptHash, ASSET_SYMBOL } from 'godcoin';
 import { Component, Vue } from 'vue-property-decorator';
@@ -112,6 +107,7 @@ interface Dialogs {
   components: {
     TxInProgressDialog,
     SendFundsDialog,
+    RxFundsDialog,
     Dashboard,
     Dialog,
     Btn,
@@ -185,6 +181,10 @@ export default class extends Vue {
 
   private openSendDialog(): void {
     this.dialogs.sendFunds.active = true;
+  }
+
+  private openReceiveDialog(): void {
+    this.dialogs.receiveFunds.active = true;
   }
 
   private sendFundsStatusUpdate(status: TransferState, msg?: string): void {
@@ -354,32 +354,6 @@ export default class extends Vue {
         background-color: $bg-color;
       }
     }
-  }
-}
-
-.dialog-receive-funds {
-  text-align: center;
-  font-size: 1.1em;
-
-  .header {
-    user-select: none;
-    color: hsla(0, 0, 100, 0.55);
-  }
-
-  .address {
-    margin-top: 1em;
-    font-size: 1.05em;
-
-    & > :first-child {
-      padding: 0.4em;
-      background-color: hsla(0, 0, 40, 0.2);
-      border-radius: 4px;
-    }
-  }
-
-  .actions {
-    padding-top: 2em;
-    font-size: 0.7em;
   }
 }
 </style>
