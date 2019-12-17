@@ -22,7 +22,7 @@ const MAX_U32 = 0xffff_ffff;
 let instance: PersistentClient;
 
 export class DisconnectedError extends Error {
-  public constructor(msg?: string) {
+  public constructor(msg = 'disconnected from node') {
     super(msg);
     Object.setPrototypeOf(this, DisconnectedError.prototype);
   }
