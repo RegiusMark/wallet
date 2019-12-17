@@ -1,33 +1,7 @@
 <template>
   <div style="height: 100%;">
     <SendFundsDialog v-model="dialogs.sendFunds.active" @transfer-status="sendFundsStatusUpdate" />
-    <Dialog class="dialog-transfer-funds" width="25%" v-model="dialogs.transferFunds.active" :disable-esc="true">
-      <div v-if="dialogs.transferFunds.state === TransferState.Success">
-        <div class="icon success">
-          <i class="fas fa-check"></i>
-        </div>
-        <div class="msg-header">Sent!</div>
-      </div>
-      <div v-else-if="dialogs.transferFunds.state === TransferState.Pending">
-        <div class="icon pending">
-          <i class="fas fa-sync-alt"></i>
-        </div>
-        <div class="msg-header">Pending...</div>
-      </div>
-      <div v-else-if="dialogs.transferFunds.state === TransferState.Error">
-        <div class="icon error">
-          <i class="fas fa-times"></i>
-        </div>
-        <div class="msg-header">Broadcast error</div>
-        <div class="msg">{{ dialogs.transferFunds.msg }}</div>
-      </div>
-      <div v-else>
-        <div class="icon error">
-          <i class="fas fa-times"></i>
-        </div>
-        <div class="msg-header">Unknown transfer state</div>
-      </div>
-    </Dialog>
+    <TxInProgressDialog v-model="dialogs.txInProgress" />
     <Dialog class="dialog-receive-funds" width="70%" v-model="dialogs.receiveFunds.active">
       <div style="user-select: none; filter: brightness(0.85); padding-bottom: 0.8em;">
         <img src="../../assets/coin-front.png" width="80" />
@@ -110,8 +84,8 @@
 </template>
 
 <script lang="ts">
+import { SendFundsDialog, TxInProgressDialog, TxInProgressModel, TransferState } from '@/components/dialogs';
 import { Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'godcoin';
-import { SendFundsDialog, TransferState } from '@/components/dialogs';
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import Dashboard from '@/components/win-area/Dashboard.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -128,17 +102,11 @@ import Big from 'big.js';
 
 const log = new Logger('renderer:dashboard');
 
-interface TransferFundsDialog {
-  active: boolean;
-  state: TransferState;
-  msg: string;
-}
-
 interface Dialogs {
   sendFunds: {
     active: boolean;
   };
-  transferFunds: TransferFundsDialog;
+  txInProgress: TxInProgressModel;
   receiveFunds: {
     active: boolean;
   };
@@ -167,6 +135,7 @@ function parseAmount(amount: string): Asset {
 
 @Component({
   components: {
+    TxInProgressDialog,
     SendFundsDialog,
     Dashboard,
     TextInput,
@@ -183,7 +152,7 @@ export default class extends Vue {
     sendFunds: {
       active: false,
     },
-    transferFunds: {
+    txInProgress: {
       active: false,
       state: TransferState.Pending,
       msg: '',
@@ -249,7 +218,7 @@ export default class extends Vue {
   }
 
   private sendFundsStatusUpdate(status: TransferState, msg?: string): void {
-    const dialog = this.dialogs.transferFunds;
+    const dialog = this.dialogs.txInProgress;
     dialog.state = status;
     dialog.msg = '';
     switch (status) {
@@ -415,38 +384,6 @@ export default class extends Vue {
         background-color: $bg-color;
       }
     }
-  }
-}
-
-.dialog-transfer-funds {
-  text-align: center;
-
-  .icon {
-    font-size: 3em;
-
-    &.success i {
-      color: hsla(123, 75, 50, 0.5);
-    }
-
-    &.pending i {
-      color: hsla(55, 83, 45, 0.75);
-      animation: fa-spin 2.5s ease-in-out infinite;
-    }
-
-    &.error i {
-      color: hsla(0, 75, 50, 0.5);
-    }
-  }
-
-  .msg-header {
-    margin-top: 1em;
-    font-size: 1.4em;
-    color: hsla(0, 0, 100, 0.7);
-  }
-
-  .msg {
-    margin-top: 1.5em;
-    color: hsla(0, 0, 100, 0.55);
   }
 }
 
