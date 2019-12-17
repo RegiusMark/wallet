@@ -1,7 +1,7 @@
 <template>
   <div class="start">
     <div class="logo">
-      <img src="../assets/logo.png" width="100" />
+      <img src="../../assets/logo.png" width="100" />
     </div>
     <div class="header">{{ headerMsg }}</div>
     <slot />
@@ -35,7 +35,7 @@ export interface ButtonClickEvent {
 }
 
 @Component
-export default class StartArea extends Vue {
+export default class extends Vue {
   @Prop({
     default: () => [],
     validator: (btns: Button[]) => {
@@ -83,7 +83,7 @@ $margin: 13%;
   margin-right: $margin;
 
   &::before {
-    background-image: url('../assets/login-bg.jpg');
+    background-image: url('../../assets/login-bg.jpg');
     background-size: cover;
     content: '';
     width: 100%;

@@ -13,7 +13,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
-export default class Tooltip extends Vue {
+export default class extends Vue {
   @Prop() private msg!: string;
   private displayStyle: { opacity: string } = { opacity: '0' };
 

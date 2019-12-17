@@ -2,7 +2,7 @@
   <div class="dash-area">
     <div class="dash-sidebar">
       <div class="dash-logo">
-        <img src="../assets/logo.png" width="60" />
+        <img src="../../assets/logo.png" width="60" />
       </div>
       <div class="dash-sync-status">
         <div v-if="syncStatus === SyncStatus.Complete">Sync complete</div>
@@ -38,7 +38,7 @@ interface MenuButton {
 }
 
 @Component
-export default class DashArea extends Vue {
+export default class extends Vue {
   // Allow referencing in the template
   private readonly SyncStatus = SyncStatus;
 

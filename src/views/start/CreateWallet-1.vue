@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
+  <Start :bottom-buttons="bottomBtns" header-msg="Welcome to GODcoin">
     <div class="form">
       <PasswordInput v-model="passwords.initial" placeholder="Choose your password" />
       <PasswordInput v-model="passwords.confirm" placeholder="Confirm password" @keyup.native.enter="onConfirmEnter" />
@@ -7,22 +7,22 @@
         <div v-for="(msg, index) in helpMsg.split('\n')" :key="index">{{ msg }}</div>
       </div>
     </div>
-  </StartArea>
+  </Start>
 </template>
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
+import Start, { Button } from '@/components/win-area/Start.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
-import StartArea, { Button } from '@/components/StartArea.vue';
 import { RootStore } from '@/store';
 
 @Component({
   components: {
     PasswordInput,
-    StartArea,
+    Start,
   },
 })
-export default class CreateWallet1 extends Vue {
+export default class extends Vue {
   private readonly restorePage = '/start/restore-wallet-2';
   private readonly nextStepPage = '/start/create-wallet-2';
 

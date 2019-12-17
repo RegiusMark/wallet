@@ -1,17 +1,17 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Welcome back" @bottom-button-click="onButtonClick">
+  <Start :bottom-buttons="bottomBtns" header-msg="Welcome back" @bottom-button-click="onButtonClick">
     <div class="form">
       <PasswordInput v-model="password" placeholder="Type your password" @keyup.native.enter="attemptLogin" />
       <div style="text-align: center; user-select: none">
         <span>{{ helpMsg }}</span>
       </div>
     </div>
-  </StartArea>
+  </Start>
 </template>
 
 <script lang="ts">
 import { Component, Watch, Vue } from 'vue-property-decorator';
-import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
+import Start, { Button, ButtonClickEvent } from '@/components/win-area/Start.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { RootStore } from '@/store';
 import ipc from '@/renderer/ipc';
@@ -22,10 +22,10 @@ const log = new Logger('welcome');
 @Component({
   components: {
     PasswordInput,
-    StartArea,
+    Start,
   },
 })
-export default class Welcome extends Vue {
+export default class extends Vue {
   private readonly dashboardPage = '/wallet/dashboard';
   private bottomBtns: Button[] = [
     {

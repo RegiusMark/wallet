@@ -72,7 +72,7 @@
         <Btn @click="receiveDialogActive(false)">Close</Btn>
       </div>
     </Dialog>
-    <DashArea>
+    <Dashboard>
       <div class="container">
         <div style="margin-top: 0.85em; user-select: none; filter: brightness(0.85)">
           <img src="../../assets/coin-front.png" width="120" />
@@ -137,15 +137,15 @@
           </div>
         </div>
       </div>
-    </DashArea>
+    </Dashboard>
   </div>
 </template>
 
 <script lang="ts">
 import { generateKeyPair, Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'godcoin';
 import { Component, Watch, Vue } from 'vue-property-decorator';
+import Dashboard from '@/components/win-area/Dashboard.vue';
 import TextInput from '@/components/TextInput.vue';
-import DashArea from '@/components/DashArea.vue';
 import { DisplayableTx } from '@/store/wallet';
 import Dialog from '@/components/Dialog.vue';
 import { SyncStatus } from '@/ipc-models';
@@ -217,13 +217,13 @@ function parseAmount(amount: string): Asset {
 
 @Component({
   components: {
+    Dashboard,
     TextInput,
-    DashArea,
     Dialog,
     Btn,
   },
 })
-export default class Dashboard extends Vue {
+export default class extends Vue {
   // Allow referencing in the template
   private readonly TransferState = TransferState;
   private readonly ASSET_SYMBOL = ASSET_SYMBOL;

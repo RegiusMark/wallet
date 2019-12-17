@@ -88,7 +88,7 @@ export function createDashboardWindow(): void {
       nodeIntegration: true,
     },
     show: false,
-    // Same color as the components/DashArea.vue background color
+    // Same color as the components/win-area/Dashboard.vue background color
     backgroundColor: '#1C0C2F',
   });
 

@@ -6,10 +6,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { ButtonClickEvent } from './StartArea.vue';
+import { ButtonClickEvent } from './win-area/Start.vue';
 
 @Component
-export default class Btn extends Vue {
+export default class extends Vue {
   @Prop({ default: () => false })
   private disabled!: boolean;
 

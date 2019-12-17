@@ -1,5 +1,5 @@
 <template>
-  <StartArea :bottom-buttons="bottomBtns" header-msg="Backup wallet" @bottom-button-click="buttonClick">
+  <Start :bottom-buttons="bottomBtns" header-msg="Backup wallet" @bottom-button-click="buttonClick">
     <div class="form">
       <div>
         <div style="margin-bottom: 0.5em">Private key</div>
@@ -16,11 +16,11 @@
         </div>
       </div>
     </div>
-  </StartArea>
+  </Start>
 </template>
 
 <script lang="ts">
-import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
+import Start, { Button, ButtonClickEvent } from '@/components/win-area/Start.vue';
 import { Component, Vue } from 'vue-property-decorator';
 import { generateKeyPair } from 'godcoin';
 import { RootStore } from '@/store';
@@ -31,10 +31,10 @@ const log = new Logger('create-wallet-2');
 
 @Component({
   components: {
-    StartArea,
+    Start,
   },
 })
-export default class CreateWallet2 extends Vue {
+export default class extends Vue {
   private readonly dashboardPage = '/wallet/dashboard';
 
   private bottomBtns: Button[] = [
