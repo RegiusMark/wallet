@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    class="dialog-transfer-funds"
+    class="dialog-tx-in-progress"
     width="25%"
     :disable-esc="true"
     :value="value.active"
@@ -68,7 +68,7 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.dialog-transfer-funds {
+.dialog-tx-in-progress {
   text-align: center;
 
   .icon {

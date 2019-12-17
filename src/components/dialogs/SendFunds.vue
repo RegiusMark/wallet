@@ -40,7 +40,7 @@ import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
 import Big from 'big.js';
 
-const log = new Logger('renderer:dashboard');
+const log = new Logger('renderer:send-funds');
 
 interface SendFundsForm {
   address: string;
@@ -295,38 +295,6 @@ export default class extends Vue {
     & > * {
       padding: 0.2em 0.2em;
     }
-  }
-}
-
-.dialog-transfer-funds {
-  text-align: center;
-
-  .icon {
-    font-size: 3em;
-
-    &.success i {
-      color: hsla(123, 75, 50, 0.5);
-    }
-
-    &.pending i {
-      color: hsla(55, 83, 45, 0.75);
-      animation: fa-spin 2.5s ease-in-out infinite;
-    }
-
-    &.error i {
-      color: hsla(0, 75, 50, 0.5);
-    }
-  }
-
-  .msg-header {
-    margin-top: 1em;
-    font-size: 1.4em;
-    color: hsla(0, 0, 100, 0.7);
-  }
-
-  .msg {
-    margin-top: 1.5em;
-    color: hsla(0, 0, 100, 0.55);
   }
 }
 </style>

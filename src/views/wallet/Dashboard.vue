@@ -85,20 +85,16 @@
 
 <script lang="ts">
 import { SendFundsDialog, TxInProgressDialog, TxInProgressModel, TransferState } from '@/components/dialogs';
-import { Asset, ScriptHash, ASSET_SYMBOL, MAX_MEMO_BYTE_SIZE } from 'godcoin';
-import { Component, Watch, Vue } from 'vue-property-decorator';
 import Dashboard from '@/components/win-area/Dashboard.vue';
-import TextInput from '@/components/TextInput.vue';
+import { Asset, ScriptHash, ASSET_SYMBOL } from 'godcoin';
+import { Component, Vue } from 'vue-property-decorator';
 import { DisplayableTx } from '@/store/wallet';
 import Dialog from '@/components/Dialog.vue';
-import { SyncStatus } from '@/ipc-models';
-import { TxRow } from '@/background/db';
 import Btn from '@/components/Btn.vue';
 import { WalletStore } from '@/store';
 import { State } from 'vuex-class';
 import ipc from '@/renderer/ipc';
 import { Logger } from '@/log';
-import Big from 'big.js';
 
 const log = new Logger('renderer:dashboard');
 
@@ -112,40 +108,17 @@ interface Dialogs {
   };
 }
 
-function parseAddress(address: string): ScriptHash {
-  address = address.trim();
-  return ScriptHash.fromWif(address);
-}
-
-function parseAmount(amount: string): Asset {
-  amount = amount.trim();
-  const pos = amount.indexOf('.');
-  const precision = 5;
-  if (pos === -1) {
-    amount += '.' + '0'.repeat(precision);
-  } else {
-    const missingPrec = precision - (amount.length - 1) + pos;
-    if (missingPrec < 0) {
-      throw new Error('precision too high');
-    }
-    amount += '0'.repeat(missingPrec);
-  }
-  return Asset.fromString(amount + ' ' + ASSET_SYMBOL);
-}
-
 @Component({
   components: {
     TxInProgressDialog,
     SendFundsDialog,
     Dashboard,
-    TextInput,
     Dialog,
     Btn,
   },
 })
 export default class extends Vue {
   // Allow referencing in the template
-  private readonly TransferState = TransferState;
   private readonly ASSET_SYMBOL = ASSET_SYMBOL;
 
   private dialogs: Dialogs = {
@@ -161,9 +134,6 @@ export default class extends Vue {
       active: false,
     },
   };
-
-  @State(state => state.wallet.syncStatus)
-  private syncStatus!: SyncStatus;
 
   @State(state => state.wallet.txs)
   private txs!: DisplayableTx[];
