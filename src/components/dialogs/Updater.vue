@@ -6,21 +6,22 @@
         <div>Checking for updates</div>
       </div>
       <div v-else-if="status.state === UpdateState.UpdateAvailable">
-        <div>Update available</div>
-        <div>Current version is {{ status.curVersion }}, version {{ status.newVersion }} is available</div>
+        <div>Update version {{ status.newVersion }} is available</div>
+        <div>Current version is {{ status.curVersion }}</div>
       </div>
       <div v-else-if="status.state === UpdateState.NoUpdateAvailable">
         <div>No new updates!</div>
       </div>
       <div v-else-if="status.state === UpdateState.Downloading">
         <div>Downloading the new update...</div>
+        <div>New version is {{ status.newVersion }}, current version is {{ status.curVersion }}</div>
       </div>
       <div v-else-if="status.state === UpdateState.ReadyForInstall">
         <div>Update is ready to be installed!</div>
       </div>
       <div v-else-if="status.state === UpdateState.Error">
-        <div>Error checking or downloading an update.</div>
-        <div>If the error persists, please manually download the update.</div>
+        <div>Error checking or downloading an update</div>
+        <div>If the error persists, please manually download and install the latest version.</div>
       </div>
       <div v-else>
         <!-- The clean state falls here, should never happen -->
