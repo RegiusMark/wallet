@@ -4,6 +4,7 @@ import { TxRow, TxRawRow } from './background/db';
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';
 export const APP_ACTION_RES = 'APP_ACTION_RES';
 
+export const CHECK_UPDATE = 'ACTION_CHECK_UPDATE';
 export const DOWNLOAD_UPDATE = 'ACTION_DOWNLOAD_UPDATE';
 export const INSTALL_UPDATE = 'ACTION_INSTALL_UPDATE';
 export const STATUS_UPDATE = 'STATUS_UPDATE';

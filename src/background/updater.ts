@@ -1,4 +1,4 @@
-import { UpdateStatus, UpdateState, DOWNLOAD_UPDATE, STATUS_UPDATE, INSTALL_UPDATE } from '../ipc-models';
+import { UpdateStatus, UpdateState, DOWNLOAD_UPDATE, STATUS_UPDATE, INSTALL_UPDATE, CHECK_UPDATE } from '../ipc-models';
 import { autoUpdater, CancellationToken } from 'electron-updater';
 import { app, ipcMain, MenuItem } from 'electron';
 import { getWindowInstance } from './index';
@@ -58,6 +58,10 @@ export function setupUpdater(): void {
     log.error('autoupdater error:', e);
     status.state = UpdateState.Error;
     emitUpdate();
+  });
+
+  ipcMain.on(CHECK_UPDATE, () => {
+    checkForUpdates();
   });
 
   ipcMain.on(DOWNLOAD_UPDATE, async () => {
