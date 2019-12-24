@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { UpdateStatus, UpdateState, STATUS_UPDATE, DOWNLOAD_UPDATE, INSTALL_UPDATE } from '@/ipc-models';
+import { UpdateStatus, UpdateState, STATUS_UPDATE, DOWNLOAD_UPDATE, INSTALL_UPDATE, CHECK_UPDATE } from '@/ipc-models';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import Dialog from '@/components/Dialog.vue';
 import Btn from '@/components/Btn.vue';
@@ -98,6 +98,10 @@ export default class extends Vue {
         });
         break;
       case UpdateState.Error:
+        btns.push({
+          label: 'Try Again',
+          action: () => ipcRenderer.send(CHECK_UPDATE),
+        });
         break;
       default:
         const _exhaustiveCheck: never = state;
