@@ -10,7 +10,7 @@
         <div>Current version is {{ status.curVersion }}</div>
       </div>
       <div v-else-if="status.state === UpdateState.NoUpdateAvailable">
-        <div>No new updates!</div>
+        <div>Your wallet is up to date!</div>
       </div>
       <div v-else-if="status.state === UpdateState.Downloading">
         <div>Downloading the new update...</div>
