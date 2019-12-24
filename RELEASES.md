@@ -6,6 +6,9 @@
   disconnecting.
 - Ensure the interval for updating the fee information is cleared after funds
   have been transferred, saving bandwidth.
+- Auto updater support has been added.
+- A custom defined menu is now implemented, this allows for manually checking
+  for updates.
 
 # Version 0.2.1 (2019-12-03)
 
