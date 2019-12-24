@@ -1,7 +1,7 @@
 <template>
   <div class="start">
     <div class="logo">
-      <img src="../assets/logo.png" width="100" />
+      <img src="../../assets/logo.png" width="100" />
     </div>
     <div class="header">{{ headerMsg }}</div>
     <slot />
@@ -21,7 +21,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 
-export interface Button {
+export interface StartBtn {
   icon: string;
   link?: string;
   go?: number;
@@ -29,16 +29,16 @@ export interface Button {
   disabled: boolean;
 }
 
-export interface ButtonClickEvent {
+export interface StartBtnClickEvent {
   canceled: boolean;
-  target: Button;
+  target: StartBtn;
 }
 
 @Component
-export default class StartArea extends Vue {
+export default class extends Vue {
   @Prop({
     default: () => [],
-    validator: (btns: Button[]) => {
+    validator: (btns: StartBtn[]) => {
       for (const btn of btns) {
         if (!(btn.icon && btn.text && typeof btn.disabled === 'boolean')) {
           return false;
@@ -50,14 +50,14 @@ export default class StartArea extends Vue {
       return true;
     },
   })
-  private bottomButtons!: Button[];
+  private bottomButtons!: StartBtn[];
 
   @Prop({ required: true })
   private headerMsg!: string;
 
-  private onBottomBtnClick(btn: Button): void {
+  private onBottomBtnClick(btn: StartBtn): void {
     if (btn.disabled) return;
-    const evt: ButtonClickEvent = { canceled: false, target: btn };
+    const evt: StartBtnClickEvent = { canceled: false, target: btn };
     this.$emit('bottom-button-click', evt);
     if (!evt.canceled) {
       if (btn.link !== undefined) {
@@ -83,7 +83,7 @@ $margin: 13%;
   margin-right: $margin;
 
   &::before {
-    background-image: url('../assets/login-bg.jpg');
+    background-image: url('../../assets/login-bg.jpg');
     background-size: cover;
     content: '';
     width: 100%;

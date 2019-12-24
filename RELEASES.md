@@ -1,5 +1,15 @@
 ## Releases
 
+# Unreleased
+
+- Force retry syncing if there is an error that isn't caused by the client
+  disconnecting.
+- Ensure the interval for updating the fee information is cleared after funds
+  have been transferred, saving bandwidth.
+- Auto updater support has been added.
+- A custom defined menu is now implemented, this allows for manually checking
+  for updates.
+
 # Version 0.2.1 (2019-12-03)
 
 This release improves the synchronization mechanism reliability and performance

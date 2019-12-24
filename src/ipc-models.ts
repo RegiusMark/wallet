@@ -4,6 +4,36 @@ import { TxRow, TxRawRow } from './background/db';
 export const APP_ACTION_REQ = 'APP_ACTION_REQ';
 export const APP_ACTION_RES = 'APP_ACTION_RES';
 
+export const DOWNLOAD_UPDATE = 'ACTION_DOWNLOAD_UPDATE';
+export const INSTALL_UPDATE = 'ACTION_INSTALL_UPDATE';
+export const STATUS_UPDATE = 'STATUS_UPDATE';
+
+/*** Update models ***/
+
+export enum UpdateState {
+  // No check has been performed
+  Clean,
+  // Checking for an update
+  Checking,
+  // Update is available
+  UpdateAvailable,
+  // Already up to date
+  NoUpdateAvailable,
+  // Downloading an update
+  Downloading,
+  // Downloaded update is ready to be installed
+  ReadyForInstall,
+  // Error during checking/downloading for updates
+  Error,
+}
+
+export interface UpdateStatus {
+  state: UpdateState;
+  curVersion: string;
+  newVersion: string | null;
+  manualTrigger?: boolean;
+}
+
 /*** RPC models ***/
 
 export interface AppActionReq {

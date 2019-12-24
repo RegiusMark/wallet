@@ -66,7 +66,7 @@ export class WalletDb {
     dbInstance = new WalletDb(dbWrapper, key);
     await runMigrations(dbInstance);
 
-    // eslint-disable-next-line require-atomic-updates
+    /* eslint-disable-next-line require-atomic-updates */
     state = DbState.Open;
   }
 

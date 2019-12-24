@@ -1,11 +1,14 @@
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
-import { app, protocol, BrowserWindow, dialog } from 'electron';
-import sodium from 'libsodium-wrappers';
+import { app, protocol, BrowserWindow, dialog, Menu } from 'electron';
+import { checkForUpdatesMenuItem, setupUpdater, checkForUpdates } from './updater';
 import { Settings, isSettingsLoaded } from './settings';
+import sodium from 'libsodium-wrappers';
 import { Logger } from '../log';
 import setupIpc from './ipc';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const isMac = process.platform === 'darwin';
+
 const log = new Logger('main');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -15,6 +18,54 @@ let preventWindowCloseQuit = false;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
+
+const menu = Menu.buildFromTemplate([
+  ...(isMac
+    ? [
+        {
+          role: 'appMenu',
+          submenu: [
+            { role: 'about' },
+            checkForUpdatesMenuItem,
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideothers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' },
+          ],
+        },
+      ]
+    : []),
+  {
+    role: 'fileMenu',
+    submenu: [...(isMac ? [{ role: 'close' }, checkForUpdatesMenuItem] : [{ role: 'quit' }])],
+  },
+  {
+    role: 'editMenu',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      ...(isMac
+        ? [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+              label: 'Speech',
+              submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
+            },
+          ]
+        : [{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }]),
+    ],
+  },
+] as any);
+Menu.setApplicationMenu(menu);
 
 async function loadAppURL(loc: string): Promise<void> {
   let url: string;
@@ -88,12 +139,15 @@ export function createDashboardWindow(): void {
       nodeIntegration: true,
     },
     show: false,
-    // Same color as the components/DashArea.vue background color
+    // Same color as the components/win-area/Dashboard.vue background color
     backgroundColor: '#1C0C2F',
   });
 
   loadAppURL('/wallet/dashboard');
   installWindowHooks();
+
+  checkForUpdatesMenuItem.visible = true;
+  checkForUpdates();
 }
 
 export function getWindowInstance(): BrowserWindow | null {
@@ -101,7 +155,7 @@ export function getWindowInstance(): BrowserWindow | null {
 }
 
 app.on('window-all-closed', () => {
-  if (!(preventWindowCloseQuit || process.platform === 'darwin')) {
+  if (!(preventWindowCloseQuit || isMac)) {
     app.quit();
   }
 });
@@ -148,6 +202,8 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     try {
+      setupUpdater();
+
       createProtocol('app');
       setupIpc();
       createStartWindow();

@@ -1,26 +1,25 @@
-import { testWithSpectron } from 'vue-cli-plugin-electron-builder';
-import { Application } from 'spectron';
+import { testWithSpectron, Server } from 'vue-cli-plugin-electron-builder';
 
-jest.setTimeout(50000);
-
-let app: Application;
-let stopServe: () => Promise<Application>;
+let spectron: Server;
 
 beforeAll(async () => {
-  const spectron = await testWithSpectron();
-  app = spectron.app;
-  stopServe = spectron.stopServe;
-});
+  spectron = await testWithSpectron();
+}, 2 * 60 * 1000);
 
 afterAll(async () => {
-  await stopServe();
+  if (spectron) {
+    await spectron.stopServe();
+  }
 });
 
 beforeEach(async () => {
-  await app.restart();
+  if (spectron) {
+    await spectron.app.restart();
+  }
 });
 
 test('Window Loads Properly', async () => {
+  const app = spectron.app;
   const win = app.browserWindow;
   const client = app.client;
 

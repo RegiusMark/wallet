@@ -2,6 +2,10 @@ const assert = require('assert');
 
 const IS_SPECTRON = process.env.IS_SPECTRON === '1';
 
+const FORCE_CODE_SIGNING = process.env.FORCE_CODE_SIGNING !== 'false';
+/* eslint-disable-next-line no-console */
+console.log('Code signing forced:', FORCE_CODE_SIGNING);
+
 function getEnv(env, def) {
   if (def !== undefined) {
     assert(typeof def === 'string');
@@ -31,9 +35,11 @@ module.exports = {
         productName: 'Regius Mark Wallet',
         mac: {
           category: 'public.app-category.finance',
+          forceCodeSigning: FORCE_CODE_SIGNING,
           identity: 'Regius Mark',
         },
         win: {
+          forceCodeSigning: FORCE_CODE_SIGNING,
           target: [{ target: 'nsis', arch: ['x64'] }],
         },
         linux: {

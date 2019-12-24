@@ -30,7 +30,7 @@ export enum MaskMode {
     Tooltip,
   },
 })
-export default class PasswordInput extends Vue {
+export default class extends Vue {
   // Allow referencing in the template
   private readonly MaskMode = MaskMode;
 

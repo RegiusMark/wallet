@@ -1,8 +1,9 @@
 <template>
   <div class="dash-area">
+    <Updater v-model="updaterDialogActive" />
     <div class="dash-sidebar">
       <div class="dash-logo">
-        <img src="../assets/logo.png" width="60" />
+        <img src="../../assets/logo.png" width="60" />
       </div>
       <div class="dash-sync-status">
         <div v-if="syncStatus === SyncStatus.Complete">Sync complete</div>
@@ -27,6 +28,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import Updater from '../dialogs/Updater.vue';
 import { SyncStatus } from '@/ipc-models';
 import { State } from 'vuex-class';
 
@@ -37,8 +39,12 @@ interface MenuButton {
   active: boolean;
 }
 
-@Component
-export default class DashArea extends Vue {
+@Component({
+  components: {
+    Updater,
+  },
+})
+export default class extends Vue {
   // Allow referencing in the template
   private readonly SyncStatus = SyncStatus;
 
@@ -56,6 +62,8 @@ export default class DashArea extends Vue {
       active: false,
     },
   ];
+
+  private updaterDialogActive = false;
 
   @State(state => state.wallet.syncStatus)
   private syncStatus!: SyncStatus;

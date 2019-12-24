@@ -16,7 +16,7 @@ export enum MaskMode {
 }
 
 @Component
-export default class TextInput extends Vue {
+export default class extends Vue {
   @Prop({ required: true }) icon!: string;
   @Prop() private readonly placeholder!: string;
   @Prop() private readonly value!: string;

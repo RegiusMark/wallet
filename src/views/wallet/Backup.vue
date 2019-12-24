@@ -1,5 +1,5 @@
 <template>
-  <DashArea>
+  <Dashboard>
     <div class="container">
       <div style="margin-top: 0.85em; user-select: none;">
         <img src="../../assets/coin-front.png" width="120" />
@@ -22,22 +22,22 @@
         </div>
       </div>
     </div>
-  </DashArea>
+  </Dashboard>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import DashArea from '@/components/DashArea.vue';
+import Dashboard from '@/components/win-area/Dashboard.vue';
 import Btn from '@/components/Btn.vue';
 import ipc from '@/renderer/ipc';
 
 @Component({
   components: {
-    DashArea,
+    Dashboard,
     Btn,
   },
 })
-export default class Backup extends Vue {
+export default class extends Vue {
   private revealed = false;
   private privateKey: string | null = null;
 

@@ -1,16 +1,16 @@
 <template>
-  <StartArea header-msg="Restore wallet" :bottom-buttons="bottomBtns" @bottom-button-click="buttonClick">
+  <Start header-msg="Restore wallet" :bottom-buttons="bottomBtns" @bottom-button-click="buttonClick">
     <div class="form">
       <PasswordInput v-model.trim="privateKey" placeholder="Enter private key" :mask-mode="MaskMode.None" />
       <div style="text-align: center;">
         <span>{{ helpMsg }}</span>
       </div>
     </div>
-  </StartArea>
+  </Start>
 </template>
 
 <script lang="ts">
-import StartArea, { Button, ButtonClickEvent } from '@/components/StartArea.vue';
+import Start, { StartBtn, StartBtnClickEvent } from '@/components/win-area/Start.vue';
 import PasswordInput, { MaskMode } from '@/components/PasswordInput.vue';
 import { Component, Watch, Vue } from 'vue-property-decorator';
 import { PrivateKey, KeyPair, InvalidWif } from 'regiusmark';
@@ -22,16 +22,16 @@ const log = new Logger('restore-wallet');
 
 @Component({
   components: {
-    StartArea,
+    Start,
     PasswordInput,
   },
 })
-export default class RestoreWallet2 extends Vue {
+export default class extends Vue {
   // Allow referencing in the template
   private MaskMode = MaskMode;
 
   private readonly dashboardPage = '/wallet/dashboard';
-  private bottomBtns: Button[] = [
+  private bottomBtns: StartBtn[] = [
     {
       icon: 'fa-arrow-circle-left',
       go: -1,
@@ -94,7 +94,7 @@ export default class RestoreWallet2 extends Vue {
     btn.disabled = !newReadyVal;
   }
 
-  private async buttonClick(evt: ButtonClickEvent): Promise<void> {
+  private async buttonClick(evt: StartBtnClickEvent): Promise<void> {
     if (evt.target.link !== this.dashboardPage) return;
     evt.canceled = true;
     if (!this.ready) return;
