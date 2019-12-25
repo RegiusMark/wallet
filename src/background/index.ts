@@ -1,6 +1,6 @@
 import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
-import { app, protocol, BrowserWindow, dialog, Menu } from 'electron';
 import { checkForUpdatesMenuItem, setupUpdater, checkForUpdates } from './updater';
+import { app, protocol, BrowserWindow, dialog, Menu } from 'electron';
 import { Settings, isSettingsLoaded } from './settings';
 import sodium from 'libsodium-wrappers';
 import { Logger } from '../log';
@@ -39,7 +39,31 @@ const menu = Menu.buildFromTemplate([
     : []),
   {
     role: 'fileMenu',
-    submenu: [...(isMac ? [{ role: 'close' }, checkForUpdatesMenuItem] : [{ role: 'quit' }])],
+    submenu: [
+      ...(isMac ? [{ role: 'close' }, checkForUpdatesMenuItem] : [{ role: 'quit' }]),
+      { type: 'separator' },
+      {
+        label: 'Developer',
+        submenu: [
+          {
+            label: 'Force Reload',
+            click: (): void => {
+              if (window) {
+                window.webContents.reload();
+              }
+            },
+          },
+          {
+            label: 'Open Developer Tools',
+            click: (): void => {
+              if (window) {
+                window.webContents.openDevTools();
+              }
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     role: 'editMenu',
