@@ -1,5 +1,4 @@
 import {
-  BodyType,
   ScriptHash,
   Block,
   BlockHeader,
@@ -10,6 +9,7 @@ import {
   TransferTxV0,
   OwnerTxV0,
   Asset,
+  RpcType,
 } from 'godcoin';
 import { WalletDb, KvTable, TxsTable, TxRawRow } from './db';
 import { emitSyncUpdate as ipcEmitSyncUpdate } from './ipc';
@@ -68,30 +68,29 @@ class Synchronizer extends EventEmitter {
     client.on(
       'sub_msg',
       async (res): Promise<void> => {
-        if (res.type === BodyType.GetBlock) {
-          const block = res.block as Block;
-          if (this.syncStatus !== SyncStatus.Complete) {
-            this.pendingBlocks.push(block);
-          } else {
-            log.info('Received block update:', block.block.header.height.toString());
-            try {
-              const updatedTxs = await this.applyBlock(block);
-              const update: SyncUpdateRaw = {
-                status: this.syncStatus,
-              };
-              if (updatedTxs && updatedTxs.length > 0) {
-                const totalBalance = await this.updateTotalBalance();
-                update.newData = {
-                  totalBalance: totalBalance.amount.toString(),
-                  txs: updatedTxs,
-                };
-              }
-              this.emitSyncUpdate(update);
-              await this.updateSyncHeight();
-            } catch (e) {
-              log.error('Failed to handle incoming block\n', block, e);
-            }
+        if (res.type !== RpcType.GetBlock) return;
+        const block = res.block as Block;
+        if (this.syncStatus !== SyncStatus.Complete) {
+          this.pendingBlocks.push(block);
+          return;
+        }
+        log.info('Received block update:', block.block.header.height.toString());
+        try {
+          const updatedTxs = await this.applyBlock(block);
+          const update: SyncUpdateRaw = {
+            status: this.syncStatus,
+          };
+          if (updatedTxs && updatedTxs.length > 0) {
+            const totalBalance = await this.updateTotalBalance();
+            update.newData = {
+              totalBalance: totalBalance.amount.toString(),
+              txs: updatedTxs,
+            };
           }
+          this.emitSyncUpdate(update);
+          await this.updateSyncHeight();
+        } catch (e) {
+          log.error('Failed to handle incoming block\n', block, e);
         }
       },
     );
@@ -121,12 +120,12 @@ class Synchronizer extends EventEmitter {
       try {
         // Subscribe to new blocks
         await client.sendReq({
-          type: BodyType.Subscribe,
+          type: RpcType.Subscribe,
         });
 
         // Configure the filter.
         await client.sendReq({
-          type: BodyType.SetBlockFilter,
+          type: RpcType.SetBlockFilter,
           addrs: this.watchAddrs,
         });
       } catch (e) {
@@ -153,9 +152,9 @@ class Synchronizer extends EventEmitter {
 
       // Get the current height that we will sync up to. Any missed blocks will be in the pending queue.
       const chainPropsBody = await client.sendReq({
-        type: BodyType.GetProperties,
+        type: RpcType.GetProperties,
       });
-      if (chainPropsBody.type !== BodyType.GetProperties) throw new Error('expected GetProperties response');
+      if (chainPropsBody.type !== RpcType.GetProperties) throw new Error('expected GetProperties response');
       const chainHeight = chainPropsBody.properties.height;
 
       // Start retrieving blocks and apply them.
@@ -287,7 +286,7 @@ class Synchronizer extends EventEmitter {
     for (const addr of this.watchAddrs) {
       proms.push(
         client.sendReq({
-          type: BodyType.GetAddressInfo,
+          type: RpcType.GetAddressInfo,
           addr,
         }),
       );
@@ -295,7 +294,7 @@ class Synchronizer extends EventEmitter {
     const responses = await Promise.all(proms);
     let totalBal = new Asset(Big(0));
     for (const res of responses) {
-      if (res.type !== BodyType.GetAddressInfo) throw new Error('unexpected RPC response: ' + res.type);
+      if (res.type !== RpcType.GetAddressInfo) throw new Error('unexpected RPC response: ' + res.type);
       totalBal = totalBal.add(res.info.balance);
     }
 
