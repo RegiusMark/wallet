@@ -1,6 +1,6 @@
 ## Releases
 
-# Unreleased
+# Version 0.3.0 (2019-12-31)
 
 - Force retry syncing if there is an error that isn't caused by the client
   disconnecting.
