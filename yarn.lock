@@ -9360,9 +9360,9 @@ registry-url@^5.0.0:
   dependencies:
     rc "^1.2.8"
 
-"regiusmark@https://github.com/RegiusMark/regiusmark-js.git#c5a8926":
+"regiusmark@https://github.com/RegiusMark/regiusmark-js.git#7ce18ef":
   version "0.2.0"
-  resolved "https://github.com/RegiusMark/regiusmark-js.git#c5a892669bd35b3d30b4558f8874d4acf9a5cccc"
+  resolved "https://github.com/RegiusMark/regiusmark-js.git#7ce18efd79c38df881a5eb22fc70981d1b71ae00"
   dependencies:
     big.js "^5.2.2"
     bs58 "^4.0.1"

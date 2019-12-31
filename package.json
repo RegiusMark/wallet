@@ -21,7 +21,7 @@
   "dependencies": {
     "core-js": "^3.5.0",
     "electron-updater": "^4.2.0",
-    "regiusmark": "https://github.com/RegiusMark/regiusmark-js.git#c5a8926",
+    "regiusmark": "https://github.com/RegiusMark/regiusmark-js.git#7ce18ef",
     "libsodium-wrappers": "^0.7.6",
     "long": "^4.0.0",
     "sqlite3": "^4.1.1",

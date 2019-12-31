@@ -1,16 +1,4 @@
-import {
-  RequestBody,
-  Request,
-  ByteBuffer,
-  Response,
-  ResponseBody,
-  BodyType,
-  ErrorRes,
-  NetworkError,
-  BlockHeader,
-  SigPair,
-  Block,
-} from 'regiusmark';
+import { Request, ByteBuffer, Response, BodyType, BlockHeader, SigPair, Block, Msg, RpcType } from 'regiusmark';
 import { EventEmitter } from 'events';
 import { Logger } from '../log';
 import { Lock } from '../lock';
@@ -28,23 +16,13 @@ export class DisconnectedError extends Error {
   }
 }
 
-export class RpcError extends Error {
-  public readonly err: NetworkError;
-
-  public constructor(err: ErrorRes) {
-    super();
-    this.err = err.error;
-    Object.setPrototypeOf(this, RpcError.prototype);
-  }
-}
-
 export interface PersistentClient {
-  sendReq(body: RequestBody): Promise<ResponseBody>;
+  sendReq(body: Request): Promise<Response>;
   getBlockRange(minHeight: Long, maxHeight: Long, cb: GetBlockRangeCallback): void;
   isOpen(): boolean;
   on(event: 'open', listener: () => void): this;
   on(event: 'close', listener: (code: string, reason: string | undefined, retryTime: number) => void): this;
-  on(event: 'sub_msg', listener: (res: ResponseBody) => void): this;
+  on(event: 'sub_msg', listener: (res: Response) => void): this;
 }
 
 export type GetBlockRangeCallback = (
@@ -52,7 +30,7 @@ export type GetBlockRangeCallback = (
   filteredBlock: [BlockHeader, SigPair] | Block | undefined,
 ) => void | Promise<void>;
 
-type ResolveReqFn = (res: ResponseBody) => void;
+type ResolveReqFn = (res: Response) => void;
 type RejectReqFn = (err: Error) => void;
 
 class ClientImpl extends EventEmitter {
@@ -75,14 +53,17 @@ class ClientImpl extends EventEmitter {
     this.tryOpen();
   }
 
-  public sendReq(body: RequestBody): Promise<ResponseBody> {
-    if (body.type === BodyType.GetBlockRange) {
+  public sendReq(body: Request): Promise<Response> {
+    if (body.type === RpcType.GetBlockRange) {
       throw new Error('cannot use GetBlockRange with sendReq');
     }
     const id = this.nextId();
-    const req = new Request(id, body);
+    const msg = new Msg(id, {
+      type: BodyType.Request,
+      req: body,
+    });
     const buf = ByteBuffer.alloc(4096);
-    req.serialize(buf);
+    msg.serialize(buf);
     return new Promise((resolve, reject): void => {
       if (this.socket) {
         this.inflightReqs[id] = [resolve, reject];
@@ -100,10 +81,13 @@ class ClientImpl extends EventEmitter {
 
   public getBlockRange(minHeight: Long, maxHeight: Long, cb: GetBlockRangeCallback): void {
     const id = this.nextId();
-    const req = new Request(id, {
-      type: BodyType.GetBlockRange,
-      minHeight,
-      maxHeight,
+    const req = new Msg(id, {
+      type: BodyType.Request,
+      req: {
+        type: RpcType.GetBlockRange,
+        minHeight,
+        maxHeight,
+      },
     });
     const buf = ByteBuffer.alloc(32);
     req.serialize(buf);
@@ -201,10 +185,6 @@ class ClientImpl extends EventEmitter {
       }
     });
 
-    this.socket.on('ping', _data => {
-      this.lastMsgReceived = Date.now();
-    });
-
     this.socket.on('message', async data => {
       if (!Buffer.isBuffer(data)) {
         log.error('Unexpected ws message:', data);
@@ -218,8 +198,8 @@ class ClientImpl extends EventEmitter {
         await this.socketMsgHandleLock.lock();
 
         const buf = ByteBuffer.from(data);
-        const res = Response.deserialize(buf);
-        await this.handleMsg(res);
+        const msg = Msg.deserialize(buf);
+        await this.handleMsg(msg);
       } catch (e) {
         log.error('Failed to deserialize response:', e);
       } finally {
@@ -228,50 +208,92 @@ class ClientImpl extends EventEmitter {
     });
   }
 
-  private async handleMsg(res: Response): Promise<void> {
-    const id = res.id;
-    if (id === MAX_U32) {
-      if (res.body.type === BodyType.Error) {
-        log.error('Received IO error:', res);
-        return;
-      }
-
-      this.emit('sub_msg', res.body);
-      return;
-    }
-
-    {
-      const streamFn = this.blockRangeStreams[id];
-      if (streamFn !== undefined) {
-        if (res.body.type === BodyType.GetBlock) {
-          // Stream update
-          await streamFn(undefined, res.body.block);
-        } else if (res.body.type === BodyType.GetBlockRange) {
-          // Stream finalized
-          delete this.blockRangeStreams[id];
-          await streamFn(undefined, undefined);
-        } else if (res.body.type === BodyType.Error) {
-          // Stream error
-          delete this.blockRangeStreams[id];
-          await streamFn(res.body.error, undefined);
+  private async handleMsg(msg: Msg): Promise<void> {
+    const id = msg.id;
+    switch (msg.body.type) {
+      case BodyType.Error: {
+        if (id === MAX_U32) {
+          log.error('Received IO error:', msg);
+          return;
         }
+
+        const streamFn = this.blockRangeStreams[id];
+        if (streamFn !== undefined) {
+          delete this.blockRangeStreams[id];
+          await streamFn(msg.body.error, undefined);
+          return;
+        }
+
+        const fns = this.inflightReqs[id];
+        if (!fns) {
+          log.error('Unrecognized response id:', msg);
+          return;
+        }
+
+        const reject = fns[1];
+        delete this.inflightReqs[id];
+        reject(msg.body.error);
+
         return;
       }
-    }
+      case BodyType.Request:
+        log.error('Unexpected request from server:', msg);
+        return;
+      case BodyType.Response: {
+        if (id === MAX_U32) {
+          const body = msg.body;
+          if (body.type === BodyType.Response && body.res.type === RpcType.GetBlock) {
+            this.emit('sub_msg', body.res);
+            return;
+          }
+        }
 
-    const fns = this.inflightReqs[id];
-    if (!fns) {
-      log.error('Unrecognized response id:', res);
-      return;
-    }
-    const [resolve, reject] = fns;
-    delete this.inflightReqs[id];
+        {
+          const streamFn = this.blockRangeStreams[id];
+          if (streamFn !== undefined) {
+            const res = msg.body.res;
+            if (res.type === RpcType.GetBlock) {
+              // Stream update
+              await streamFn(undefined, res.block);
+            } else if (res.type === RpcType.GetBlockRange) {
+              // Stream finalized
+              delete this.blockRangeStreams[id];
+              await streamFn(undefined, undefined);
+            }
+            return;
+          }
+        }
 
-    if (res.body.type === BodyType.Error) {
-      reject(res.body.error);
-      return;
+        const fns = this.inflightReqs[id];
+        if (!fns) {
+          log.error('Unrecognized response id:', msg);
+          return;
+        }
+        const resolve = fns[0];
+        delete this.inflightReqs[id];
+        resolve(msg.body.res);
+
+        return;
+      }
+      case BodyType.Ping: {
+        const pongMsg = new Msg(id, {
+          type: BodyType.Pong,
+          nonce: msg.body.nonce,
+        });
+        const buf = ByteBuffer.alloc(4096);
+        pongMsg.serialize(buf);
+        if (this.socket) this.socket.send(buf.sharedView());
+        return;
+      }
+      /* fall through */
+      case BodyType.Pong: {
+        // Last message receive is already updated
+        return;
+      }
+      default:
+        const _exhaustiveCheck: never = msg.body;
+        throw new Error('exhaustive check failed:' + _exhaustiveCheck);
     }
-    resolve(res.body);
   }
 }
 

@@ -1,5 +1,5 @@
 import { Settings, NoAvailableSettings, setGlobalSettings, getGlobalSettings } from './settings';
-import { KeyPair, BodyType, ScriptHash, Asset, TxVariant, TransferTxV0 } from 'regiusmark';
+import { KeyPair, ScriptHash, Asset, TxVariant, TransferTxV0, RpcType } from 'regiusmark';
 import { SecretKey, DecryptError, DecryptErrorType } from './crypto';
 import { createDashboardWindow, getWindowInstance } from './index';
 import { initSynchronizer, getSynchronizer } from './synchronizer';
@@ -110,10 +110,10 @@ export default function(): void {
           const settings = getGlobalSettings();
           try {
             const res = await client.sendReq({
-              type: BodyType.GetAddressInfo,
+              type: RpcType.GetAddressInfo,
               addr: settings.p2shAddr,
             });
-            if (res.type !== BodyType.GetAddressInfo) {
+            if (res.type !== RpcType.GetAddressInfo) {
               throw new Error('unexpected RPC response: ' + res);
             }
 
@@ -202,11 +202,11 @@ export default function(): void {
           try {
             const client = getClient();
             const res = await client.sendReq({
-              type: BodyType.Broadcast,
+              type: RpcType.Broadcast,
               tx,
             });
 
-            if (res.type !== BodyType.Broadcast) {
+            if (res.type !== RpcType.Broadcast) {
               throw new Error('unexpected RPC response: ' + res);
             }
           } catch (e) {

@@ -9,6 +9,12 @@
 - Auto updater support has been added.
 - A custom defined menu is now implemented, this allows for manually checking
   for updates.
+- Update to the latest network protocol which directly supports ping/pong.
+
+### Breaking changes
+
+- Previous wallet versions will no longer be able to properly communicate to the
+  network.
 
 # Version 0.2.1 (2019-12-03)
 
